@@ -8,13 +8,13 @@ class Memory
 public:
     Memory();
 
-    int8_t ReadByte(const Registers& InRegisterState, const EAddressingMode InAddressingMode) const;
-    int8_t ReadByte(const uint16_t InAddress) const;
+    uint8_t ReadViaAddressingMode(const Registers& InRegisterState, const EAddressingMode InAddressingMode, bool* bOutDidCrossPageBoundry = nullptr) const;
 
-    void WriteByte(const int8_t InData, const uint16_t InAddress);
+    uint8_t ReadByte(const uint16_t InAddress) const;
+    void WriteByte(const uint8_t InData, const uint16_t InAddress);
 
 private:
-    static constexpr uint16_t k_MaxMemory = 2048;
+    static constexpr uint16_t k_MaxMemory = 65535;
 
     int8_t m_MemoryBuffer[k_MaxMemory];
 };

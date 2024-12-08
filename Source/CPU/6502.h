@@ -83,6 +83,11 @@ struct Registers
      */
     std::bitset<8> Flags = 36; //36 = 00100100 in binary which sets all flags to 0 except the 'Unused' and 'Interrupt Disable' flags which are default-initialised to 1
 
+    uint8_t GetFlags() const
+    {
+        return static_cast<uint8_t>(Flags.to_ulong());
+    }
+
     void SetFlag(const ECpuFlag InFlag, const bool bInShouldSet)
     {
         Flags.set(std::size_t(InFlag), bInShouldSet);

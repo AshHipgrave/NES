@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "System/Memory.h"
 #include "Core/Core.h"
+#include "CPU/OpCodes.h"
+#include "CPU/6502.h"
+#include "Core/Utils.h"
 
 Memory::Memory()
 {
@@ -10,20 +13,146 @@ Memory::Memory()
     }
 }
 
-int8_t Memory::ReadByte(const Registers& InRegisterState, const EAddressingMode InAddressingMode) const
+uint8_t Memory::ReadViaAddressingMode(const Registers& InRegisterState, const EAddressingMode InAddressingMode, bool* bOutDidCrossPageBoundry /* = nullptr */) const
 {
-    UNUSED_PARAMETER(InRegisterState);
-    UNUSED_PARAMETER(InAddressingMode);
+    *bOutDidCrossPageBoundry = false;
+
+    switch (InAddressingMode)
+    {
+        case EAddressingMode::Absolute:
+        {
+            const uint8_t lowbyte = m_MemoryBuffer[InRegisterState.ProgramCounter + 1];
+            const uint8_t highbyte = ReadByte(InRegisterState.ProgramCounter + 2);
+
+            const uint16_t address = (highbyte << 8) | lowbyte;
+
+            return ReadByte(address);
+        }
+        case EAddressingMode::AbsoluteX:
+        {
+            const uint8_t lowbyte = ReadByte(InRegisterState.ProgramCounter + 1);
+            const uint8_t highbyte = ReadByte(InRegisterState.ProgramCounter + 2);
+
+            uint16_t address = (highbyte << 8) | lowbyte;
+            address += InRegisterState.X;
+
+            *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(InRegisterState.ProgramCounter, address);
+
+            return ReadByte(address);
+        }
+        case EAddressingMode::AbsoluteY:
+        {
+            const uint8_t lowbyte = ReadByte(InRegisterState.ProgramCounter + 1);
+            const uint8_t highbyte = ReadByte(InRegisterState.ProgramCounter + 2);
+
+            uint16_t address = (highbyte << 8) | lowbyte;
+            address += InRegisterState.Y;
+
+            *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(InRegisterState.ProgramCounter, address);
+
+            return ReadByte(address);
+        }
+        case EAddressingMode::Immediate:
+        {
+            return ReadByte(InRegisterState.ProgramCounter + 1);
+        }
+        case EAddressingMode::Indirect:
+        {
+            const uint8_t pointerLow = ReadByte(InRegisterState.ProgramCounter + 1);
+            const uint8_t pointerHigh = ReadByte(InRegisterState.ProgramCounter + 2);
+
+            const uint16_t pointer = (pointerHigh << 8) | pointerLow;
+
+            const uint8_t lowbyte = ReadByte(pointer);
+
+            const uint16_t highbyteAddress = (pointer & 0xFF) == 0xFF ? (pointer & 0xFF00) : (pointer + 1);
+            const uint8_t highbyte = ReadByte(highbyteAddress);
+
+            const uint16_t address = (highbyte << 8) | lowbyte;
+
+            return ReadByte(address);
+        }
+        case EAddressingMode::IndirectX:
+        {
+            uint8_t effectiveZP = ReadByte(InRegisterState.ProgramCounter + 1);
+            effectiveZP = (effectiveZP + InRegisterState.X) & 0xFF;
+
+            const uint8_t lowbyte = ReadByte(effectiveZP);
+            const uint8_t highbyte = ReadByte((effectiveZP + 1) & 0xFF);
+
+            const uint8_t address = (highbyte << 8) | lowbyte;
+
+            return ReadByte(address);
+        }
+        case EAddressingMode::IndirectY:
+        {
+            const uint8_t zpAddress = ReadByte(InRegisterState.ProgramCounter + 1);
+
+            const uint8_t lowbyte = ReadByte(zpAddress);
+            const uint8_t highbyte = ReadByte((zpAddress + 1) & 0xFF);
+
+            const uint16_t baseAddress = (highbyte << 8) | lowbyte;
+            const uint16_t address = baseAddress + InRegisterState.Y;
+
+            *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(InRegisterState.ProgramCounter, address);
+
+            return ReadByte(address);
+        }
+        case EAddressingMode::Relative:
+        {
+            int8_t offset = ReadByte(InRegisterState.ProgramCounter + 1);
+
+            const uint16_t finalAddress = InRegisterState.ProgramCounter + offset;
+
+            *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(InRegisterState.ProgramCounter, finalAddress);
+
+            return offset;
+        }
+        case EAddressingMode::ZeroPage:
+        {
+            const uint8_t address = ReadByte(InRegisterState.ProgramCounter + 1);
+            return ReadByte(address);
+        }
+        case EAddressingMode::ZeroPageX:
+        {
+            const uint8_t baseAddress = ReadByte(InRegisterState.ProgramCounter + 1);
+            const uint16_t address = (baseAddress + InRegisterState.X) & 0xFF;
+
+            return ReadByte(address);
+        }
+        case EAddressingMode::ZeroPageY:
+        {
+            const uint8_t baseAddress = ReadByte(InRegisterState.ProgramCounter + 1);
+            const uint16_t address = (baseAddress + InRegisterState.Y) & 0xFF;
+
+            return ReadByte(address);
+        }
+
+    }
+    
+    std::cout << "Error: Unimplemented address mode" << std::endl;
+
+    __debugbreak();
+    return 0;
+}
+
+uint8_t Memory::ReadByte(const uint16_t InAddress) const
+{
+    if (InAddress >= 0x00 && InAddress <= 0xFFFF)
+    {
+        return m_MemoryBuffer[InAddress];
+    }
+
+    std::cout << "Error: Segmentation fault! Attempting to read outside of memory bounds." << std::endl;
+    __debugbreak();
 
     return 0;
 }
 
-int8_t Memory::ReadByte(const uint16_t InAddress) const
+void Memory::WriteByte(const uint8_t InData, const uint16_t InAddress)
 {
-    return m_MemoryBuffer[InAddress];
-}
-
-void Memory::WriteByte(const int8_t InData, const uint16_t InAddress)
-{
-    m_MemoryBuffer[InAddress] = InData;
+    if (InAddress >= 0x00 && InAddress <= 0xFFFF)
+    {
+        m_MemoryBuffer[InAddress] = InData;
+    }
 }

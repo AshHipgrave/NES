@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "CPU/6502.h"
-#include "CPU/OpCodes.h"
 #include "Core/Core.h"
+#include "Core/Utils.h"
+#include "CPU/OpCodes.h"
 #include "System/Memory.h"
 
 Cpu::Cpu(std::shared_ptr<Memory> InSystemMemory)
@@ -81,107 +82,227 @@ Registers Cpu::GetCpuState() const
 
 void Cpu::LDA(const OpCode& InOpCode)
 {
-    const uint8_t value = m_pMemory->ReadByte(m_Registers, InOpCode.AddressingMode);
+    bool bDidCrossPageBoundry = false;
+    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
     m_Registers.Accumulator = value;
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
 
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += (bDidCrossPageBoundry) ? 1 : 0;
 }
 
 void Cpu::LDX(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    bool bDidCrossPageBoundry = false;
+    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    m_Registers.X = value;
+
+    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.X == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.X, 7));
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += (bDidCrossPageBoundry) ? 1 : 0;
 }
 
 void Cpu::LDY(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    bool bDidCrossPageBoundry = false;
+    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    m_Registers.Y = value;
+
+    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Y == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Y, 7));
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += (bDidCrossPageBoundry) ? 1 : 0;
 }
 
 void Cpu::STA(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    const uint16_t address = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode);
+
+    m_pMemory->WriteByte(m_Registers.Accumulator, address);
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::STX(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    const uint16_t address = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode);
+
+    m_pMemory->WriteByte(m_Registers.X, address);
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::STY(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    const uint16_t address = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode);
+
+    m_pMemory->WriteByte(m_Registers.Y, address);
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::TAX(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    m_Registers.X = m_Registers.Accumulator;
+
+    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.X == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.X, 7));
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::TAY(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    m_Registers.Y = m_Registers.Accumulator;
+
+    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Y == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Y, 7));
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::TXA(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    m_Registers.Accumulator = m_Registers.X;
+
+    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::TYA(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    m_Registers.Accumulator = m_Registers.Y;
+
+    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::TSX(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    m_Registers.X = m_Registers.StackPointer;
+
+    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.X == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.X, 7));
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::TXS(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    m_Registers.StackPointer = m_Registers.X;
+
+    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.X == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.X, 7));
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::PHA(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    const uint16_t stackAddress = 0x0100 + m_Registers.StackPointer;
+
+    m_pMemory->WriteByte(m_Registers.Accumulator, stackAddress);
+
+    m_Registers.StackPointer--;
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::PHP(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    const uint16_t stackAddress = 0x0100 + m_Registers.StackPointer;
+
+    m_pMemory->WriteByte(m_Registers.GetFlags(), stackAddress);
+
+    m_Registers.StackPointer--;
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::PLA(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    const uint16_t stackAddress = 0x0100 + m_Registers.StackPointer;
+
+    m_Registers.Accumulator = m_pMemory->ReadByte(stackAddress);
+
+    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
+
+    m_Registers.StackPointer++;
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::PLP(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    const uint16_t stackAddress = 0x0100 + m_Registers.StackPointer;
+
+    m_Registers.Flags = m_pMemory->ReadByte(stackAddress);
+
+    m_Registers.StackPointer++;
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::AND(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    bool bDidCrossPageBoundry = false;
+    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    m_Registers.Accumulator &= value;
+
+    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += (bDidCrossPageBoundry) ? 1 : 0;
 }
 
 void Cpu::EOR(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    bool bDidCrossPageBoundry = false;
+    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    m_Registers.Accumulator ^= value;
+
+    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += (bDidCrossPageBoundry) ? 1 : 0;
 }
 
 void Cpu::ORA(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    bool bDidCrossPageBoundry = false;
+    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    m_Registers.Accumulator |= value;
+
+    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += (bDidCrossPageBoundry) ? 1 : 0;
 }
 
 void Cpu::BIT(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode);
+
+    m_Registers.SetFlag(ECpuFlag::Zero, (m_Registers.Accumulator & value) == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, value & 0x80);
+    m_Registers.SetFlag(ECpuFlag::Overflow, value & 0x60);
+
+    m_Registers.ProgramCounter += InOpCode.CycleCount;
 }
 
 void Cpu::ADC(const OpCode& InOpCode)

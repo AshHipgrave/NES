@@ -101,6 +101,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp" />
+    <ClCompile Include="Core\Utils.cpp" />
     <ClCompile Include="CPU\6502.cpp" />
     <ClCompile Include="CPU\OpCodes.cpp" />
     <ClCompile Include="Emulator.cpp" />
@@ -149,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Core.h" />
+    <ClInclude Include="Core\Utils.h" />
     <ClInclude Include="CPU\6502.h" />
     <ClInclude Include="CPU\OpCodes.h" />
     <ClInclude Include="Emulator.h" />
