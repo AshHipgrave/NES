@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\CPU">
+      <UniqueIdentifier>{835243dc-272e-4bed-9ba9-d0958aa7258e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CPU">
+      <UniqueIdentifier>{8dbcba43-8dcc-4a9b-8fc1-776fb4274287}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{d71d28ae-b881-4798-a796-fb5dade719c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\System">
+      <UniqueIdentifier>{8e108101-43ff-4384-a39b-6182b65051ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\System">
+      <UniqueIdentifier>{95fa4a13-e6d4-4b77-a8a8-080432b15077}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{cc897893-8207-4ca8-94ed-65df1283440c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ImGui">
+      <UniqueIdentifier>{b2fae3de-caa9-44d8-a0cf-c9d35b1a6dd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ImGui">
+      <UniqueIdentifier>{c606f93d-2a8a-4a34-8e2d-f8ffb3d744b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ImGui\misc">
+      <UniqueIdentifier>{0b209fd8-c455-4e1a-9706-f927785a3edb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ImGui\misc\cpp">
+      <UniqueIdentifier>{230194c0-8737-43e4-832f-4b15023ad945}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ImGui\misc">
+      <UniqueIdentifier>{6cb14553-4441-42c1-97de-e0f68675bcdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ImGui\misc\cpp">
+      <UniqueIdentifier>{69374033-a625-4462-9f24-d71aa16eecef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ImGui\dirent">
+      <UniqueIdentifier>{965d1f9d-fc2a-4738-a802-2d3bfc389144}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ImGui\stb">
+      <UniqueIdentifier>{453d3763-e4eb-49a1-8f56-09c722ec7637}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPU\6502.cpp">
+      <Filter>Source Files\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CPU\OpCodes.cpp">
+      <Filter>Source Files\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="System\Memory.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Core.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_sdl2.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_sdlrenderer2.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_demo.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_draw.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_tables.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_widgets.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\misc\cpp\imgui_stdlib.cpp">
+      <Filter>Source Files\ImGui\misc\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\ImGuiFileDialog.cpp">
+      <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CPU\6502.h">
+      <Filter>Header Files\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Core.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPU\OpCodes.h">
+      <Filter>Header Files\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Memory.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_sdl2.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_sdlrenderer2.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imconfig.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_internal.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_rectpack.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_textedit.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imstb_truetype.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\misc\cpp\imgui_stdlib.h">
+      <Filter>Header Files\ImGui\misc\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\ImGuiFileDialog.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\ImGuiFileDialogConfig.h">
+      <Filter>Header Files\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\stb\stb_image.h">
+      <Filter>Header Files\ImGui\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\stb\stb_image_resize.h">
+      <Filter>Header Files\ImGui\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\dirent\dirent.h">
+      <Filter>Header Files\ImGui\dirent</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
