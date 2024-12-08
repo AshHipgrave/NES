@@ -90,7 +90,7 @@ void Cpu::LDA(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
     m_Registers.ProgramCounter += (bDidCrossPageBoundry) ? 1 : 0;
 }
 
@@ -104,7 +104,7 @@ void Cpu::LDX(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.X == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.X, 7));
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
     m_Registers.ProgramCounter += (bDidCrossPageBoundry) ? 1 : 0;
 }
 
@@ -118,7 +118,7 @@ void Cpu::LDY(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Y == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Y, 7));
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
     m_Registers.ProgramCounter += (bDidCrossPageBoundry) ? 1 : 0;
 }
 
@@ -128,7 +128,7 @@ void Cpu::STA(const OpCode& InOpCode)
 
     m_pMemory->WriteByte(m_Registers.Accumulator, address);
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::STX(const OpCode& InOpCode)
@@ -137,7 +137,7 @@ void Cpu::STX(const OpCode& InOpCode)
 
     m_pMemory->WriteByte(m_Registers.X, address);
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::STY(const OpCode& InOpCode)
@@ -146,7 +146,7 @@ void Cpu::STY(const OpCode& InOpCode)
 
     m_pMemory->WriteByte(m_Registers.Y, address);
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::TAX(const OpCode& InOpCode)
@@ -156,7 +156,7 @@ void Cpu::TAX(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.X == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.X, 7));
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::TAY(const OpCode& InOpCode)
@@ -166,7 +166,7 @@ void Cpu::TAY(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Y == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Y, 7));
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::TXA(const OpCode& InOpCode)
@@ -176,7 +176,7 @@ void Cpu::TXA(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::TYA(const OpCode& InOpCode)
@@ -186,7 +186,7 @@ void Cpu::TYA(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::TSX(const OpCode& InOpCode)
@@ -196,7 +196,7 @@ void Cpu::TSX(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.X == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.X, 7));
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::TXS(const OpCode& InOpCode)
@@ -206,7 +206,7 @@ void Cpu::TXS(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.X == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.X, 7));
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::PHA(const OpCode& InOpCode)
@@ -216,7 +216,7 @@ void Cpu::PHA(const OpCode& InOpCode)
     m_pMemory->WriteByte(m_Registers.Accumulator, stackAddress);
 
     m_Registers.StackPointer--;
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::PHP(const OpCode& InOpCode)
@@ -226,7 +226,7 @@ void Cpu::PHP(const OpCode& InOpCode)
     m_pMemory->WriteByte(m_Registers.GetFlags(), stackAddress);
 
     m_Registers.StackPointer--;
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::PLA(const OpCode& InOpCode)
@@ -239,7 +239,7 @@ void Cpu::PLA(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
 
     m_Registers.StackPointer++;
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::PLP(const OpCode& InOpCode)
@@ -249,7 +249,7 @@ void Cpu::PLP(const OpCode& InOpCode)
     m_Registers.Flags = m_pMemory->ReadByte(stackAddress);
 
     m_Registers.StackPointer++;
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::AND(const OpCode& InOpCode)
@@ -262,7 +262,7 @@ void Cpu::AND(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
     m_Registers.ProgramCounter += (bDidCrossPageBoundry) ? 1 : 0;
 }
 
@@ -276,7 +276,7 @@ void Cpu::EOR(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
     m_Registers.ProgramCounter += (bDidCrossPageBoundry) ? 1 : 0;
 }
 
@@ -290,7 +290,7 @@ void Cpu::ORA(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
     m_Registers.ProgramCounter += (bDidCrossPageBoundry) ? 1 : 0;
 }
 
@@ -302,7 +302,7 @@ void Cpu::BIT(const OpCode& InOpCode)
     m_Registers.SetFlag(ECpuFlag::Negative, value & 0x80);
     m_Registers.SetFlag(ECpuFlag::Overflow, value & 0x60);
 
-    m_Registers.ProgramCounter += InOpCode.CycleCount;
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::ADC(const OpCode& InOpCode)
@@ -477,7 +477,7 @@ void Cpu::BRK(const OpCode& InOpCode)
 
 void Cpu::NOP(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    m_Registers.ProgramCounter += InOpCode.Size;
 }
 
 void Cpu::RTI(const OpCode& InOpCode)
