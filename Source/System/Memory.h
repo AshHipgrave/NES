@@ -8,6 +8,7 @@ class Memory
 public:
     Memory();
 
+    uint16_t GetAddress(const Registers& InRegisterState, const EAddressingMode InAddressingMode, bool* bOutDidCrossPageBoundry = nullptr) const;
     uint8_t ReadViaAddressingMode(const Registers& InRegisterState, const EAddressingMode InAddressingMode, bool* bOutDidCrossPageBoundry = nullptr) const;
 
     uint8_t ReadByte(const uint16_t InAddress) const;

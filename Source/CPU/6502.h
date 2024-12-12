@@ -114,73 +114,76 @@ public:
     Registers GetCpuState() const;
 
 private:
-    void LDA(const OpCode& InOpCode);
-    void LDX(const OpCode& InOpCode);
-    void LDY(const OpCode& InOpCode);
+    void PushStack(const uint8_t InValue);
+    uint8_t PopStack();
 
-    void STA(const OpCode& InOpCode);
-    void STX(const OpCode& InOpCode);
-    void STY(const OpCode& InOpCode);
+    uint8_t LDA(const OpCode& InOpCode);
+    uint8_t LDX(const OpCode& InOpCode);
+    uint8_t LDY(const OpCode& InOpCode);
 
-    void TAX(const OpCode& InOpCode);
-    void TAY(const OpCode& InOpCode);
-    void TXA(const OpCode& InOpCode);
-    void TYA(const OpCode& InOpCode);
+    uint8_t STA(const OpCode& InOpCode);
+    uint8_t STX(const OpCode& InOpCode);
+    uint8_t STY(const OpCode& InOpCode);
 
-    void TSX(const OpCode& InOpCode);
-    void TXS(const OpCode& InOpCode);
-    void PHA(const OpCode& InOpCode);
-    void PHP(const OpCode& InOpCode);
-    void PLA(const OpCode& InOpCode);
-    void PLP(const OpCode& InOpCode);
+    uint8_t TAX(const OpCode& InOpCode);
+    uint8_t TAY(const OpCode& InOpCode);
+    uint8_t TXA(const OpCode& InOpCode);
+    uint8_t TYA(const OpCode& InOpCode);
 
-    void AND(const OpCode& InOpCode);
-    void EOR(const OpCode& InOpCode);
-    void ORA(const OpCode& InOpCode);
-    void BIT(const OpCode& InOpCode);
+    uint8_t TSX(const OpCode& InOpCode);
+    uint8_t TXS(const OpCode& InOpCode);
+    uint8_t PHA(const OpCode& InOpCode);
+    uint8_t PHP(const OpCode& InOpCode);
+    uint8_t PLA(const OpCode& InOpCode);
+    uint8_t PLP(const OpCode& InOpCode);
 
-    void ADC(const OpCode& InOpCode);
-    void SBC(const OpCode& InOpCode);
-    void CMP(const OpCode& InOpCode);
-    void CPX(const OpCode& InOpCode);
-    void CPY(const OpCode& InOpCode);
+    uint8_t AND(const OpCode& InOpCode);
+    uint8_t EOR(const OpCode& InOpCode);
+    uint8_t ORA(const OpCode& InOpCode);
+    uint8_t BIT(const OpCode& InOpCode);
 
-    void INC(const OpCode& InOpCode);
-    void INX(const OpCode& InOpCode);
-    void INY(const OpCode& InOpCode);
-    void DEC(const OpCode& InOpCode);
-    void DEX(const OpCode& InOpCode);
-    void DEY(const OpCode& InOpCode);
+    uint8_t ADC(const OpCode& InOpCode);
+    uint8_t SBC(const OpCode& InOpCode);
+    uint8_t CMP(const OpCode& InOpCode);
+    uint8_t CPX(const OpCode& InOpCode);
+    uint8_t CPY(const OpCode& InOpCode);
 
-    void ASL(const OpCode& InOpCode);
-    void LSR(const OpCode& InOpCode);
-    void ROL(const OpCode& InOpCode);
-    void ROR(const OpCode& InOpCode);
+    uint8_t INC(const OpCode& InOpCode);
+    uint8_t INX(const OpCode& InOpCode);
+    uint8_t INY(const OpCode& InOpCode);
+    uint8_t DEC(const OpCode& InOpCode);
+    uint8_t DEX(const OpCode& InOpCode);
+    uint8_t DEY(const OpCode& InOpCode);
 
-    void JMP(const OpCode& InOpCode);
-    void JSR(const OpCode& InOpCode);
-    void RTS(const OpCode& InOpCode);
+    uint8_t ASL(const OpCode& InOpCode);
+    uint8_t LSR(const OpCode& InOpCode);
+    uint8_t ROL(const OpCode& InOpCode);
+    uint8_t ROR(const OpCode& InOpCode);
 
-    void BCC(const OpCode& InOpCode);
-    void BCS(const OpCode& InOpCode);
-    void BEQ(const OpCode& InOpCode);
-    void BMI(const OpCode& InOpCode);
-    void BNE(const OpCode& InOpCode);
-    void BPL(const OpCode& InOpCode);
-    void BVC(const OpCode& InOpCode);
-    void BVS(const OpCode& InOpCode);
+    uint8_t JMP(const OpCode& InOpCode);
+    uint8_t JSR(const OpCode& InOpCode);
+    uint8_t RTS(const OpCode& InOpCode);
 
-    void CLC(const OpCode& InOpCode);
-    void CLD(const OpCode& InOpCode);
-    void CLI(const OpCode& InOpCode);
-    void CLV(const OpCode& InOpCode);
-    void SEC(const OpCode& InOpCode);
-    void SED(const OpCode& InOpCode);
-    void SEI(const OpCode& InOpCode);
+    uint8_t BCC(const OpCode& InOpCode);
+    uint8_t BCS(const OpCode& InOpCode);
+    uint8_t BEQ(const OpCode& InOpCode);
+    uint8_t BMI(const OpCode& InOpCode);
+    uint8_t BNE(const OpCode& InOpCode);
+    uint8_t BPL(const OpCode& InOpCode);
+    uint8_t BVC(const OpCode& InOpCode);
+    uint8_t BVS(const OpCode& InOpCode);
 
-    void BRK(const OpCode& InOpCode);
-    void NOP(const OpCode& InOpCode);
-    void RTI(const OpCode& InOpCode);
+    uint8_t CLC(const OpCode& InOpCode);
+    uint8_t CLD(const OpCode& InOpCode);
+    uint8_t CLI(const OpCode& InOpCode);
+    uint8_t CLV(const OpCode& InOpCode);
+    uint8_t SEC(const OpCode& InOpCode);
+    uint8_t SED(const OpCode& InOpCode);
+    uint8_t SEI(const OpCode& InOpCode);
+
+    uint8_t BRK(const OpCode& InOpCode);
+    uint8_t NOP(const OpCode& InOpCode);
+    uint8_t RTI(const OpCode& InOpCode);
 
 private:
     Registers m_Registers;

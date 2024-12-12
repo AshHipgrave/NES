@@ -30,7 +30,7 @@ struct OpCode
 struct Instruction
 {
     OpCode Code;
-    void (Cpu::*PFN_OpCodeHandlerFunction)(const OpCode&) = nullptr;
+    uint8_t (Cpu::*PFN_OpCodeHandlerFunction)(const OpCode&) = nullptr;
 };
 
 /// 
