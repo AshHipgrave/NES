@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Emulator.h"
 #include "CPU/6502.h"
+#include "System/Bus.h"
 #include "System/Memory.h"
 #include "ImGui/imgui_impl_sdl2.h"
 #include "ImGui/imgui_impl_sdlrenderer2.h"
@@ -77,7 +78,9 @@ void Emulator::Stop()
 bool Emulator::Init()
 {
     m_pMemory = std::make_shared<Memory>();
-    m_pCpu = std::make_unique<Cpu>(m_pMemory);
+    m_pDataBus = std::make_shared<Bus>(m_pMemory);
+
+    m_pCpu = std::make_unique<Cpu>(m_pDataBus);
 
     if (InitSDL())
     {

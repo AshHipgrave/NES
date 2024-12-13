@@ -11,7 +11,7 @@ uint8_t Utils::GetLowByte(const uint16_t InValue)
     return InValue & 0xFF;
 }
 
-uint16_t Utils::Combine(const uint8_t InLowByte, const uint8_t InHighByte)
+uint16_t Utils::MakeDword(const uint8_t InLowByte, const uint8_t InHighByte)
 {
     return (static_cast<uint16_t>(InHighByte) << 8) | InLowByte;
 }

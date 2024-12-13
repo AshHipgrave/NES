@@ -3,12 +3,11 @@
 #include "Core/Core.h"
 #include "Core/Utils.h"
 #include "CPU/OpCodes.h"
-#include "System/Memory.h"
+#include "System/Bus.h"
 
-Cpu::Cpu(std::shared_ptr<Memory> InSystemMemory)
+Cpu::Cpu(std::shared_ptr<Bus> InDataBus)
+    : m_pDataBus(InDataBus)
 {
-    m_pMemory = InSystemMemory;
-
     m_Registers = Registers();
 
     m_Registers.X = 0;
@@ -67,7 +66,7 @@ void Cpu::NMI()
 
 void Cpu::Tick()
 {
-    const uint8_t opcode = m_pMemory->ReadByte(m_Registers.ProgramCounter);
+    const uint8_t opcode = m_pDataBus->ReadData(m_Registers.ProgramCounter);
     const Instruction instruction = m_InstructionTable[opcode];
     
     const uint8_t cycles = (this->*instruction.PFN_OpCodeHandlerFunction)(instruction.Code);
@@ -83,13 +82,13 @@ Registers Cpu::GetCpuState() const
 
 void Cpu::PushStack(const uint8_t InValue)
 {
-    m_pMemory->WriteByte(InValue, 0x0100 + m_Registers.StackPointer);
+    m_pDataBus->WriteData(InValue, 0x0100 + m_Registers.StackPointer);
     m_Registers.StackPointer--;
 }
 
 uint8_t Cpu::PopStack()
 {
-    const uint8_t value = m_pMemory->ReadByte(0x0100 + m_Registers.StackPointer);
+    const uint8_t value = m_pDataBus->ReadData(0x0100 + m_Registers.StackPointer);
     m_Registers.StackPointer++;
 
     return value;
@@ -98,9 +97,9 @@ uint8_t Cpu::PopStack()
 uint8_t Cpu::LDA(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
-    m_Registers.Accumulator = value;
+    m_Registers.Accumulator = m_pDataBus->ReadData(address);
 
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
@@ -113,9 +112,9 @@ uint8_t Cpu::LDA(const OpCode& InOpCode)
 uint8_t Cpu::LDX(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
-    m_Registers.X = value;
+    m_Registers.X = m_pDataBus->ReadData(address);
 
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.X == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.X, 7));
@@ -128,9 +127,9 @@ uint8_t Cpu::LDX(const OpCode& InOpCode)
 uint8_t Cpu::LDY(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
-    m_Registers.Y = value;
+    m_Registers.Y = m_pDataBus->ReadData(address);
 
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Y == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Y, 7));
@@ -142,9 +141,9 @@ uint8_t Cpu::LDY(const OpCode& InOpCode)
 
 uint8_t Cpu::STA(const OpCode& InOpCode)
 {
-    const uint16_t address = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
 
-    m_pMemory->WriteByte(m_Registers.Accumulator, address);
+    m_pDataBus->WriteData(m_Registers.Accumulator, address);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -153,9 +152,9 @@ uint8_t Cpu::STA(const OpCode& InOpCode)
 
 uint8_t Cpu::STX(const OpCode& InOpCode)
 {
-    const uint16_t address = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
 
-    m_pMemory->WriteByte(m_Registers.X, address);
+    m_pDataBus->WriteData(m_Registers.X, address);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -164,9 +163,9 @@ uint8_t Cpu::STX(const OpCode& InOpCode)
 
 uint8_t Cpu::STY(const OpCode& InOpCode)
 {
-    const uint16_t address = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
 
-    m_pMemory->WriteByte(m_Registers.Y, address);
+    m_pDataBus->WriteData(m_Registers.Y, address);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -287,9 +286,9 @@ uint8_t Cpu::PLP(const OpCode& InOpCode)
 uint8_t Cpu::AND(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
-    m_Registers.Accumulator &= value;
+    m_Registers.Accumulator &= m_pDataBus->ReadData(address);
 
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
@@ -302,9 +301,9 @@ uint8_t Cpu::AND(const OpCode& InOpCode)
 uint8_t Cpu::EOR(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
-    m_Registers.Accumulator ^= value;
+    m_Registers.Accumulator ^= m_pDataBus->ReadData(address);
 
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
@@ -317,9 +316,9 @@ uint8_t Cpu::EOR(const OpCode& InOpCode)
 uint8_t Cpu::ORA(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
-    m_Registers.Accumulator |= value;
+    m_Registers.Accumulator |= m_pDataBus->ReadData(address);
 
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
@@ -331,7 +330,8 @@ uint8_t Cpu::ORA(const OpCode& InOpCode)
 
 uint8_t Cpu::BIT(const OpCode& InOpCode)
 {
-    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+    const uint8_t value = m_pDataBus->ReadData(address);
 
     m_Registers.SetFlag(ECpuFlag::Zero, (m_Registers.Accumulator & value) == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, value & 0x80);
@@ -345,7 +345,8 @@ uint8_t Cpu::BIT(const OpCode& InOpCode)
 uint8_t Cpu::ADC(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
+    const uint8_t value = m_pDataBus->ReadData(address);
 
     const uint8_t accumulator = m_Registers.Accumulator;
     const uint8_t carry = m_Registers.IsFlagSet(ECpuFlag::Carry) ? 1 : 0;
@@ -368,7 +369,9 @@ uint8_t Cpu::ADC(const OpCode& InOpCode)
 uint8_t Cpu::SBC(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    const uint8_t value = m_pDataBus->ReadData(address);
     const uint8_t invertedValue = ~value;
 
     const uint8_t accumulator = m_Registers.Accumulator;
@@ -392,7 +395,8 @@ uint8_t Cpu::SBC(const OpCode& InOpCode)
 uint8_t Cpu::CMP(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode, &bDidCrossPageBoundry);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
+    const uint8_t value = m_pDataBus->ReadData(address);
 
     const uint8_t accumulator = m_Registers.Accumulator;
 
@@ -407,7 +411,8 @@ uint8_t Cpu::CMP(const OpCode& InOpCode)
 
 uint8_t Cpu::CPX(const OpCode& InOpCode)
 {
-    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+    const uint8_t value = m_pDataBus->ReadData(address);
 
     const uint8_t X = m_Registers.X;
 
@@ -422,7 +427,8 @@ uint8_t Cpu::CPX(const OpCode& InOpCode)
 
 uint8_t Cpu::CPY(const OpCode& InOpCode)
 {
-    const uint8_t value = m_pMemory->ReadViaAddressingMode(m_Registers, InOpCode.AddressingMode);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+    const uint8_t value = m_pDataBus->ReadData(address);
 
     const uint8_t Y = m_Registers.Y;
 
@@ -437,11 +443,11 @@ uint8_t Cpu::CPY(const OpCode& InOpCode)
 
 uint8_t Cpu::INC(const OpCode& InOpCode)
 {
-    const uint16_t address = m_pMemory->GetAddress(m_Registers, InOpCode.AddressingMode);
-    const uint8_t value = m_pMemory->ReadByte(address);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+    const uint8_t value = m_pDataBus->ReadData(address);
     const uint8_t result = value + 1;
 
-    m_pMemory->WriteByte(result, address);
+    m_pDataBus->WriteData(result, address);
 
     m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
@@ -477,11 +483,11 @@ uint8_t Cpu::INY(const OpCode& InOpCode)
 
 uint8_t Cpu::DEC(const OpCode& InOpCode)
 {
-    const uint16_t address = m_pMemory->GetAddress(m_Registers, InOpCode.AddressingMode);
-    const uint8_t value = m_pMemory->ReadByte(address);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+    const uint8_t value = m_pDataBus->ReadData(address);
     const uint8_t result = value - 1;
 
-    m_pMemory->WriteByte(result, address);
+    m_pDataBus->WriteData(result, address);
 
     m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
@@ -517,15 +523,15 @@ uint8_t Cpu::DEY(const OpCode& InOpCode)
 
 uint8_t Cpu::ASL(const OpCode& InOpCode)
 {
-    const uint16_t address = m_pMemory->GetAddress(m_Registers, InOpCode.AddressingMode);
-    const uint8_t value = m_pMemory->ReadByte(address);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+    const uint8_t value = m_pDataBus->ReadData(address);
     const uint8_t result = value << 1;
 
     m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(value, 7));
     m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
 
-    m_pMemory->WriteByte(result, address);
+    m_pDataBus->WriteData(result, address);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -534,15 +540,15 @@ uint8_t Cpu::ASL(const OpCode& InOpCode)
 
 uint8_t Cpu::LSR(const OpCode& InOpCode)
 {
-    const uint16_t address = m_pMemory->GetAddress(m_Registers, InOpCode.AddressingMode);
-    const uint8_t value = m_pMemory->ReadByte(address);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+    const uint8_t value = m_pDataBus->ReadData(address);
     const uint8_t result = value >> 1;
 
     m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(value, 7));
     m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
 
-    m_pMemory->WriteByte(result, address);
+    m_pDataBus->WriteData(result, address);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -551,8 +557,8 @@ uint8_t Cpu::LSR(const OpCode& InOpCode)
 
 uint8_t Cpu::ROL(const OpCode& InOpCode)
 {
-    const uint16_t address = m_pMemory->GetAddress(m_Registers, InOpCode.AddressingMode);
-    const uint8_t value = m_pMemory->ReadByte(address);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+    const uint8_t value = m_pDataBus->ReadData(address);
     uint8_t result = value << 1;
 
     const bool bCarrySetBefore = m_Registers.IsFlagSet(ECpuFlag::Carry);
@@ -563,7 +569,7 @@ uint8_t Cpu::ROL(const OpCode& InOpCode)
         result |= 0x01;
     }
 
-    m_pMemory->WriteByte(result, address);
+    m_pDataBus->WriteData(result, address);
 
     m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
@@ -575,19 +581,19 @@ uint8_t Cpu::ROL(const OpCode& InOpCode)
 
 uint8_t Cpu::ROR(const OpCode& InOpCode)
 {
-    const uint16_t address = m_pMemory->GetAddress(m_Registers, InOpCode.AddressingMode);
-    const uint8_t value = m_pMemory->ReadByte(address);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+    const uint8_t value = m_pDataBus->ReadData(address);
     uint8_t result = value >> 1;
 
     const bool bCarrySetBefore = m_Registers.IsFlagSet(ECpuFlag::Carry);
-    m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(value, 1));
+    m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(value, 0));
 
     if (bCarrySetBefore)
     {
         result |= 0x08;
     }
 
-    m_pMemory->WriteByte(result, address);
+    m_pDataBus->WriteData(result, address);
 
     m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
     m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
@@ -599,12 +605,12 @@ uint8_t Cpu::ROR(const OpCode& InOpCode)
 
 uint8_t Cpu::JMP(const OpCode& InOpCode)
 {
-    const uint16_t address = m_pMemory->GetAddress(m_Registers, InOpCode.AddressingMode);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
 
-    const uint8_t lowbyte = m_pMemory->ReadByte(address);
-    const uint8_t highbyte = m_pMemory->ReadByte(address + 1);
+    const uint8_t lowbyte = m_pDataBus->ReadData(address);
+    const uint8_t highbyte = m_pDataBus->ReadData(address + 1);
 
-    m_Registers.ProgramCounter = Utils::Combine(lowbyte, highbyte);
+    m_Registers.ProgramCounter = Utils::MakeDword(lowbyte, highbyte);
 
     return InOpCode.CycleCount;
 }
@@ -617,12 +623,12 @@ uint8_t Cpu::JSR(const OpCode& InOpCode)
     PushStack(pcHigh);
     PushStack(pcLow);
 
-    const uint16_t address = m_pMemory->GetAddress(m_Registers, InOpCode.AddressingMode);
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
 
-    const uint8_t lowbyte = m_pMemory->ReadByte(address);
-    const uint8_t highbyte = m_pMemory->ReadByte(address + 1);
+    const uint8_t lowbyte = m_pDataBus->ReadData(address);
+    const uint8_t highbyte = m_pDataBus->ReadData(address + 1);
 
-    m_Registers.ProgramCounter = Utils::Combine(lowbyte, highbyte);
+    m_Registers.ProgramCounter = Utils::MakeDword(lowbyte, highbyte);
 
     return InOpCode.CycleCount;
 }
@@ -632,7 +638,7 @@ uint8_t Cpu::RTS(const OpCode& InOpCode)
     const uint8_t lowbyte = PopStack();
     const uint8_t highbyte = PopStack();
 
-    m_Registers.ProgramCounter = Utils::Combine(lowbyte, highbyte);
+    m_Registers.ProgramCounter = Utils::MakeDword(lowbyte, highbyte);
     m_Registers.ProgramCounter++;
 
     return InOpCode.CycleCount;
@@ -781,7 +787,138 @@ uint8_t Cpu::RTI(const OpCode& InOpCode)
     const uint8_t lowbyte = PopStack();
     const uint8_t highbyte = PopStack();
 
-    m_Registers.ProgramCounter = Utils::Combine(lowbyte, highbyte);;
+    m_Registers.ProgramCounter = Utils::MakeDword(lowbyte, highbyte);;
 
     return InOpCode.CycleCount;
+}
+
+uint16_t Cpu::GetAddressByAddressingMode(const EAddressingMode InAddressingMode, bool* bOutDidCrossPageBoundry /*= nullptr*/) const
+{
+    switch (InAddressingMode)
+    {
+        case EAddressingMode::Absolute:
+        {
+            const uint8_t lowbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
+            const uint8_t highbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 2);
+
+            const uint16_t address = Utils::MakeDword(lowbyte, highbyte);
+
+            return address;
+        }
+        case EAddressingMode::AbsoluteX:
+        {
+            const uint8_t lowbyte =m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
+            const uint8_t highbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 2);
+
+            uint16_t address = Utils::MakeDword(lowbyte, highbyte);
+            address += m_Registers.X;
+
+            if (bOutDidCrossPageBoundry != nullptr)
+            {
+                *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(m_Registers.ProgramCounter, address);
+            }
+
+            return address;
+        }
+        case EAddressingMode::AbsoluteY:
+        {
+            const uint8_t lowbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
+            const uint8_t highbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 2);
+
+            uint16_t address = Utils::MakeDword(lowbyte, highbyte);
+            address += m_Registers.Y;
+
+            if (bOutDidCrossPageBoundry != nullptr)
+            {
+                *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(m_Registers.ProgramCounter, address);
+            }
+
+            return address;
+        }
+        case EAddressingMode::Immediate:
+        {
+            return m_Registers.ProgramCounter + 1;
+        }
+        case EAddressingMode::Indirect:
+        {
+            const uint8_t pointerLow = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
+            const uint8_t pointerHigh = m_pDataBus->ReadData(m_Registers.ProgramCounter + 2);
+
+            const uint16_t pointer = Utils::MakeDword(pointerLow, pointerHigh);
+
+            const uint8_t lowbyte = m_pDataBus->ReadData(pointer);
+
+            const uint16_t highbyteAddress = (pointer & 0xFF) == 0xFF ? (pointer & 0xFF00) : (pointer + 1);
+            const uint8_t highbyte = m_pDataBus->ReadData(highbyteAddress);
+
+            const uint16_t address = Utils::MakeDword(lowbyte, highbyte);
+
+            return address;
+        }
+        case EAddressingMode::IndirectX:
+        {
+            uint8_t effectiveZP = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
+            effectiveZP = (effectiveZP + m_Registers.X) & 0xFF;
+
+            const uint8_t lowbyte = m_pDataBus->ReadData(effectiveZP);
+            const uint8_t highbyte = m_pDataBus->ReadData((effectiveZP + 1) & 0xFF);
+
+            const uint16_t address = Utils::MakeDword(lowbyte, highbyte);
+
+            return address;
+        }
+        case EAddressingMode::IndirectY:
+        {
+            const uint8_t zpAddress = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
+
+            const uint8_t lowbyte = m_pDataBus->ReadData(zpAddress);
+            const uint8_t highbyte = m_pDataBus->ReadData((zpAddress + 1) & 0xFF);
+
+            const uint16_t baseAddress = Utils::MakeDword(lowbyte, highbyte);
+            const uint16_t address = baseAddress + m_Registers.Y;
+
+            if (bOutDidCrossPageBoundry != nullptr)
+            {
+                *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(m_Registers.ProgramCounter, address);
+            }
+
+            return address;
+        }
+        case EAddressingMode::Relative:
+        {
+            int8_t offset = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
+
+            const uint16_t finalAddress = m_Registers.ProgramCounter + offset;
+
+            if (bOutDidCrossPageBoundry != nullptr)
+            {
+                *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(m_Registers.ProgramCounter, finalAddress);
+            }
+
+            return finalAddress;
+        }
+        case EAddressingMode::ZeroPage:
+        {
+            return m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
+        }
+        case EAddressingMode::ZeroPageX:
+        {
+            const uint8_t baseAddress = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
+            const uint16_t address = (baseAddress + m_Registers.X) & 0xFF;
+
+            return address;
+        }
+        case EAddressingMode::ZeroPageY:
+        {
+            const uint8_t baseAddress = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
+            const uint16_t address = (baseAddress + m_Registers.Y) & 0xFF;
+
+            return address;
+        }
+    }
+
+    std::cout << "Error: Unimplemented address mode" << std::endl;
+
+    __debugbreak();
+    return 0;
 }

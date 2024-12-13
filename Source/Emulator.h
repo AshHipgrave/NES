@@ -1,6 +1,7 @@
 #pragma once
 
 class Cpu;
+class Bus;
 class Memory;
 
 struct SDL_Window;
@@ -30,6 +31,8 @@ private:
     bool m_bIsRunning = false;
 
     std::unique_ptr<Cpu> m_pCpu;
+
+    std::shared_ptr<Bus> m_pDataBus;
     std::shared_ptr<Memory> m_pMemory;
 
     std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> m_pWindow;

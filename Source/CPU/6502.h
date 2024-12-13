@@ -2,7 +2,7 @@
 
 #include "Cpu/OpCodes.h"
 
-class Memory;
+class Bus;
 
 enum class ECpuFlag : uint8_t
 {
@@ -102,7 +102,7 @@ struct Registers
 class Cpu
 {
 public:
-    Cpu(std::shared_ptr<Memory> InSystemMemory);
+    Cpu(std::shared_ptr<Bus> InDataBus);
     ~Cpu();
 
     void Reset();
@@ -185,10 +185,12 @@ private:
     uint8_t NOP(const OpCode& InOpCode);
     uint8_t RTI(const OpCode& InOpCode);
 
+    uint16_t GetAddressByAddressingMode(const EAddressingMode InAddressingMode, bool* bOutDidCrossPageBoundry = nullptr) const;
+
 private:
     Registers m_Registers;
 
-    std::shared_ptr<Memory> m_pMemory;
+    std::shared_ptr<Bus> m_pDataBus;
 
     std::vector<Instruction> m_InstructionTable;
 };
