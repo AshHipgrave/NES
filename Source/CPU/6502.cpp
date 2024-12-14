@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "CPU/6502.h"
 #include "Core/Core.h"
+#include "Core/Types.h"
 #include "Core/Utils.h"
 #include "CPU/OpCodes.h"
 #include "System/Bus.h"
@@ -73,11 +74,6 @@ void Cpu::Tick()
 
     // TODO: Delay for how long the previous instruction took (e.g. if it took 3 cycles, delay for the equivelent of 3 cycles).
     UNUSED_PARAMETER(cycles);
-}
-
-Registers Cpu::GetCpuState() const
-{
-    return m_Registers;
 }
 
 void Cpu::PushStack(const uint8_t InValue)

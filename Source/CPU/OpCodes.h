@@ -1,37 +1,8 @@
 #pragma once
 
+#include "Core/Types.h"
+
 class Cpu;
-
-enum class EAddressingMode : uint8_t
-{
-    Implied     = 0,
-    Accumulator = 1,
-    Immediate   = 2,
-    ZeroPage    = 3,
-    ZeroPageX   = 4,
-    ZeroPageY   = 5,
-    Relative    = 6,
-    Absolute    = 7,
-    AbsoluteX   = 8,
-    AbsoluteY   = 9,
-    Indirect    = 10,
-    IndirectX   = 11,
-    IndirectY   = 12
-};
-
-struct OpCode
-{
-    uint8_t Size = 0;
-    uint8_t CycleCount = 0;
-
-    EAddressingMode AddressingMode = EAddressingMode::Implied;
-};
-
-struct Instruction
-{
-    OpCode Code;
-    uint8_t (Cpu::*PFN_OpCodeHandlerFunction)(const OpCode&) = nullptr;
-};
 
 /// 
 /// Load Accumulator

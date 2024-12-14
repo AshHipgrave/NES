@@ -1,103 +1,8 @@
 #pragma once
 
-#include "Cpu/OpCodes.h"
+#include "Core/Types.h"
 
 class Bus;
-
-enum class ECpuFlag : uint8_t
-{
-    /**
-    * Set if the last operation caused an overflow from bit 7 of the result, or an underflow from bit 0.
-    */
-    Carry = 0,
-
-    /**
-    * Set if the result of the last operation was 0.
-    */
-    Zero = 1,
-
-    /**
-    * When set the CPU will not respond to any interrupts from devices until cleared.
-    */
-    InterruptDisable = 2,
-
-    /**
-    * When set the CPU will obey the rules of 'Binary Coded Decimal (BCD)' artuhmetic during addition and subtraction.
-    */
-    DecimalMode = 3,
-
-    /**
-    * Set when the 'BRK' instruction has been executed and an interrupt has been generated to process it.
-    */
-    Break = 4,
-
-    /**
-    * This bit is always unused / ignored on the 6502.
-    */
-    Unused = 5,
-
-    /**
-    * Used during arithmetic operations if the result yeilded an invalid 2's compliment result.
-    * For example, adding two positive numbers and ending up with a negative result (e.g. 64 + 64 = -128).
-    * This is determined by looking at the carry between bits 6 and 8 and between bit 7 and the carry flag.
-    */
-    Overflow = 6,
-
-    /**
-    * Set if the result of the last operation had bit 7 set to a one.
-    */
-    Negative = 7,
-};
-
-struct Registers
-{
-    /**
-     * 16-bit register which points to the next instruction to be executed.
-     */
-    uint16_t ProgramCounter = 0;
-
-    /**
-     * 8-bit register that holds the low 8-bits of the next free location on the stack.
-     */
-    uint8_t StackPointer = 0;
-
-    /**
-     * 8-bit register used for all arithmetic and logical operations (with the exception of increments and decrements).
-     */
-    uint8_t Accumulator = 0;
-
-    /**
-     * 8-bit index register most commonly used to hold counters or offsets for accessing memory.
-     * Also has a special function where it can get a copy of the stack pointer or change its value.
-     */
-    uint8_t X = 0;
-
-    /**
-     * Similar to the X register in that it is available for holding counter or offsets memory access and supports the same set of memory load, save and compare operations as wells as increments and decrements.
-     * Unlike X however it has no special functions.
-     */
-    uint8_t Y = 0;
-
-    /**
-     * Represents a set of CPU status flags that are set or cleared as instructions execute to record the result of the operation.
-     */
-    std::bitset<8> Flags = 36; //36 = 00100100 in binary which sets all flags to 0 except the 'Unused' and 'Interrupt Disable' flags which are default-initialised to 1
-
-    uint8_t GetFlags() const
-    {
-        return static_cast<uint8_t>(Flags.to_ulong());
-    }
-
-    void SetFlag(const ECpuFlag InFlag, const bool bInShouldSet)
-    {
-        Flags.set(std::size_t(InFlag), bInShouldSet);
-    }
-
-    bool IsFlagSet(const ECpuFlag InFlag)
-    {
-        return Flags.test(std::size_t(InFlag));
-    }
-};
 
 class Cpu
 {
@@ -105,16 +10,39 @@ public:
     Cpu(std::shared_ptr<Bus> InDataBus);
     ~Cpu();
 
+    /**
+     * Handles a system reset and sets the CPU state accordingly.
+     */
     void Reset();
+
+    /**
+     * Handles a request to interrupt the CPU.
+     * The interrupt can be discarded if the CPU 'InterruptDisable' flag is set.
+     */
     void IRQ();
+
+    /**
+     * Handles a CPU interrupt request that cannot be masked out by the CPU 'InterruptDisable' flag.
+     * NMI interrupts can however be disabled whilst writing to an memory mapped I/O device.
+     */
     void NMI();
 
+    /**
+     * Executes a single CPU instruction.
+     */
     void Tick();
 
-    Registers GetCpuState() const;
-
 private:
+    /**
+     * Pushes the specified value to the top of the stack.
+     * The stack pointer will be decremented once the operation completes.
+     */
     void PushStack(const uint8_t InValue);
+
+    /**
+     * Reads the value at the top of the stack.
+     * The stack pointer will be incremented once the operation completes
+     */
     uint8_t PopStack();
 
     uint8_t LDA(const OpCode& InOpCode);
@@ -185,6 +113,10 @@ private:
     uint8_t NOP(const OpCode& InOpCode);
     uint8_t RTI(const OpCode& InOpCode);
 
+    /**
+     * Returns the address to read from the Bus based on the specified addressing mode.
+     * Optionally will also notify if the address will cross a page boundry and should incur a performance penalty.
+     */
     uint16_t GetAddressByAddressingMode(const EAddressingMode InAddressingMode, bool* bOutDidCrossPageBoundry = nullptr) const;
 
 private:

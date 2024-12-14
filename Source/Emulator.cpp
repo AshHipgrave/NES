@@ -10,6 +10,7 @@
 Emulator::Emulator()
     : m_pCpu(nullptr)
     , m_pMemory(nullptr)
+    , m_pDataBus(nullptr)
     , m_pWindow(nullptr, SDL_DestroyWindow)
     , m_pRenderer(nullptr, SDL_DestroyRenderer)
 {
@@ -32,6 +33,7 @@ Emulator::~Emulator()
     ::SDL_Quit();
 
     m_pCpu = nullptr;
+    m_pDataBus = nullptr;
     m_pMemory = nullptr;
 }
 

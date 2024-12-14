@@ -111,6 +111,9 @@
     <ClCompile Include="System\Bus.cpp">
       <Filter>Source Files\System</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Types.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPU\6502.h">
@@ -178,6 +181,9 @@
     </ClInclude>
     <ClInclude Include="System\Bus.h">
       <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Types.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
