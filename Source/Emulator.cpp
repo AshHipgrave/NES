@@ -148,10 +148,6 @@ void Emulator::HandleEvents()
         switch (sdlEvent.type)
         {
             case SDL_QUIT:
-            {
-                Stop();
-                break;
-            }
             case SDL_WINDOWEVENT_CLOSE:
             {
                 Stop();

@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "CPU/6502.h"
 #include "Core/Core.h"
-#include "Core/Types.h"
 #include "Core/Utils.h"
 #include "CPU/OpCodes.h"
 #include "System/Bus.h"
@@ -914,7 +913,7 @@ uint16_t Cpu::GetAddressByAddressingMode(const EAddressingMode InAddressingMode,
     }
 
     std::cout << "Error: Unimplemented address mode" << std::endl;
+    EMULATOR_DEBUG_BREAK();
 
-    __debugbreak();
     return 0;
 }
