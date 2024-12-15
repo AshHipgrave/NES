@@ -105,9 +105,10 @@ void Bus::WriteData(const uint8_t InData, const uint16_t InAddress)
     {
         m_pPPU->WriteData(InData, (InAddress & 0x0007));
     }
-    else /* if (InAddress >= 0x8000 && InAddress <= 0xFFFF) */
+    else if (InAddress >= 0x8000 && InAddress <= 0xFFFF)
     {
-        //EMULATOR_DEBUG_BREAK();
+        // TODO: Writing to cartridge memory is not yet supported. If we reach this we've likely loaded a ROM which relies on mappers (?)
+        EMULATOR_DEBUG_BREAK();
     }
 }
 
@@ -127,7 +128,7 @@ uint8_t Bus::ReadData(const uint16_t InAddress) const
     }
     else
     {
-        //EMULATOR_DEBUG_BREAK();
+        EMULATOR_DEBUG_BREAK();
     }
 
     return 0;

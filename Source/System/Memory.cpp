@@ -20,7 +20,7 @@ uint8_t Memory::ReadByte(const uint16_t InAddress) const
 
     std::cout << "Error: Segmentation fault! Attempting to read outside of memory bounds." << std::endl;
 
-    //EMULATOR_DEBUG_BREAK();
+    EMULATOR_DEBUG_BREAK();
 
     return 0;
 }

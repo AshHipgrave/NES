@@ -4,8 +4,23 @@
 
 class Bus;
 
+struct ExecutionCycle
+{
+    uint16_t AddressReadFrom = 0;
+    std::string InstructionHex = "";
+    std::string InstructionHexAssembly = "";
+
+    uint8_t Accumulator = 0;
+    uint8_t X = 0;
+    uint8_t Y = 0;
+    uint8_t SP = 0;
+
+};
+
 class Cpu
 {
+    friend class UIManager;
+
 public:
     Cpu(Bus* InDataBus);
     ~Cpu();

@@ -96,10 +96,14 @@ void Cpu::NMI()
 
 void Cpu::Tick()
 {
+    const CpuRegisters registersBefore = m_Registers;
+
     const uint8_t opcode = m_pDataBus->ReadData(m_Registers.ProgramCounter);
     const Instruction instruction = m_InstructionTable[opcode];
     
     const uint8_t cycles = (this->*instruction.PFN_OpCodeHandlerFunction)(instruction.Code);
+
+    Utils::LogInstruction(instruction.Code, registersBefore, cycles);
 
     // TODO: Delay for how long the previous instruction took (e.g. if it took 3 cycles, delay for the equivelent of 3 cycles).
     UNUSED_PARAMETER(cycles);
@@ -651,10 +655,7 @@ uint8_t Cpu::JSR(const OpCode& InOpCode)
 
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
 
-    const uint8_t lowbyte = m_pDataBus->ReadData(address);
-    const uint8_t highbyte = m_pDataBus->ReadData(address + 1);
-
-    m_Registers.ProgramCounter = Utils::MakeDword(lowbyte, highbyte);
+    m_Registers.ProgramCounter = address;
 
     return InOpCode.CycleCount;
 }

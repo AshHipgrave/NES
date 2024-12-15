@@ -1,6 +1,36 @@
 #include "pch.h"
 #include "Core/Utils.h"
 #include "Core/Types.h"
+#include "System/Bus.h"
+
+const std::vector<std::string> OpCodeStrings = 
+{
+     "BRK", "ORA", "???", "???", "???", "ORA", "ASL", "???", "PHP", "ORA", "ASL", "???", "???", "ORA", "ASL", "???",
+     "BPL", "ORA", "???", "???", "???", "ORA", "ASL", "???", "CLC", "ORA", "???", "???", "???", "ORA", "ASL", "???",
+     "JSR", "AND", "???", "???", "BIT", "AND", "ROL", "???", "PLP", "AND", "ROL", "???", "BIT", "AND", "ROL", "???",
+     "BMI", "AND", "???", "???", "???", "AND", "ROL", "???", "SEC", "AND", "???", "???", "???", "AND", "ROL", "???",
+     "RTI", "EOR", "???", "???", "???", "EOR", "LSR", "???", "PHA", "EOR", "LSR", "???", "JMP", "EOR", "LSR", "???",
+     "BVC", "EOR", "???", "???", "???", "EOR", "LSR", "???", "CLI", "EOR", "???", "???", "???", "EOR", "LSR", "???",
+     "RTS", "ADC", "???", "???", "???", "ADC", "ROR", "???", "PLA", "ADC", "ROR", "???", "JMP", "ADC", "ROR", "???",
+     "BVS", "ADC", "???", "???", "???", "ADC", "ROR", "???", "SEI", "ADC", "???", "???", "???", "ADC", "ROR", "???",
+     "???", "STA", "???", "???", "STY", "STA", "STX", "???", "DEY", "???", "TXA", "???", "STY", "STA", "STX", "???",
+     "BCC", "STA", "???", "???", "STY", "STA", "STX", "???", "TYA", "STA", "TXS", "???", "???", "STA", "???", "???",
+     "LDY", "LDA", "LDX", "???", "LDY", "LDA", "LDX", "???", "TAY", "LDA", "TAX", "???", "LDY", "LDA", "LDX", "???",
+     "BCS", "LDA", "???", "???", "LDY", "LDA", "LDX", "???", "CLV", "LDA", "TSX", "???", "LDX", "LDA", "LDX", "???",
+     "CPY", "CMP", "???", "???", "CPY", "CMP", "DEC", "???", "INY", "CMP", "DEX", "???", "CPY", "CMP", "DEC", "???",
+     "BNE", "CMP", "???", "???", "???", "CMP", "DEC", "???", "CLD", "CMP", "???", "???", "???", "CMP", "DEC", "???",
+     "CPX", "SBC", "???", "???", "CPX", "SBC", "INC", "???", "INX", "SBC", "NOP", "???", "CPX", "SBC", "INC", "???",
+     "BEQ", "SBC", "???", "???", "???", "SBC", "INC", "???", "SED", "SBC", "???", "???", "???", "SBC", "INC", "???"
+};
+
+std::string Utils::ConvertToHex(const uint16_t InInteger)
+{
+    std::stringstream stream;
+
+    stream << std::setfill('0') << std::hex << std::uppercase << InInteger;
+
+    return stream.str();
+}
 
 uint8_t Utils::GetHighByte(const uint16_t InValue)
 {
@@ -37,4 +67,52 @@ std::string Utils::ConvertFlagToString(const ECpuFlag InFlag)
     }
 
     return "-";
+}
+
+std::string Utils::ConvertOpcodeToString(const uint8_t InOpcode)
+{
+    return OpCodeStrings[InOpcode];
+}
+
+std::string Utils::LogInstruction(const OpCode InOpCode, const CpuRegisters CpuStateBefore, const uint8_t InTakenCycles)
+{
+    static uint64_t totalCycles = 0;
+    totalCycles += InTakenCycles;
+
+    std::stringstream ss;
+
+    ss << Utils::ConvertToHex(CpuStateBefore.ProgramCounter) << "  ";
+
+    Bus* dataBus = Bus::Get();
+
+    for (uint16_t i = 0; i < InOpCode.Size; i++)
+    {
+        const uint8_t value = dataBus->ReadData(CpuStateBefore.ProgramCounter + i);
+        ss << std::setw(2) << Utils::ConvertToHex(value) << " ";
+    }
+
+    if (InOpCode.Size == 2)
+    {
+        ss << "   ";
+    }
+
+    const uint8_t opcodeHex = dataBus->ReadData(CpuStateBefore.ProgramCounter);
+    ss << " " << ConvertOpcodeToString(opcodeHex) << " ";
+
+    if (InOpCode.AddressingMode != EAddressingMode::Implied)
+    {
+        // TODO: Print the ASM representation of the operation, taking into account the addressing mode so it's formatted correctly.
+    }
+
+    ss << " \t\t ";
+    ss << "A:" << ConvertToHex(CpuStateBefore.Accumulator) << " ";
+    ss << "X:" << ConvertToHex(CpuStateBefore.X) << " ";
+    ss << "Y:" << ConvertToHex(CpuStateBefore.Y) << " ";
+    ss << "P:" << static_cast<uint16_t>(CpuStateBefore.GetFlags()) << " "; // TODO: The example log shows the status registers initialized to 24 (BRK and DEC flags set, everything else clear). This is different to what NesDev wiki says the default state is.
+    ss << "SP:" << ConvertToHex(CpuStateBefore.StackPointer) << " ";
+    ss << "PPU: " << "0,0" << " "; // TODO: PPU hasn't been implemented yet so this will always be wrong when compared to the example log.
+    ss << "CYC:" << totalCycles;   // TODO: Cycle accurate timing hasn't been implemented yet so this will always be wrong when compared to the example log.
+
+    std::cout << ss.str() << std::endl;
+    return ss.str();
 }

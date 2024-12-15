@@ -1,6 +1,6 @@
 #pragma once
 
-enum class ECpuFlag : uint8_t;
+#include "Core/Types.h"
 
 /**
  * Common utility functions that don't belong to a single component.
@@ -18,11 +18,17 @@ namespace Utils
     }
 
     /**
-     * Returns the highbyte of a 16-bit value.
+     * Converts the specified integer into a hexadecimal string. 
+     * The output string will be padded according to the size of the type.
+     * For example, a uint8_t of 255 will become FF, but a uint16_t would be 00FF
+     */
+    std::string ConvertToHex(const uint16_t InInteger);
+
+    /**
+     * Returns the high byte of a 16-bit value.
      * For example: if 0xAAFF is provided this will return 0xAA
      */
     uint8_t GetHighByte(const uint16_t InValue);
-
 
     /**
      * Returns the lowbyte of a 16-bit value.
@@ -31,7 +37,7 @@ namespace Utils
     uint8_t GetLowByte(const uint16_t InValue);
 
     /**
-     * Combines the provided low and highbytes into a single 16-bit value.
+     * Combines the provided low and high bytes into a single 16-bit value.
      * For example: If low = 0xAA and high=0xFF this will return 0xFFAA
      */
     uint16_t MakeDword(const uint8_t InLowByte, const uint8_t InHighByte);
@@ -43,8 +49,24 @@ namespace Utils
     bool DidCrossPageBoundry(const uint16_t InStartAddress, const uint16_t InEndAddress);
 
     /**
-     * Converts the specified CPU flag enum into a string representative of how it appears in 6502 manuals.
+     * Converts the specified flag enum into a string representation of how it appears in 6502 manuals.
      * For example: The 'Overflow' flag is returned as the string "V" as this is how it appears in the CPU manual.
      */
     std::string ConvertFlagToString(const ECpuFlag InFlag);
+
+    /**
+     * Converts the specified opcode to a string matching its assembly instruction representation.
+     * For example: If the opcode 0x8E is specified then this will return "STX".
+     */
+    std::string ConvertOpcodeToString(const uint8_t InOpcode);
+
+    /**
+     * Decompiles and logs the specified CPU instruction for debugging purposes. The format is matched as closely as possible to the nestest ROMs example log.
+     * Example output:
+     * 
+     *     C000  4C F5 C5  JMP $C5F5           A:00 X:00 Y:00 P:24 SP:FD PPU:  0, 21 CYC:7
+     *     C5F5  A2 00     LDX #$00            A:00 X:00 Y:00 P:24 SP:FD PPU:  0, 30 CYC:10
+     *     C5F7  86 00     STX $00 = 00        A:00 X:00 Y:00 P:26 SP:FD PPU:  0, 36 CYC:12
+     */
+    std::string LogInstruction(const OpCode InOpCode, const CpuRegisters CpuStateBefore, const uint8_t InCyclesTaken);
 }

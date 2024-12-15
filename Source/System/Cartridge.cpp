@@ -62,5 +62,5 @@ uint8_t Cartridge::ReadProgramData(const uint16_t InAddress) const
 
 uint8_t Cartridge::ReadCharacterData(const uint16_t InAddress) const
 {
-    return m_ProgramROM[InAddress];
+    return m_CharacterROM[InAddress];
 }
