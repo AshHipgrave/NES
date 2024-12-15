@@ -7,7 +7,7 @@ class Bus;
 class Cpu
 {
 public:
-    Cpu(std::shared_ptr<Bus> InDataBus);
+    Cpu(Bus* InDataBus);
     ~Cpu();
 
     /**
@@ -31,6 +31,11 @@ public:
      * Executes a single CPU instruction.
      */
     void Tick();
+
+    /**
+     * Returns a copy of the CPU register state
+     */
+    CpuRegisters GetRegisters() const;
 
 private:
     /**
@@ -120,9 +125,9 @@ private:
     uint16_t GetAddressByAddressingMode(const EAddressingMode InAddressingMode, bool* bOutDidCrossPageBoundry = nullptr) const;
 
 private:
-    Registers m_Registers;
+    CpuRegisters m_Registers;
 
-    std::shared_ptr<Bus> m_pDataBus;
+    Bus* m_pDataBus;
 
     std::vector<Instruction> m_InstructionTable;
 };

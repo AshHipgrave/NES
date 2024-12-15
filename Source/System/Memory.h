@@ -1,10 +1,9 @@
 #pragma once
 
-struct Registers;
-enum class EAddressingMode : uint8_t;
-
 class Memory
 {
+    friend class UIManager;
+
 public:
     Memory();
 

@@ -1,5 +1,7 @@
 #pragma once
 
+enum class ECpuFlag : uint8_t;
+
 /**
  * Common utility functions that don't belong to a single component.
  */
@@ -39,4 +41,10 @@ namespace Utils
      * The 6502 groups memory into 256 byte "pages". If an operation crosses the boundry between one page and another it can incur a performance penalty
      */
     bool DidCrossPageBoundry(const uint16_t InStartAddress, const uint16_t InEndAddress);
+
+    /**
+     * Converts the specified CPU flag enum into a string representative of how it appears in 6502 manuals.
+     * For example: The 'Overflow' flag is returned as the string "V" as this is how it appears in the CPU manual.
+     */
+    std::string ConvertFlagToString(const ECpuFlag InFlag);
 }

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Core/Utils.h"
+#include "Core/Types.h"
 
 uint8_t Utils::GetHighByte(const uint16_t InValue)
 {
@@ -19,4 +20,21 @@ uint16_t Utils::MakeDword(const uint8_t InLowByte, const uint8_t InHighByte)
 bool Utils::DidCrossPageBoundry(const uint16_t InStartAddress, const uint16_t InEndAddress)
 {
     return (InStartAddress & 0xFF00) != (InEndAddress & 0xFF00);
+}
+
+std::string Utils::ConvertFlagToString(const ECpuFlag InFlag)
+{
+    switch (InFlag)
+    {
+        case ECpuFlag::Carry:            return "C";
+        case ECpuFlag::Zero:             return "Z";
+        case ECpuFlag::InterruptDisable: return "I";
+        case ECpuFlag::DecimalMode:      return "D";
+        case ECpuFlag::Break:            return "B";
+        case ECpuFlag::Unused:           return "-";
+        case ECpuFlag::Overflow:         return "V";
+        case ECpuFlag::Negative:         return "N";
+    }
+
+    return "-";
 }

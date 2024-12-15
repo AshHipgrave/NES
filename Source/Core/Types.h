@@ -184,7 +184,7 @@ struct Instruction
 /**
  * Represents the 'Registers' contained within a 6502 CPU.
  */
-struct Registers
+struct CpuRegisters
 {
     /**
      * 16-bit register which points to the next instruction to be executed.
@@ -233,4 +233,51 @@ struct Registers
      * Tests if the specified flag is set or not
      */
     bool IsFlagSet(const ECpuFlag InFlag) const;
+};
+
+/**
+ * Represents the memory mapped registered used by the PPU
+ */
+struct PPURegisters
+{
+    /**
+     * 8-bit control register which contains a mix of settings related to rendering.
+     */
+    uint8_t Control = 0;
+
+    /**
+     * 8-bit register which controls the rendering of sprites and backgrounds, as well as colour effects.
+     */
+    uint8_t Mask = 0;
+
+    /**
+     * 8-bit status register which reflects the state of rendering related events and is primarily used for timing.
+     */
+    uint8_t Status = 0;
+
+    /**
+     * 8-bit register which holds to address of the OAM (Object Attribute Memory) being accessed.
+     * Note: Most games write 0x00 here and use the OAM Data register instead.
+     */
+    uint8_t OAMAddress = 0;
+
+    /**
+     * 8-bit register used for writing OAM (Object Attribute Memory) to.
+     */
+    uint8_t OAMData = 0;
+
+    /**
+     * 8-bit register used to change the scroll position.
+     */
+    uint8_t Scroll = 0;
+
+    /**
+     * 16-bit register used to facilitate communication between the CPU and PPU busses.
+     */
+    uint16_t PPUAddress = 0;
+
+    /**
+     * 8-bit CPU register that suspends the CPU so it can quickly copy a page of CPU memory to PPU OAM using DMA
+     */
+    uint8_t OAMDMA = 0;
 };

@@ -5,10 +5,10 @@
 #include "CPU/OpCodes.h"
 #include "System/Bus.h"
 
-Cpu::Cpu(std::shared_ptr<Bus> InDataBus)
+Cpu::Cpu(Bus* InDataBus)
     : m_pDataBus(InDataBus)
 {
-    m_Registers = Registers();
+    m_Registers = CpuRegisters();
 
     m_Registers.X = 0;
     m_Registers.Y = 0;
@@ -17,7 +17,7 @@ Cpu::Cpu(std::shared_ptr<Bus> InDataBus)
     m_Registers.Flags = 36;
 
     m_Registers.StackPointer = 0xFD;
-    m_Registers.ProgramCounter = 0xFFFC;
+    m_Registers.ProgramCounter = 0xC000; //0xFFFC;
 
     // https://www.masswerk.at/6502/6502_instruction_set.html
     m_InstructionTable =
@@ -43,6 +43,7 @@ Cpu::Cpu(std::shared_ptr<Bus> InDataBus)
 
 Cpu::~Cpu()
 {
+    m_pDataBus = nullptr;
     m_InstructionTable.clear();
 }
 
@@ -51,17 +52,46 @@ void Cpu::Reset()
     m_Registers.SetFlag(ECpuFlag::InterruptDisable, true);
 
     m_Registers.StackPointer -= 3;
-    m_Registers.ProgramCounter = 0xFFFC;
+
+    const uint8_t newLow = m_pDataBus->ReadData(0xFFFC);
+    const uint8_t newHigh = m_pDataBus->ReadData(0xFFFD);
+
+    m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
 }
 
 void Cpu::IRQ()
 {
+    if (m_Registers.IsFlagSet(ECpuFlag::InterruptDisable))
+    {
+        return;
+    }
 
+    const uint8_t lowbyte = Utils::GetLowByte(m_Registers.ProgramCounter);
+    const uint8_t highbyte = Utils::GetHighByte(m_Registers.ProgramCounter);
+
+    PushStack(highbyte);
+    PushStack(lowbyte);
+    PushStack(m_Registers.GetFlags());
+
+    const uint8_t newLow = m_pDataBus->ReadData(0xFFEE);
+    const uint8_t newHigh = m_pDataBus->ReadData(0xFFEF);
+
+    m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
 }
 
 void Cpu::NMI()
 {
+    const uint8_t lowbyte = Utils::GetLowByte(m_Registers.ProgramCounter);
+    const uint8_t highbyte = Utils::GetHighByte(m_Registers.ProgramCounter);
 
+    PushStack(highbyte);
+    PushStack(lowbyte);
+    PushStack(m_Registers.GetFlags());
+
+    const uint8_t newLow = m_pDataBus->ReadData(0xFFFA);
+    const uint8_t newHigh = m_pDataBus->ReadData(0xFFFB);
+
+    m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
 }
 
 void Cpu::Tick()
@@ -73,6 +103,11 @@ void Cpu::Tick()
 
     // TODO: Delay for how long the previous instruction took (e.g. if it took 3 cycles, delay for the equivelent of 3 cycles).
     UNUSED_PARAMETER(cycles);
+}
+
+CpuRegisters Cpu::GetRegisters() const
+{
+    return m_Registers;
 }
 
 void Cpu::PushStack(const uint8_t InValue)
@@ -601,11 +636,7 @@ uint8_t Cpu::ROR(const OpCode& InOpCode)
 uint8_t Cpu::JMP(const OpCode& InOpCode)
 {
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
-
-    const uint8_t lowbyte = m_pDataBus->ReadData(address);
-    const uint8_t highbyte = m_pDataBus->ReadData(address + 1);
-
-    m_Registers.ProgramCounter = Utils::MakeDword(lowbyte, highbyte);
+    m_Registers.ProgramCounter = address;
 
     return InOpCode.CycleCount;
 }
@@ -641,56 +672,152 @@ uint8_t Cpu::RTS(const OpCode& InOpCode)
 
 uint8_t Cpu::BCC(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    bool bDidCrossPageBoundry = false;
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+
+    m_Registers.ProgramCounter += InOpCode.Size;
+
+    if (m_Registers.IsFlagSet(ECpuFlag::Carry) == false)
+    {
+        m_Registers.ProgramCounter += branchAddress;
+
+        return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
+    }
 
     return InOpCode.CycleCount;
 }
 
 uint8_t Cpu::BCS(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    bool bDidCrossPageBoundry = false;
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+
+    m_Registers.ProgramCounter += InOpCode.Size;
+
+    if (m_Registers.IsFlagSet(ECpuFlag::Carry) == true)
+    {
+        m_Registers.ProgramCounter += branchAddress;
+
+        return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
+    }
 
     return InOpCode.CycleCount;
 }
 
 uint8_t Cpu::BEQ(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    bool bDidCrossPageBoundry = false;
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+
+    m_Registers.ProgramCounter += InOpCode.Size;
+
+    if (m_Registers.IsFlagSet(ECpuFlag::Zero) == true)
+    {
+        m_Registers.ProgramCounter += branchAddress;
+
+        return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
+    }
 
     return InOpCode.CycleCount;
 }
 
 uint8_t Cpu::BMI(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    bool bDidCrossPageBoundry = false;
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+
+    m_Registers.ProgramCounter += InOpCode.Size;
+
+    if (m_Registers.IsFlagSet(ECpuFlag::Negative) == true)
+    {
+        m_Registers.ProgramCounter += branchAddress;
+
+        return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
+    }
 
     return InOpCode.CycleCount;
 }
 
 uint8_t Cpu::BNE(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    bool bDidCrossPageBoundry = false;
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+
+    m_Registers.ProgramCounter += InOpCode.Size;
+
+    if (m_Registers.IsFlagSet(ECpuFlag::Zero) == false)
+    {
+        m_Registers.ProgramCounter += branchAddress;
+
+        return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
+    }
 
     return InOpCode.CycleCount;
 }
 
 uint8_t Cpu::BPL(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    bool bDidCrossPageBoundry = false;
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+
+    m_Registers.ProgramCounter += InOpCode.Size;
+
+    if (m_Registers.IsFlagSet(ECpuFlag::Negative) == false)
+    {
+        m_Registers.ProgramCounter += branchAddress;
+
+        return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
+    }
 
     return InOpCode.CycleCount;
 }
 
 uint8_t Cpu::BVC(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    bool bDidCrossPageBoundry = false;
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+
+    m_Registers.ProgramCounter += InOpCode.Size;
+
+    if (m_Registers.IsFlagSet(ECpuFlag::Overflow) == false)
+    {
+        m_Registers.ProgramCounter += branchAddress;
+
+        return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
+    }
 
     return InOpCode.CycleCount;
 }
 
 uint8_t Cpu::BVS(const OpCode& InOpCode)
 {
-    UNUSED_PARAMETER(InOpCode);
+    bool bDidCrossPageBoundry = false;
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
+
+    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+
+    m_Registers.ProgramCounter += InOpCode.Size;
+
+    if (m_Registers.IsFlagSet(ECpuFlag::Overflow) == true)
+    {
+        m_Registers.ProgramCounter += branchAddress;
+
+        return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
+    }
 
     return InOpCode.CycleCount;
 }
@@ -763,7 +890,10 @@ uint8_t Cpu::BRK(const OpCode& InOpCode)
     PushStack(lowbyte);
     PushStack(m_Registers.GetFlags());
 
-    m_Registers.ProgramCounter = 0xFFFE;
+    const uint8_t newLow = m_pDataBus->ReadData(0xFFFE);
+    const uint8_t newHigh = m_pDataBus->ReadData(0xFFFF);
+
+    m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
 
     return InOpCode.CycleCount;
 }

@@ -1,8 +1,10 @@
 #pragma once
 
 class Cpu;
+class PPU;
 class Bus;
 class Memory;
+class UIManager;
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -19,7 +21,6 @@ public:
 private:
     bool Init();
     bool InitSDL();
-    void InitImGui();
 
     void HandleEvents();
 
@@ -30,10 +31,8 @@ private:
 private:
     bool m_bIsRunning = false;
 
-    std::unique_ptr<Cpu> m_pCpu;
-
-    std::shared_ptr<Bus> m_pDataBus;
-    std::shared_ptr<Memory> m_pMemory;
+    std::unique_ptr<Bus> m_pDataBus;
+    std::unique_ptr<UIManager> m_pUIManager;
 
     std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> m_pWindow;
     std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)> m_pRenderer;
