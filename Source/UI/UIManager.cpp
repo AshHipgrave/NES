@@ -21,10 +21,10 @@ UIManager::UIManager()
 
 UIManager::~UIManager()
 {
-    if (m_pMemoryViewer)
+    if (m_pWorkRAMViewer)
     {
-        delete m_pMemoryViewer;
-        m_pMemoryViewer = nullptr;
+        delete m_pWorkRAMViewer;
+        m_pWorkRAMViewer = nullptr;
     }
 }
 
@@ -43,8 +43,8 @@ void UIManager::Init(SDL_Window* InWindow, SDL_Renderer* InRenderer)
 
     SDL_RenderSetScale(InRenderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
 
-    m_pMemoryViewer = new MemoryEditor();
-    m_pMemoryViewer->ReadOnly = true;
+    m_pWorkRAMViewer = new MemoryEditor();
+    m_pWorkRAMViewer->ReadOnly = true;
 
     m_pProgramMemoryViewer = new MemoryEditor();
     m_pProgramMemoryViewer->ReadOnly = true;
@@ -84,7 +84,7 @@ void UIManager::Draw()
     bus->SetSingleStepModeEnabled(m_bEnableSingleStepMode); // TODO: Hack - The UI's Draw function shouldn't change the state of another class.
 
     if (m_bShowMemoryViewer)
-        m_pMemoryViewer->DrawWindow("Memory Viewer", bus->GetMemory()->m_MemoryBuffer, 2048);
+        m_pWorkRAMViewer->DrawWindow("Work RAM", bus->GetMemory()->m_MemoryBuffer, 2048);
 
     if (m_bShowProgramMemoryViewer && bus->HasCartridgeLoaded())
         m_pProgramMemoryViewer->DrawWindow("Program RAM", bus->GetCartridge()->m_ProgramROM.data(), bus->GetCartridge()->m_ProgramROM.size());
@@ -190,6 +190,11 @@ void UIManager::DrawCpuStatusOverlay()
         ImGui::Text("Y Register:        ");
         ImGui::SameLine();
         ImGui::Text(format_byte_space, yReg);
+
+        const std::string statusReg = Utils::ConvertToHex(registers.GetFlags());
+        ImGui::Text("P Register:        ");
+        ImGui::SameLine();
+        ImGui::Text(statusReg.c_str());
 
         ImGui::Separator();
 

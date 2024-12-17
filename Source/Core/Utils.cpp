@@ -27,7 +27,7 @@ std::string Utils::ConvertToHex(const uint16_t InInteger)
 {
     std::stringstream stream;
 
-    stream << std::setfill('0') << std::hex << std::uppercase << InInteger;
+    stream << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << InInteger;
 
     return stream.str();
 }
@@ -81,34 +81,42 @@ std::string Utils::LogInstruction(const OpCode InOpCode, const CpuRegisters CpuS
 
     std::stringstream ss;
 
-    ss << Utils::ConvertToHex(CpuStateBefore.ProgramCounter) << "  ";
+    ss << std::left << std::setw(6) << Utils::ConvertToHex(CpuStateBefore.ProgramCounter);
 
     Bus* dataBus = Bus::Get();
 
     for (uint16_t i = 0; i < InOpCode.Size; i++)
     {
         const uint8_t value = dataBus->ReadData(CpuStateBefore.ProgramCounter + i);
-        ss << std::setw(2) << Utils::ConvertToHex(value) << " ";
+        ss << std::left << std::setw(3) << Utils::ConvertToHex(value);
     }
 
-    if (InOpCode.Size == 2)
+    // TODO: fix using 'setw()'
+    if (InOpCode.Size == 1)
     {
-        ss << "   ";
+        ss << "       ";
+    }
+    else if (InOpCode.Size == 2)
+    {
+        ss << "    ";
+    }
+    else
+    {
+        ss << " ";
     }
 
     const uint8_t opcodeHex = dataBus->ReadData(CpuStateBefore.ProgramCounter);
-    ss << " " << ConvertOpcodeToString(opcodeHex) << " ";
+    ss << std::left << std::setw(30) << ConvertOpcodeToString(opcodeHex);
 
     if (InOpCode.AddressingMode != EAddressingMode::Implied)
     {
         // TODO: Print the ASM representation of the operation, taking into account the addressing mode so it's formatted correctly.
     }
 
-    ss << " \t\t ";
     ss << "A:" << ConvertToHex(CpuStateBefore.Accumulator) << " ";
     ss << "X:" << ConvertToHex(CpuStateBefore.X) << " ";
     ss << "Y:" << ConvertToHex(CpuStateBefore.Y) << " ";
-    ss << "P:" << static_cast<uint16_t>(CpuStateBefore.GetFlags()) << " "; // TODO: The example log shows the status registers initialized to 24 (BRK and DEC flags set, everything else clear). This is different to what NesDev wiki says the default state is.
+    ss << "P:" << ConvertToHex(CpuStateBefore.GetFlags()) << " ";
     ss << "SP:" << ConvertToHex(CpuStateBefore.StackPointer) << " ";
     ss << "PPU: " << "0,0" << " "; // TODO: PPU hasn't been implemented yet so this will always be wrong when compared to the example log.
     ss << "CYC:" << totalCycles;   // TODO: Cycle accurate timing hasn't been implemented yet so this will always be wrong when compared to the example log.

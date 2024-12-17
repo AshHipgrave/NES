@@ -33,7 +33,7 @@ private:
     bool m_bShowProgramMemoryViewer = false;
     bool m_bShowCharacterMemoryViewer = false;
 
-    MemoryEditor* m_pMemoryViewer = nullptr;
+    MemoryEditor* m_pWorkRAMViewer = nullptr;
     MemoryEditor* m_pProgramMemoryViewer = nullptr;
     MemoryEditor* m_pCharacterMemoryViewer = nullptr;
 };

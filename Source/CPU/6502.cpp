@@ -22,22 +22,22 @@ Cpu::Cpu(Bus* InDataBus)
     // https://www.masswerk.at/6502/6502_instruction_set.html
     m_InstructionTable =
     {
-        { BRK_Implied,       &Cpu::BRK }, { ORA_IndirectX, &Cpu::ORA }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { ORA_ZeroPage,  &Cpu::ORA }, { ASL_ZeroPage,  &Cpu::ASL }, { OP_NotImplemented, &Cpu::NOP }, { PHP_Implied, &Cpu::PHP }, { ORA_Immediate,     &Cpu::ORA }, { ASL_Accumulator,   &Cpu::ASL }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { ORA_Absolute,  &Cpu::ORA }, { ASL_Absolute,      &Cpu::ASL }, { OP_NotImplemented, &Cpu::NOP },
-        { BPL_Relative,      &Cpu::BPL }, { ORA_IndirectY, &Cpu::ORA }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { ORA_ZeroPageX, &Cpu::ORA }, { ASL_ZeroPageX, &Cpu::ASL }, { OP_NotImplemented, &Cpu::NOP }, { CLC_Implied, &Cpu::CLC }, { ORA_AbsoluteY,     &Cpu::ORA }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { ORA_AbsoluteX, &Cpu::ORA }, { ASL_AbsoluteX,     &Cpu::ASL }, { OP_NotImplemented, &Cpu::NOP },
-        { JSR_Absolute,      &Cpu::JSR }, { AND_IndirectX, &Cpu::AND }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { BIT_ZeroPage,      &Cpu::BIT }, { AND_ZeroPage,  &Cpu::AND }, { ROL_ZeroPage,  &Cpu::ROL }, { OP_NotImplemented, &Cpu::NOP }, { PLP_Implied, &Cpu::PLP }, { AND_Immediate,     &Cpu::AND }, { ROL_Accumulator,   &Cpu::ROL }, { OP_NotImplemented, &Cpu::NOP }, { BIT_Absolute,      &Cpu::BIT }, { AND_Absolute,  &Cpu::AND }, { ROL_Absolute,      &Cpu::ROL }, { OP_NotImplemented, &Cpu::NOP },
-        { BMI_Relative,      &Cpu::BMI }, { AND_IndirectY, &Cpu::AND }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { AND_ZeroPageX, &Cpu::AND }, { ROL_ZeroPageX, &Cpu::ROL }, { OP_NotImplemented, &Cpu::NOP }, { SEC_Implied, &Cpu::SEC }, { AND_AbsoluteY,     &Cpu::AND }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { AND_AbsoluteX, &Cpu::AND }, { ROL_AbsoluteX,     &Cpu::ROL }, { OP_NotImplemented, &Cpu::NOP },
-        { RTI_Implied,       &Cpu::RTI }, { EOR_IndirectX, &Cpu::EOR }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { EOR_ZeroPage,  &Cpu::EOR }, { LSR_ZeroPage,  &Cpu::LSR }, { OP_NotImplemented, &Cpu::NOP }, { PHA_Implied, &Cpu::PHA }, { EOR_Immediate,     &Cpu::EOR }, { LSR_Accumulator,   &Cpu::LSR }, { OP_NotImplemented, &Cpu::NOP }, { JMP_Absolute,      &Cpu::JMP }, { EOR_Absolute,  &Cpu::EOR }, { LSR_Absolute,      &Cpu::LSR }, { OP_NotImplemented, &Cpu::NOP },
-        { BVC_Relative,      &Cpu::BVC }, { EOR_IndirectY, &Cpu::EOR }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { EOR_ZeroPageX, &Cpu::EOR }, { LSR_ZeroPageX, &Cpu::LSR }, { OP_NotImplemented, &Cpu::NOP }, { CLI_Implied, &Cpu::CLI }, { EOR_AbsoluteY,     &Cpu::EOR }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { EOR_AbsoluteX, &Cpu::EOR }, { LSR_AbsoluteX,     &Cpu::LSR }, { OP_NotImplemented, &Cpu::NOP },
-        { RTS_Implied,       &Cpu::RTS }, { ADC_IndirectX, &Cpu::ADC }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { ADC_ZeroPage,  &Cpu::ADC }, { ROR_ZeroPage,  &Cpu::ROR }, { OP_NotImplemented, &Cpu::NOP }, { PLA_Implied, &Cpu::PLA }, { ADC_Immediate,     &Cpu::ADC }, { ROR_Accumulator,   &Cpu::ROR }, { OP_NotImplemented, &Cpu::NOP }, { JMP_Indirect,      &Cpu::JMP }, { ADC_Absolute,  &Cpu::ADC }, { ROR_Absolute,      &Cpu::ROR }, { OP_NotImplemented, &Cpu::NOP },
-        { BVS_Relative,      &Cpu::BVS }, { ADC_IndirectY, &Cpu::ADC }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { ADC_ZeroPageX, &Cpu::ADC }, { ROR_ZeroPageX, &Cpu::ROR }, { OP_NotImplemented, &Cpu::NOP }, { SEI_Implied, &Cpu::SEI }, { ADC_AbsoluteY,     &Cpu::ADC }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { ADC_AbsoluteX, &Cpu::ADC }, { ROR_AbsoluteX,     &Cpu::ROR }, { OP_NotImplemented, &Cpu::NOP },
-        { OP_NotImplemented, &Cpu::NOP }, { STA_IndirectX, &Cpu::STA }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { STY_ZeroPage,      &Cpu::STY }, { STA_ZeroPage,  &Cpu::STA }, { STX_ZeroPage,  &Cpu::STX }, { OP_NotImplemented, &Cpu::NOP }, { DEY_Implied, &Cpu::DEY }, { OP_NotImplemented, &Cpu::NOP }, { TXA_Implied,       &Cpu::TXA }, { OP_NotImplemented, &Cpu::NOP }, { STY_Absolute,      &Cpu::STY }, { STA_Absolute,  &Cpu::STA }, { STX_Absolute,      &Cpu::STX }, { OP_NotImplemented, &Cpu::NOP },
-        { BCC_Relative,      &Cpu::BCC }, { STA_IndirectY, &Cpu::STA }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { STY_ZeroPageX,     &Cpu::STY }, { STA_ZeroPageX, &Cpu::STA }, { STX_ZeroPageY, &Cpu::STX }, { OP_NotImplemented, &Cpu::NOP }, { TYA_Implied, &Cpu::TYA }, { STA_AbsoluteY,     &Cpu::STA }, { TXS_Implied,       &Cpu::TXS }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { STA_AbsoluteX, &Cpu::STA }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP },
-        { LDY_Immediate,     &Cpu::LDY }, { LDA_IndirectX, &Cpu::LDA }, { LDX_Immediate,     &Cpu::LDX }, { OP_NotImplemented, &Cpu::NOP }, { LDY_ZeroPage,      &Cpu::LDY }, { LDA_ZeroPage,  &Cpu::LDA }, { LDX_ZeroPage,  &Cpu::LDX }, { OP_NotImplemented, &Cpu::NOP }, { TAY_Implied, &Cpu::TAY }, { LDA_Immediate,     &Cpu::LDA }, { TAX_Implied,       &Cpu::TAX }, { OP_NotImplemented, &Cpu::NOP }, { LDY_Absolute,      &Cpu::LDY }, { LDA_Absolute,  &Cpu::LDA }, { LDX_Absolute,      &Cpu::LDX }, { OP_NotImplemented, &Cpu::NOP },
-        { BCS_Relative,      &Cpu::BCS }, { LDA_IndirectY, &Cpu::LDA }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { LDY_ZeroPageX,     &Cpu::LDY }, { LDA_ZeroPageX, &Cpu::LDA }, { LDX_ZeroPageY, &Cpu::LDX }, { OP_NotImplemented, &Cpu::NOP }, { CLV_Implied, &Cpu::CLV }, { LDA_AbsoluteY,     &Cpu::LDA }, { TSX_Implied,       &Cpu::TSX }, { OP_NotImplemented, &Cpu::NOP }, { LDY_AbsoluteX,     &Cpu::LDX }, { LDA_AbsoluteX, &Cpu::LDA }, { LDX_AbsoluteY,     &Cpu::LDX }, { OP_NotImplemented, &Cpu::NOP },
-        { CPY_Immediate,     &Cpu::CPY }, { CMP_IndirectX, &Cpu::CMP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { CPY_ZeroPage,      &Cpu::CPY }, { CMP_ZeroPage,  &Cpu::CMP }, { DEC_ZeroPage,  &Cpu::DEC }, { OP_NotImplemented, &Cpu::NOP }, { INY_Implied, &Cpu::INY }, { CMP_Immediate,     &Cpu::CMP }, { DEX_Implied,       &Cpu::DEX }, { OP_NotImplemented, &Cpu::NOP }, { CPY_Absolute,      &Cpu::CPY }, { CMP_Absolute,  &Cpu::CMP }, { DEC_Absolute,      &Cpu::DEC }, { OP_NotImplemented, &Cpu::NOP },
-        { BNE_Relative,      &Cpu::BNE }, { CMP_IndirectY, &Cpu::CMP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { CMP_ZeroPageX, &Cpu::CMP }, { DEC_ZeroPageX, &Cpu::DEC }, { OP_NotImplemented, &Cpu::NOP }, { CLD_Implied, &Cpu::CLD }, { CMP_AbsoluteY,     &Cpu::CMP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { CMP_AbsoluteX, &Cpu::CMP }, { DEC_AbsoluteX,     &Cpu::DEC }, { OP_NotImplemented, &Cpu::NOP },
-        { CPX_Immediate,     &Cpu::CPX }, { SBC_IndirectX, &Cpu::SBC }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { CPX_ZeroPage,      &Cpu::CPX }, { SBC_ZeroPage,  &Cpu::SBC }, { INC_ZeroPage,  &Cpu::INC }, { OP_NotImplemented, &Cpu::NOP }, { INX_Implied, &Cpu::INX }, { SBC_Immediate,     &Cpu::SBC }, { NOP_Implied,       &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { CPX_Absolute,      &Cpu::CPX }, { SBC_Absolute,  &Cpu::SBC }, { INC_Absolute,      &Cpu::INC }, { OP_NotImplemented, &Cpu::NOP },
-        { BEQ_Relative,      &Cpu::BEQ }, { SBC_IndirectY, &Cpu::SBC }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { SBC_ZeroPageX, &Cpu::SBC }, { INC_ZeroPageX, &Cpu::INC }, { OP_NotImplemented, &Cpu::NOP }, { SED_Implied, &Cpu::SED }, { SBC_AbsoluteY,     &Cpu::SBC }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { OP_NotImplemented, &Cpu::NOP }, { SBC_AbsoluteX, &Cpu::SBC }, { INC_AbsoluteX,     &Cpu::INC }, { OP_NotImplemented, &Cpu::NOP }
+        { BRK_Implied,       &Cpu::BRK }, { ORA_IndirectX, &Cpu::ORA }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { ORA_ZeroPage,  &Cpu::ORA }, { ASL_ZeroPage,  &Cpu::ASL }, { OP_NotImplemented, &Cpu::INV }, { PHP_Implied, &Cpu::PHP }, { ORA_Immediate,     &Cpu::ORA }, { ASL_Accumulator,   &Cpu::ASL }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { ORA_Absolute,  &Cpu::ORA }, { ASL_Absolute,      &Cpu::ASL }, { OP_NotImplemented, &Cpu::INV },
+        { BPL_Relative,      &Cpu::BPL }, { ORA_IndirectY, &Cpu::ORA }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { ORA_ZeroPageX, &Cpu::ORA }, { ASL_ZeroPageX, &Cpu::ASL }, { OP_NotImplemented, &Cpu::INV }, { CLC_Implied, &Cpu::CLC }, { ORA_AbsoluteY,     &Cpu::ORA }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { ORA_AbsoluteX, &Cpu::ORA }, { ASL_AbsoluteX,     &Cpu::ASL }, { OP_NotImplemented, &Cpu::INV },
+        { JSR_Absolute,      &Cpu::JSR }, { AND_IndirectX, &Cpu::AND }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { BIT_ZeroPage,      &Cpu::BIT }, { AND_ZeroPage,  &Cpu::AND }, { ROL_ZeroPage,  &Cpu::ROL }, { OP_NotImplemented, &Cpu::INV }, { PLP_Implied, &Cpu::PLP }, { AND_Immediate,     &Cpu::AND }, { ROL_Accumulator,   &Cpu::ROL }, { OP_NotImplemented, &Cpu::INV }, { BIT_Absolute,      &Cpu::BIT }, { AND_Absolute,  &Cpu::AND }, { ROL_Absolute,      &Cpu::ROL }, { OP_NotImplemented, &Cpu::INV },
+        { BMI_Relative,      &Cpu::BMI }, { AND_IndirectY, &Cpu::AND }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { AND_ZeroPageX, &Cpu::AND }, { ROL_ZeroPageX, &Cpu::ROL }, { OP_NotImplemented, &Cpu::INV }, { SEC_Implied, &Cpu::SEC }, { AND_AbsoluteY,     &Cpu::AND }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { AND_AbsoluteX, &Cpu::AND }, { ROL_AbsoluteX,     &Cpu::ROL }, { OP_NotImplemented, &Cpu::INV },
+        { RTI_Implied,       &Cpu::RTI }, { EOR_IndirectX, &Cpu::EOR }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { EOR_ZeroPage,  &Cpu::EOR }, { LSR_ZeroPage,  &Cpu::LSR }, { OP_NotImplemented, &Cpu::INV }, { PHA_Implied, &Cpu::PHA }, { EOR_Immediate,     &Cpu::EOR }, { LSR_Accumulator,   &Cpu::LSR }, { OP_NotImplemented, &Cpu::INV }, { JMP_Absolute,      &Cpu::JMP }, { EOR_Absolute,  &Cpu::EOR }, { LSR_Absolute,      &Cpu::LSR }, { OP_NotImplemented, &Cpu::INV },
+        { BVC_Relative,      &Cpu::BVC }, { EOR_IndirectY, &Cpu::EOR }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { EOR_ZeroPageX, &Cpu::EOR }, { LSR_ZeroPageX, &Cpu::LSR }, { OP_NotImplemented, &Cpu::INV }, { CLI_Implied, &Cpu::CLI }, { EOR_AbsoluteY,     &Cpu::EOR }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { EOR_AbsoluteX, &Cpu::EOR }, { LSR_AbsoluteX,     &Cpu::LSR }, { OP_NotImplemented, &Cpu::INV },
+        { RTS_Implied,       &Cpu::RTS }, { ADC_IndirectX, &Cpu::ADC }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { ADC_ZeroPage,  &Cpu::ADC }, { ROR_ZeroPage,  &Cpu::ROR }, { OP_NotImplemented, &Cpu::INV }, { PLA_Implied, &Cpu::PLA }, { ADC_Immediate,     &Cpu::ADC }, { ROR_Accumulator,   &Cpu::ROR }, { OP_NotImplemented, &Cpu::INV }, { JMP_Indirect,      &Cpu::JMP }, { ADC_Absolute,  &Cpu::ADC }, { ROR_Absolute,      &Cpu::ROR }, { OP_NotImplemented, &Cpu::INV },
+        { BVS_Relative,      &Cpu::BVS }, { ADC_IndirectY, &Cpu::ADC }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { ADC_ZeroPageX, &Cpu::ADC }, { ROR_ZeroPageX, &Cpu::ROR }, { OP_NotImplemented, &Cpu::INV }, { SEI_Implied, &Cpu::SEI }, { ADC_AbsoluteY,     &Cpu::ADC }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { ADC_AbsoluteX, &Cpu::ADC }, { ROR_AbsoluteX,     &Cpu::ROR }, { OP_NotImplemented, &Cpu::INV },
+        { OP_NotImplemented, &Cpu::INV }, { STA_IndirectX, &Cpu::STA }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { STY_ZeroPage,      &Cpu::STY }, { STA_ZeroPage,  &Cpu::STA }, { STX_ZeroPage,  &Cpu::STX }, { OP_NotImplemented, &Cpu::INV }, { DEY_Implied, &Cpu::DEY }, { OP_NotImplemented, &Cpu::INV }, { TXA_Implied,       &Cpu::TXA }, { OP_NotImplemented, &Cpu::INV }, { STY_Absolute,      &Cpu::STY }, { STA_Absolute,  &Cpu::STA }, { STX_Absolute,      &Cpu::STX }, { OP_NotImplemented, &Cpu::INV },
+        { BCC_Relative,      &Cpu::BCC }, { STA_IndirectY, &Cpu::STA }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { STY_ZeroPageX,     &Cpu::STY }, { STA_ZeroPageX, &Cpu::STA }, { STX_ZeroPageY, &Cpu::STX }, { OP_NotImplemented, &Cpu::INV }, { TYA_Implied, &Cpu::TYA }, { STA_AbsoluteY,     &Cpu::STA }, { TXS_Implied,       &Cpu::TXS }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { STA_AbsoluteX, &Cpu::STA }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV },
+        { LDY_Immediate,     &Cpu::LDY }, { LDA_IndirectX, &Cpu::LDA }, { LDX_Immediate,     &Cpu::LDX }, { OP_NotImplemented, &Cpu::INV }, { LDY_ZeroPage,      &Cpu::LDY }, { LDA_ZeroPage,  &Cpu::LDA }, { LDX_ZeroPage,  &Cpu::LDX }, { OP_NotImplemented, &Cpu::INV }, { TAY_Implied, &Cpu::TAY }, { LDA_Immediate,     &Cpu::LDA }, { TAX_Implied,       &Cpu::TAX }, { OP_NotImplemented, &Cpu::INV }, { LDY_Absolute,      &Cpu::LDY }, { LDA_Absolute,  &Cpu::LDA }, { LDX_Absolute,      &Cpu::LDX }, { OP_NotImplemented, &Cpu::INV },
+        { BCS_Relative,      &Cpu::BCS }, { LDA_IndirectY, &Cpu::LDA }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { LDY_ZeroPageX,     &Cpu::LDY }, { LDA_ZeroPageX, &Cpu::LDA }, { LDX_ZeroPageY, &Cpu::LDX }, { OP_NotImplemented, &Cpu::INV }, { CLV_Implied, &Cpu::CLV }, { LDA_AbsoluteY,     &Cpu::LDA }, { TSX_Implied,       &Cpu::TSX }, { OP_NotImplemented, &Cpu::INV }, { LDY_AbsoluteX,     &Cpu::LDY }, { LDA_AbsoluteX, &Cpu::LDA }, { LDX_AbsoluteY,     &Cpu::LDX }, { OP_NotImplemented, &Cpu::INV },
+        { CPY_Immediate,     &Cpu::CPY }, { CMP_IndirectX, &Cpu::CMP }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { CPY_ZeroPage,      &Cpu::CPY }, { CMP_ZeroPage,  &Cpu::CMP }, { DEC_ZeroPage,  &Cpu::DEC }, { OP_NotImplemented, &Cpu::INV }, { INY_Implied, &Cpu::INY }, { CMP_Immediate,     &Cpu::CMP }, { DEX_Implied,       &Cpu::DEX }, { OP_NotImplemented, &Cpu::INV }, { CPY_Absolute,      &Cpu::CPY }, { CMP_Absolute,  &Cpu::CMP }, { DEC_Absolute,      &Cpu::DEC }, { OP_NotImplemented, &Cpu::INV },
+        { BNE_Relative,      &Cpu::BNE }, { CMP_IndirectY, &Cpu::CMP }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { CMP_ZeroPageX, &Cpu::CMP }, { DEC_ZeroPageX, &Cpu::DEC }, { OP_NotImplemented, &Cpu::INV }, { CLD_Implied, &Cpu::CLD }, { CMP_AbsoluteY,     &Cpu::CMP }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { CMP_AbsoluteX, &Cpu::CMP }, { DEC_AbsoluteX,     &Cpu::DEC }, { OP_NotImplemented, &Cpu::INV },
+        { CPX_Immediate,     &Cpu::CPX }, { SBC_IndirectX, &Cpu::SBC }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { CPX_ZeroPage,      &Cpu::CPX }, { SBC_ZeroPage,  &Cpu::SBC }, { INC_ZeroPage,  &Cpu::INC }, { OP_NotImplemented, &Cpu::INV }, { INX_Implied, &Cpu::INX }, { SBC_Immediate,     &Cpu::SBC }, { NOP_Implied,       &Cpu::NOP }, { OP_NotImplemented, &Cpu::INV }, { CPX_Absolute,      &Cpu::CPX }, { SBC_Absolute,  &Cpu::SBC }, { INC_Absolute,      &Cpu::INC }, { OP_NotImplemented, &Cpu::INV },
+        { BEQ_Relative,      &Cpu::BEQ }, { SBC_IndirectY, &Cpu::SBC }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { SBC_ZeroPageX, &Cpu::SBC }, { INC_ZeroPageX, &Cpu::INC }, { OP_NotImplemented, &Cpu::INV }, { SED_Implied, &Cpu::SED }, { SBC_AbsoluteY,     &Cpu::SBC }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { SBC_AbsoluteX, &Cpu::SBC }, { INC_AbsoluteX,     &Cpu::INC }, { OP_NotImplemented, &Cpu::INV }
     };
 }
 
@@ -122,8 +122,9 @@ void Cpu::PushStack(const uint8_t InValue)
 
 uint8_t Cpu::PopStack()
 {
-    const uint8_t value = m_pDataBus->ReadData(0x0100 + m_Registers.StackPointer);
     m_Registers.StackPointer++;
+
+    const uint8_t value = m_pDataBus->ReadData(0x0100 + m_Registers.StackPointer);
 
     return value;
 }
@@ -270,9 +271,6 @@ uint8_t Cpu::TXS(const OpCode& InOpCode)
 {
     m_Registers.StackPointer = m_Registers.X;
 
-    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.X == 0);
-    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.X, 7));
-
     m_Registers.ProgramCounter += InOpCode.Size;
 
     return InOpCode.CycleCount;
@@ -289,7 +287,10 @@ uint8_t Cpu::PHA(const OpCode& InOpCode)
 
 uint8_t Cpu::PHP(const OpCode& InOpCode)
 {
-    PushStack(m_Registers.GetFlags());
+    std::bitset<8> flags = m_Registers.GetFlags();
+    flags.set(std::size_t(ECpuFlag::Break), true);
+
+    PushStack(static_cast<uint8_t>(flags.to_ulong()));
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -310,7 +311,11 @@ uint8_t Cpu::PLA(const OpCode& InOpCode)
 
 uint8_t Cpu::PLP(const OpCode& InOpCode)
 {
+    const bool bIsBreakSet = m_Registers.IsFlagSet(ECpuFlag::Break);
+
     m_Registers.Flags = PopStack();
+    m_Registers.SetFlag(ECpuFlag::Break, bIsBreakSet);
+    m_Registers.SetFlag(ECpuFlag::Unused, true);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -430,13 +435,15 @@ uint8_t Cpu::CMP(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-    const uint8_t value = m_pDataBus->ReadData(address);
 
+    const uint8_t value = m_pDataBus->ReadData(address);
     const uint8_t accumulator = m_Registers.Accumulator;
 
+    const uint8_t result = accumulator - value;
+
     m_Registers.SetFlag(ECpuFlag::Carry, accumulator >= value);
-    m_Registers.SetFlag(ECpuFlag::Zero, accumulator == value);
-    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(value, 7));
+    m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -446,13 +453,15 @@ uint8_t Cpu::CMP(const OpCode& InOpCode)
 uint8_t Cpu::CPX(const OpCode& InOpCode)
 {
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+
     const uint8_t value = m_pDataBus->ReadData(address);
+    const uint8_t x = m_Registers.X;
 
-    const uint8_t X = m_Registers.X;
+    const uint8_t result = x - value;
 
-    m_Registers.SetFlag(ECpuFlag::Carry, X >= value);
-    m_Registers.SetFlag(ECpuFlag::Zero, X == value);
-    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(value, 7));
+    m_Registers.SetFlag(ECpuFlag::Carry, x >= value);
+    m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -462,13 +471,15 @@ uint8_t Cpu::CPX(const OpCode& InOpCode)
 uint8_t Cpu::CPY(const OpCode& InOpCode)
 {
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+
     const uint8_t value = m_pDataBus->ReadData(address);
+    const uint8_t y = m_Registers.Y;
 
-    const uint8_t Y = m_Registers.Y;
+    const uint8_t result = y - value;
 
-    m_Registers.SetFlag(ECpuFlag::Carry, Y >= value);
-    m_Registers.SetFlag(ECpuFlag::Zero, Y == value);
-    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(value, 7));
+    m_Registers.SetFlag(ECpuFlag::Carry, y >= value);
+    m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -557,15 +568,27 @@ uint8_t Cpu::DEY(const OpCode& InOpCode)
 
 uint8_t Cpu::ASL(const OpCode& InOpCode)
 {
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
-    const uint8_t value = m_pDataBus->ReadData(address);
-    const uint8_t result = value << 1;
+    if (InOpCode.AddressingMode == EAddressingMode::Accumulator)
+    {
+        m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(m_Registers.Accumulator, 7));
 
-    m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(value, 7));
-    m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
-    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
+        m_Registers.Accumulator = m_Registers.Accumulator << 1;
 
-    m_pDataBus->WriteData(result, address);
+        m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
+        m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
+    }
+    else
+    {
+        const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+        const uint8_t value = m_pDataBus->ReadData(address);
+        const uint8_t result = value << 1;
+
+        m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(value, 7));
+        m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
+        m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
+
+        m_pDataBus->WriteData(result, address);
+    }
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -574,15 +597,27 @@ uint8_t Cpu::ASL(const OpCode& InOpCode)
 
 uint8_t Cpu::LSR(const OpCode& InOpCode)
 {
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
-    const uint8_t value = m_pDataBus->ReadData(address);
-    const uint8_t result = value >> 1;
+    if (InOpCode.AddressingMode == EAddressingMode::Accumulator)
+    {
+        m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(m_Registers.Accumulator, 0));
 
-    m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(value, 7));
-    m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
-    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
+        m_Registers.Accumulator = m_Registers.Accumulator >> 1;
 
-    m_pDataBus->WriteData(result, address);
+        m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
+    }
+    else
+    {
+        const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+        const uint8_t value = m_pDataBus->ReadData(address);
+        const uint8_t result = value >> 1;
+
+        m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(value, 0));
+        m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
+
+        m_pDataBus->WriteData(result, address);
+    }
+
+    m_Registers.SetFlag(ECpuFlag::Negative, false);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -591,22 +626,42 @@ uint8_t Cpu::LSR(const OpCode& InOpCode)
 
 uint8_t Cpu::ROL(const OpCode& InOpCode)
 {
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
-    const uint8_t value = m_pDataBus->ReadData(address);
-    uint8_t result = value << 1;
-
-    const bool bCarrySetBefore = m_Registers.IsFlagSet(ECpuFlag::Carry);
-    m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(value, 7));
-
-    if (bCarrySetBefore)
+    if (InOpCode.AddressingMode == EAddressingMode::Accumulator)
     {
-        result |= 0x01;
+        const uint8_t accumulatorBefore = m_Registers.Accumulator;
+
+        m_Registers.Accumulator = m_Registers.Accumulator << 1;
+
+        const bool bCarrySetBefore = m_Registers.IsFlagSet(ECpuFlag::Carry);
+        m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(accumulatorBefore, 7));
+
+        if (bCarrySetBefore)
+        {
+            m_Registers.Accumulator |= 0x01;
+        }
+
+        m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
+        m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
     }
+    else
+    {
+        const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+        const uint8_t value = m_pDataBus->ReadData(address);
+        uint8_t result = value << 1;
 
-    m_pDataBus->WriteData(result, address);
+        const bool bCarrySetBefore = m_Registers.IsFlagSet(ECpuFlag::Carry);
+        m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(value, 7));
 
-    m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
-    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
+        if (bCarrySetBefore)
+        {
+            result |= 0x01;
+        }
+
+        m_pDataBus->WriteData(result, address);
+
+        m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
+        m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
+    }
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -615,22 +670,42 @@ uint8_t Cpu::ROL(const OpCode& InOpCode)
 
 uint8_t Cpu::ROR(const OpCode& InOpCode)
 {
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
-    const uint8_t value = m_pDataBus->ReadData(address);
-    uint8_t result = value >> 1;
-
-    const bool bCarrySetBefore = m_Registers.IsFlagSet(ECpuFlag::Carry);
-    m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(value, 0));
-
-    if (bCarrySetBefore)
+    if (InOpCode.AddressingMode == EAddressingMode::Accumulator)
     {
-        result |= 0x08;
+        const uint8_t accumulatorBefore = m_Registers.Accumulator;
+
+        m_Registers.Accumulator = m_Registers.Accumulator >> 1;
+
+        const bool bCarrySetBefore = m_Registers.IsFlagSet(ECpuFlag::Carry);
+        m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(accumulatorBefore, 0));
+
+        if (bCarrySetBefore)
+        {
+            m_Registers.Accumulator |= 0x80;
+        }
+
+        m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
+        m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
     }
+    else
+    {
+        const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+        const uint8_t value = m_pDataBus->ReadData(address);
+        uint8_t result = value >> 1;
 
-    m_pDataBus->WriteData(result, address);
+        const bool bCarrySetBefore = m_Registers.IsFlagSet(ECpuFlag::Carry);
+        m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(value, 0));
 
-    m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
-    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
+        if (bCarrySetBefore)
+        {
+            result |= 0x80;
+        }
+
+        m_pDataBus->WriteData(result, address);
+
+        m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
+        m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
+    }
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
@@ -647,15 +722,17 @@ uint8_t Cpu::JMP(const OpCode& InOpCode)
 
 uint8_t Cpu::JSR(const OpCode& InOpCode)
 {
-    const uint8_t pcLow = Utils::GetLowByte(m_Registers.ProgramCounter);
-    const uint8_t pcHigh = Utils::GetHighByte(m_Registers.ProgramCounter);
+    const uint16_t returnAddress = (m_Registers.ProgramCounter + InOpCode.Size) - 1;
+
+    const uint8_t pcLow = Utils::GetLowByte(returnAddress);
+    const uint8_t pcHigh = Utils::GetHighByte(returnAddress);
 
     PushStack(pcHigh);
     PushStack(pcLow);
 
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+    const uint16_t jumpAddress = GetAddressByAddressingMode(InOpCode.AddressingMode);
 
-    m_Registers.ProgramCounter = address;
+    m_Registers.ProgramCounter = jumpAddress;
 
     return InOpCode.CycleCount;
 }
@@ -665,8 +742,9 @@ uint8_t Cpu::RTS(const OpCode& InOpCode)
     const uint8_t lowbyte = PopStack();
     const uint8_t highbyte = PopStack();
 
-    m_Registers.ProgramCounter = Utils::MakeDword(lowbyte, highbyte);
-    m_Registers.ProgramCounter++;
+    const uint16_t returnAddress = Utils::MakeDword(lowbyte, highbyte);
+
+    m_Registers.ProgramCounter = returnAddress + 1;
 
     return InOpCode.CycleCount;
 }
@@ -675,14 +753,13 @@ uint8_t Cpu::BCC(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-
-    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+    const uint8_t offset = m_pDataBus->ReadData(address);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
     if (m_Registers.IsFlagSet(ECpuFlag::Carry) == false)
     {
-        m_Registers.ProgramCounter += branchAddress;
+        m_Registers.ProgramCounter += static_cast<uint16_t>(offset);
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
@@ -694,14 +771,13 @@ uint8_t Cpu::BCS(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-
-    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+    const uint8_t offset = m_pDataBus->ReadData(address);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
     if (m_Registers.IsFlagSet(ECpuFlag::Carry) == true)
     {
-        m_Registers.ProgramCounter += branchAddress;
+        m_Registers.ProgramCounter += static_cast<uint16_t>(offset);
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
@@ -713,14 +789,13 @@ uint8_t Cpu::BEQ(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-
-    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+    const uint8_t offset = m_pDataBus->ReadData(address);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
     if (m_Registers.IsFlagSet(ECpuFlag::Zero) == true)
     {
-        m_Registers.ProgramCounter += branchAddress;
+        m_Registers.ProgramCounter += static_cast<uint16_t>(offset);
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
@@ -732,14 +807,13 @@ uint8_t Cpu::BMI(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-
-    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+    const uint8_t offset = m_pDataBus->ReadData(address);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
     if (m_Registers.IsFlagSet(ECpuFlag::Negative) == true)
     {
-        m_Registers.ProgramCounter += branchAddress;
+        m_Registers.ProgramCounter += static_cast<uint16_t>(offset);
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
@@ -751,14 +825,13 @@ uint8_t Cpu::BNE(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-
-    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+    const uint8_t offset = m_pDataBus->ReadData(address);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
     if (m_Registers.IsFlagSet(ECpuFlag::Zero) == false)
     {
-        m_Registers.ProgramCounter += branchAddress;
+        m_Registers.ProgramCounter += static_cast<uint16_t>(offset);
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
@@ -770,14 +843,13 @@ uint8_t Cpu::BPL(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-
-    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+    const uint8_t offset = m_pDataBus->ReadData(address);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
     if (m_Registers.IsFlagSet(ECpuFlag::Negative) == false)
     {
-        m_Registers.ProgramCounter += branchAddress;
+        m_Registers.ProgramCounter += static_cast<uint16_t>(offset);
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
@@ -789,14 +861,13 @@ uint8_t Cpu::BVC(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-
-    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+    const uint8_t offset = m_pDataBus->ReadData(address);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
     if (m_Registers.IsFlagSet(ECpuFlag::Overflow) == false)
     {
-        m_Registers.ProgramCounter += branchAddress;
+        m_Registers.ProgramCounter += static_cast<uint16_t>(offset);
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
@@ -808,14 +879,13 @@ uint8_t Cpu::BVS(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-
-    const uint16_t branchAddress = m_Registers.ProgramCounter + address;
+    const uint8_t offset = m_pDataBus->ReadData(address);
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
     if (m_Registers.IsFlagSet(ECpuFlag::Overflow) == true)
     {
-        m_Registers.ProgramCounter += branchAddress;
+        m_Registers.ProgramCounter += static_cast<uint16_t>(offset);
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
@@ -889,7 +959,11 @@ uint8_t Cpu::BRK(const OpCode& InOpCode)
 
     PushStack(highbyte);
     PushStack(lowbyte);
-    PushStack(m_Registers.GetFlags());
+
+    std::bitset<8> flags = m_Registers.GetFlags();
+    flags.set(std::size_t(ECpuFlag::Break), true);
+
+    PushStack(static_cast<uint8_t>(flags.to_ulong()));
 
     const uint8_t newLow = m_pDataBus->ReadData(0xFFFE);
     const uint8_t newHigh = m_pDataBus->ReadData(0xFFFF);
@@ -909,11 +983,23 @@ uint8_t Cpu::NOP(const OpCode& InOpCode)
 uint8_t Cpu::RTI(const OpCode& InOpCode)
 {
     m_Registers.Flags = PopStack();
+    m_Registers.SetFlag(ECpuFlag::Unused, true);
     
     const uint8_t lowbyte = PopStack();
     const uint8_t highbyte = PopStack();
 
-    m_Registers.ProgramCounter = Utils::MakeDword(lowbyte, highbyte);;
+    m_Registers.ProgramCounter = Utils::MakeDword(lowbyte, highbyte);
+
+    return InOpCode.CycleCount;
+}
+
+uint8_t Cpu::INV(const OpCode& InOpCode)
+{
+    std::cout << "ERROR: Attempted to execute an illegal opcode." << std::endl;
+
+    EMULATOR_DEBUG_BREAK();
+
+    //Reset();
 
     return InOpCode.CycleCount;
 }
@@ -1012,9 +1098,7 @@ uint16_t Cpu::GetAddressByAddressingMode(const EAddressingMode InAddressingMode,
         }
         case EAddressingMode::Relative:
         {
-            int8_t offset = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
-
-            const uint16_t finalAddress = m_Registers.ProgramCounter + offset;
+            const uint16_t finalAddress = m_Registers.ProgramCounter + 1;
 
             if (bOutDidCrossPageBoundry != nullptr)
             {

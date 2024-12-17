@@ -133,6 +133,8 @@ private:
     uint8_t NOP(const OpCode& InOpCode);
     uint8_t RTI(const OpCode& InOpCode);
 
+    uint8_t INV(const OpCode& InOpCode);
+
     /**
      * Returns the address to read from the Bus based on the specified addressing mode.
      * Optionally will also notify if the address will cross a page boundry and should incur a performance penalty.

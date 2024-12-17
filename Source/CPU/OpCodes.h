@@ -309,4 +309,4 @@ constexpr OpCode RTI_Implied = { 1, 6, EAddressingMode::Implied };
 /// Unimplemented Opcodes
 ///
 
-constexpr OpCode OP_NotImplemented = NOP_Implied;
+constexpr OpCode OP_NotImplemented = { 0, 0, EAddressingMode::Implied };

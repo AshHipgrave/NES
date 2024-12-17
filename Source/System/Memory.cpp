@@ -31,4 +31,9 @@ void Memory::WriteByte(const uint8_t InData, const uint16_t InAddress)
     {
         m_MemoryBuffer[InAddress] = InData;
     }
+    else
+    {
+        std::cout << "Error: Segmentation fault! Attempting to write outside of memory bounds." << std::endl;
+        EMULATOR_DEBUG_BREAK();
+    }
 }
