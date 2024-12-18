@@ -2,8 +2,6 @@
 
 #include "Core/Types.h"
 
-class Cpu;
-
 /// 
 /// Load Accumulator
 /// 
@@ -306,7 +304,97 @@ constexpr OpCode NOP_Implied = { 1, 2, EAddressingMode::Implied };
 constexpr OpCode RTI_Implied = { 1, 6, EAddressingMode::Implied };
 
 ///
-/// Unimplemented Opcodes
+/// Illegal DCP
+/// 
+
+constexpr OpCode DCP_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
+constexpr OpCode DCP_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
+constexpr OpCode DCP_Absolute  = { 3, 6, EAddressingMode::Absolute  };
+constexpr OpCode DCP_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
+constexpr OpCode DCP_AbsoluteY = { 3, 7, EAddressingMode::AbsoluteY };
+constexpr OpCode DCP_IndirectX = { 2, 8, EAddressingMode::IndirectX };
+constexpr OpCode DCP_IndirectY = { 2, 8, EAddressingMode::IndirectY };
+
+///
+/// Illegal LAX
+///
+
+constexpr OpCode LAX_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
+constexpr OpCode LAX_ZeroPageY = { 2, 4, EAddressingMode::ZeroPageY };
+constexpr OpCode LAX_Absolute  = { 3, 4, EAddressingMode::Absolute  };
+constexpr OpCode LAX_AbsoluteY = { 3, 4, EAddressingMode::AbsoluteY };
+constexpr OpCode LAX_IndirectX = { 2, 6, EAddressingMode::IndirectX };
+constexpr OpCode LAX_IndirectY = { 2, 5, EAddressingMode::IndirectY };
+
+///
+/// Illegal RLA
+/// 
+
+constexpr OpCode RLA_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
+constexpr OpCode RLA_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
+constexpr OpCode RLA_Absolute  = { 3, 6, EAddressingMode::Absolute  };
+constexpr OpCode RLA_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
+constexpr OpCode RLA_AbsoluteY = { 3, 7, EAddressingMode::AbsoluteY };
+constexpr OpCode RLA_IndirectX = { 2, 8, EAddressingMode::IndirectX };
+constexpr OpCode RLA_IndirectY = { 2, 8, EAddressingMode::IndirectY };
+
+///
+/// Illegal RRA
+/// 
+
+constexpr OpCode RRA_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
+constexpr OpCode RRA_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
+constexpr OpCode RRA_Absolute  = { 3, 6, EAddressingMode::Absolute  };
+constexpr OpCode RRA_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
+constexpr OpCode RRA_AbsoluteY = { 3, 7, EAddressingMode::AbsoluteY };
+constexpr OpCode RRA_IndirectX = { 2, 8, EAddressingMode::IndirectX };
+constexpr OpCode RRA_IndirectY = { 2, 8, EAddressingMode::IndirectY };
+
+///
+/// Illegal SAX
+/// 
+
+constexpr OpCode SAX_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
+constexpr OpCode SAX_ZeroPageY = { 2, 6, EAddressingMode::ZeroPageY };
+constexpr OpCode SAX_Absolute  = { 3, 6, EAddressingMode::Absolute  };
+constexpr OpCode SAX_IndirectX = { 2, 8, EAddressingMode::IndirectX };
+
+///
+/// Illegal SLO
+/// 
+
+constexpr OpCode SLO_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
+constexpr OpCode SLO_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
+constexpr OpCode SLO_Absolute  = { 3, 6, EAddressingMode::Absolute  };
+constexpr OpCode SLO_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
+constexpr OpCode SLO_AbsoluteY = { 3, 7, EAddressingMode::AbsoluteY };
+constexpr OpCode SLO_IndirectX = { 2, 8, EAddressingMode::IndirectX };
+constexpr OpCode SLO_IndirectY = { 2, 8, EAddressingMode::IndirectY };
+
+///
+/// Illegal SRE
+/// 
+
+constexpr OpCode SRE_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
+constexpr OpCode SRE_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
+constexpr OpCode SRE_Absolute  = { 3, 6, EAddressingMode::Absolute  };
+constexpr OpCode SRE_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
+constexpr OpCode SRE_AbsoluteY = { 3, 7, EAddressingMode::AbsoluteY };
+constexpr OpCode SRE_IndirectX = { 2, 8, EAddressingMode::IndirectX };
+constexpr OpCode SRE_IndirectY = { 2, 8, EAddressingMode::IndirectY };
+
+///
+/// Illegal NOP
+///
+
+constexpr OpCode NOP_Immediate = { 2, 2, EAddressingMode::Immediate };
+constexpr OpCode NOP_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
+constexpr OpCode NOP_ZeroPageX = { 2, 4, EAddressingMode::ZeroPageX };
+constexpr OpCode NOP_Absolute  = { 3, 4, EAddressingMode::Absolute  };
+constexpr OpCode NOP_AbsoluteX = { 3, 4, EAddressingMode::AbsoluteX };
+
+///
+/// Unimplemented opcodes
 ///
 
 constexpr OpCode OP_NotImplemented = { 0, 0, EAddressingMode::Implied };

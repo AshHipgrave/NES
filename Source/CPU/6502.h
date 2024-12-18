@@ -4,19 +4,6 @@
 
 class Bus;
 
-struct ExecutionCycle
-{
-    uint16_t AddressReadFrom = 0;
-    std::string InstructionHex = "";
-    std::string InstructionHexAssembly = "";
-
-    uint8_t Accumulator = 0;
-    uint8_t X = 0;
-    uint8_t Y = 0;
-    uint8_t SP = 0;
-
-};
-
 class Cpu
 {
     friend class UIManager;
@@ -134,6 +121,19 @@ private:
     uint8_t RTI(const OpCode& InOpCode);
 
     uint8_t INV(const OpCode& InOpCode);
+
+    ///
+    /// Undocumented / illegal opcodes. Some ROMs use these so they need to be supported.
+    /// Not all of this type of opcodes have been implemented (only the ones tested by nestest).
+    /// 
+    
+    uint8_t DCP(const OpCode& InOpCode);
+    uint8_t LAX(const OpCode& InOpCode);
+    uint8_t RLA(const OpCode& InOpCode);
+    uint8_t RRA(const OpCode& InOpCode);
+    uint8_t SAX(const OpCode& InOpCode);
+    uint8_t SLO(const OpCode& InOpCode);
+    uint8_t SRE(const OpCode& InOpCode);
 
     /**
      * Returns the address to read from the Bus based on the specified addressing mode.

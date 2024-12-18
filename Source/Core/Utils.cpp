@@ -3,24 +3,28 @@
 #include "Core/Types.h"
 #include "System/Bus.h"
 
+/**
+ * String representation of all opcodes.
+ * Opcodes prefixed with an asterisk are illegal/invalid opcodes.
+ */
 const std::vector<std::string> OpCodeStrings = 
 {
-     "BRK", "ORA", "???", "???", "???", "ORA", "ASL", "???", "PHP", "ORA", "ASL", "???", "???", "ORA", "ASL", "???",
-     "BPL", "ORA", "???", "???", "???", "ORA", "ASL", "???", "CLC", "ORA", "???", "???", "???", "ORA", "ASL", "???",
-     "JSR", "AND", "???", "???", "BIT", "AND", "ROL", "???", "PLP", "AND", "ROL", "???", "BIT", "AND", "ROL", "???",
-     "BMI", "AND", "???", "???", "???", "AND", "ROL", "???", "SEC", "AND", "???", "???", "???", "AND", "ROL", "???",
-     "RTI", "EOR", "???", "???", "???", "EOR", "LSR", "???", "PHA", "EOR", "LSR", "???", "JMP", "EOR", "LSR", "???",
-     "BVC", "EOR", "???", "???", "???", "EOR", "LSR", "???", "CLI", "EOR", "???", "???", "???", "EOR", "LSR", "???",
-     "RTS", "ADC", "???", "???", "???", "ADC", "ROR", "???", "PLA", "ADC", "ROR", "???", "JMP", "ADC", "ROR", "???",
-     "BVS", "ADC", "???", "???", "???", "ADC", "ROR", "???", "SEI", "ADC", "???", "???", "???", "ADC", "ROR", "???",
-     "???", "STA", "???", "???", "STY", "STA", "STX", "???", "DEY", "???", "TXA", "???", "STY", "STA", "STX", "???",
-     "BCC", "STA", "???", "???", "STY", "STA", "STX", "???", "TYA", "STA", "TXS", "???", "???", "STA", "???", "???",
-     "LDY", "LDA", "LDX", "???", "LDY", "LDA", "LDX", "???", "TAY", "LDA", "TAX", "???", "LDY", "LDA", "LDX", "???",
-     "BCS", "LDA", "???", "???", "LDY", "LDA", "LDX", "???", "CLV", "LDA", "TSX", "???", "LDX", "LDA", "LDX", "???",
-     "CPY", "CMP", "???", "???", "CPY", "CMP", "DEC", "???", "INY", "CMP", "DEX", "???", "CPY", "CMP", "DEC", "???",
-     "BNE", "CMP", "???", "???", "???", "CMP", "DEC", "???", "CLD", "CMP", "???", "???", "???", "CMP", "DEC", "???",
-     "CPX", "SBC", "???", "???", "CPX", "SBC", "INC", "???", "INX", "SBC", "NOP", "???", "CPX", "SBC", "INC", "???",
-     "BEQ", "SBC", "???", "???", "???", "SBC", "INC", "???", "SED", "SBC", "???", "???", "???", "SBC", "INC", "???"
+     "BRK",  "ORA", "*JAM", "*SLO", "*NOP", "ORA", "ASL", "*SLO", "PHP", "ORA",  "ASL",  "*ANC",  "*NOP", "ORA", "ASL",  "*SLO",
+     "BPL",  "ORA", "*JAM", "*SLO", "*NOP", "ORA", "ASL", "*SLO", "CLC", "ORA",  "*NOP", "*SLO",  "*NOP", "ORA", "ASL",  "*SLO",
+     "JSR",  "AND", "*JAM", "*RLA", "BIT",  "AND", "ROL", "*RLA", "PLP", "AND",  "ROL",  "*ANC",  "BIT",  "AND", "ROL",  "*RLA",
+     "BMI",  "AND", "*JAM", "*RLA", "*NOP", "AND", "ROL", "*RLA", "SEC", "AND",  "*NOP", "*RLA",  "*NOP", "AND", "ROL",  "*RLA",
+     "RTI",  "EOR", "*JAM", "*SRE", "*NOP", "EOR", "LSR", "*SRE", "PHA", "EOR",  "LSR",  "*ALR",  "JMP",  "EOR", "LSR",  "*SRE",
+     "BVC",  "EOR", "*JAM", "*SRE", "*NOP", "EOR", "LSR", "*SRE", "CLI", "EOR",  "*NOP", "*SRE",  "*NOP", "EOR", "LSR",  "*SRE",
+     "RTS",  "ADC", "*JAM", "*RRA", "*NOP", "ADC", "ROR", "*RRA", "PLA", "ADC",  "ROR",  "*ARR",  "JMP",  "ADC", "ROR",  "*RRA",
+     "BVS",  "ADC", "*JAM", "*RRA", "*NOP", "ADC", "ROR", "*RRA", "SEI", "ADC",  "*NOP", "*RRA",  "*NOP", "ADC", "ROR",  "*RRA",
+     "*NOP", "STA", "*NOP", "*SAX", "STY",  "STA", "STX", "*SAX", "DEY", "*NOP", "TXA",  "*ANE",  "STY",  "STA", "STX",  "*SAX",
+     "BCC",  "STA", "*JAM", "*SHA", "STY",  "STA", "STX", "*SAX", "TYA", "STA",  "TXS",  "*TAS",  "*SHY", "STA", "*SHX", "*SHA",
+     "LDY",  "LDA", "LDX",  "*LAX", "LDY",  "LDA", "LDX", "*LAX", "TAY", "LDA",  "TAX",  "*LXA",  "LDY",  "LDA", "LDX",  "*LAX",
+     "BCS",  "LDA", "*JAM", "*LAX", "LDY",  "LDA", "LDX", "*LAX", "CLV", "LDA",  "TSX",  "*LAS",  "LDX",  "LDA", "LDX",  "*LAX",
+     "CPY",  "CMP", "*NOP", "*DCP", "CPY",  "CMP", "DEC", "*DCP", "INY", "CMP",  "DEX",  "*SBX",  "CPY",  "CMP", "DEC",  "*DCP",
+     "BNE",  "CMP", "*JAM", "*DCP", "*NOP", "CMP", "DEC", "*DCP", "CLD", "CMP",  "*NOP", "*DCP",  "*NOP", "CMP", "DEC",  "*DCP",
+     "CPX",  "SBC", "*NOP", "*ISC", "CPX",  "SBC", "INC", "*ISC", "INX", "SBC",  "NOP",  "*USBC", "CPX",  "SBC", "INC",  "*ISC",
+     "BEQ",  "SBC", "*JAM", "*ISC", "*NOP", "SBC", "INC", "*ISC", "SED", "SBC",  "*NOP", "*ISC",  "*NOP", "SBC", "INC",  "*ISC"
 };
 
 std::string Utils::ConvertToHex(const uint16_t InInteger)
