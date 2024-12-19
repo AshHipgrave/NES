@@ -24,16 +24,24 @@ private:
     void DrawLoadROMDialog();
 
 private:
-    bool m_bShowMemoryViewer = false;
+    // Toggles
     bool m_bShowLoadROMDialog = false;
     bool m_bShowCpuStatusOverlay = false;
-    bool m_bShowImGuiDemoWindow = false;
     bool m_bEnableSingleStepMode = false;
+    bool m_bShowImGuiDemoWindow = false;
 
+    // Memory Viewers
+    bool m_bWorkRAMMemoryViewer = false;
     bool m_bShowProgramMemoryViewer = false;
     bool m_bShowCharacterMemoryViewer = false;
+
+    // PPU Memory Viewers
+    bool m_bShowOAMDataMemoryViewer = false;
+    bool m_bShowNametableMemoryViewer = false;
 
     MemoryEditor* m_pWorkRAMViewer = nullptr;
     MemoryEditor* m_pProgramMemoryViewer = nullptr;
     MemoryEditor* m_pCharacterMemoryViewer = nullptr;
+    MemoryEditor* m_pNametableMemoryViewer = nullptr;
+    MemoryEditor* m_pOAMDataMemoryViewer = nullptr;
 };

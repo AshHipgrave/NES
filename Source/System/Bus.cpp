@@ -43,6 +43,11 @@ Cpu* Bus::GetCPU() const
     return m_pCpu;
 }
 
+PPU* Bus::GetPPU() const
+{
+    return m_pPPU;
+}
+
 Memory* Bus::GetMemory() const
 {
     return m_pMemory;
@@ -71,13 +76,16 @@ void Bus::SetCanPerformSingleStep()
 void Bus::InitDevices()
 {
     m_pCpu = new Cpu(this);
-    m_pPPU = new PPU();
+    m_pPPU = new PPU(this);
     m_pMemory = new Memory();
 }
 
 void Bus::LoadCartridge(const std::string& InFileName)
 {
     m_pCartridge = Cartridge::LoadFromFile(InFileName);
+    m_pPPU->LoadCartridge(m_pCartridge);
+
+    m_pCpu->Reset();
 }
 
 void Bus::Tick()
@@ -85,7 +93,12 @@ void Bus::Tick()
     if (m_bEnableSingleStepMode == true && m_bCanSingleStep == false)
         return;
 
-    m_pCpu->Tick();
+    const uint8_t cpuCycles = m_pCpu->Tick();
+
+    for (int i = 0; i < cpuCycles * 3; i++)
+    {
+        m_pPPU->Tick();
+    }
 
     m_bCanSingleStep = false;
 }
@@ -93,6 +106,11 @@ void Bus::Tick()
 bool Bus::HasCartridgeLoaded() const
 {
     return m_pCartridge != nullptr;
+}
+
+void Bus::NotifyFrameComplete()
+{
+    m_pCpu->NMI();
 }
 
 void Bus::WriteData(const uint8_t InData, const uint16_t InAddress)
@@ -105,9 +123,23 @@ void Bus::WriteData(const uint8_t InData, const uint16_t InAddress)
     {
         m_pPPU->WriteData(InData, (InAddress & 0x0007));
     }
+    else if ((InAddress >= 0x4000 && InAddress <= 0x4013) || InAddress == 0x4015 || InAddress == 0x4017)
+    {
+        // TODO: APU hasn't been implemented.
+    }
+    else if (InAddress >= 0x4016 && InAddress <= 0x4017)
+    {
+        // TODO: Controller hasn't been implemented.
+    }
     else if (InAddress >= 0x8000 && InAddress <= 0xFFFF)
     {
         // TODO: Writing to cartridge memory is not yet supported. If we reach this we've likely loaded a ROM which relies on mappers (?)
+        EMULATOR_DEBUG_BREAK();
+    }
+    else
+    {
+        std::cout << "Error: Segmentation fault! Attempting to write outside of bounds." << std::endl;
+
         EMULATOR_DEBUG_BREAK();
     }
 }
@@ -122,12 +154,19 @@ uint8_t Bus::ReadData(const uint16_t InAddress) const
     {
         return m_pPPU->ReadData((InAddress & 0x0007));
     }
+    else if (InAddress >= 0x4016 && InAddress <= 0x4017)
+    {
+        // TODO: Controller hasn't been implemented.
+        return 0;
+    }
     else if (InAddress >= 0x8000 && InAddress <= 0xFFFF)
     {
         return m_pCartridge->ReadProgramData(InAddress & 0x3FFF);
     }
     else
     {
+        std::cout << "Error: Segmentation fault! Attempting to read outside of bounds." << std::endl;
+
         EMULATOR_DEBUG_BREAK();
     }
 

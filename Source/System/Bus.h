@@ -18,12 +18,9 @@ public:
     static Bus* Get();
 
     Cpu* GetCPU() const;
+    PPU* GetPPU() const;
     Memory* GetMemory() const;
     Cartridge* GetCartridge() const;
-
-    bool GetIsSingleStepEnabled() const;
-    void SetSingleStepModeEnabled(const bool bInIsEnabled);
-    void SetCanPerformSingleStep();
 
     /**
     * Initialises the devices connected to the bus
@@ -46,6 +43,11 @@ public:
     bool HasCartridgeLoaded() const;
 
     /**
+     * Called by the PPU to trigger an NMI on the next CPU cycle
+     */
+    void NotifyFrameComplete();
+
+    /**
      * Writes the specified data to the address on the bus.
      * Different devices can be mapped to different addressess so the bus will determine which device receives this value.
      */
@@ -56,6 +58,24 @@ public:
      * Different devices can be mapped to different addressess so the bus will determine which device we read this value from.
      */
     uint8_t ReadData(const uint16_t InAddress) const;
+
+    /**
+    * [Debug] Returns true if the emulator is in single-step mode (only executes 1 opcode before waiting).
+    * Designed to allow for debugging the execution of a single instruction to confirm it's executed and set the emulator state as expected.
+    */
+    bool GetIsSingleStepEnabled() const;
+
+    /**
+     * [Debug] Enables (or disables) single-step mode. When enabled the emulator will not execute any instructions until prompted via the F5 key.
+     * Once prompted it will only execute a single instruction before pausing and waiting for the next prompt. When disabled the emulator will run normally.
+     */
+    void SetSingleStepModeEnabled(const bool bInIsEnabled);
+
+    /**
+     * [Debug] Tells the emualtor it is allowed to execute a single instruction (i.e. the user has pressed F5 to perform a single-step).
+     * The flag is reset after the step has been performed to re-enter the waiting state.
+     */
+    void SetCanPerformSingleStep();
 
 private:
     // TODO: Make smart pointers:

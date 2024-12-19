@@ -1,16 +1,17 @@
 #include "pch.h"
 #include "UI/UIManager.h"
 #include "CPU/6502.h"
+#include "Core/Core.h"
+#include "Core/Utils.h"
 #include "System/Bus.h"
+#include "System/PPU.h"
 #include "System/Memory.h"
 #include "System/Cartridge.h"
-#include "Core/Utils.h"
-#include "Core/Core.h"
 
 UIManager::UIManager()
 {
 #if EMULATOR_DEBUG_BUILD
-    m_bShowMemoryViewer = true;
+    m_bWorkRAMMemoryViewer = true;
     m_bShowCpuStatusOverlay = true;
     m_bShowProgramMemoryViewer = true;
     m_bShowCharacterMemoryViewer = true;
@@ -83,7 +84,7 @@ void UIManager::Draw()
     Bus* bus = Bus::Get();
     bus->SetSingleStepModeEnabled(m_bEnableSingleStepMode); // TODO: Hack - The UI's Draw function shouldn't change the state of another class.
 
-    if (m_bShowMemoryViewer)
+    if (m_bWorkRAMMemoryViewer)
         m_pWorkRAMViewer->DrawWindow("Work RAM", bus->GetMemory()->m_MemoryBuffer, 2048);
 
     if (m_bShowProgramMemoryViewer && bus->HasCartridgeLoaded())
@@ -91,6 +92,12 @@ void UIManager::Draw()
 
     if (m_bShowCharacterMemoryViewer && bus->HasCartridgeLoaded())
         m_pProgramMemoryViewer->DrawWindow("Character RAM", bus->GetCartridge()->m_CharacterROM.data(), bus->GetCartridge()->m_CharacterROM.size());
+
+    if (m_bShowOAMDataMemoryViewer && bus->HasCartridgeLoaded())
+        m_pNametableMemoryViewer->DrawWindow("OAM Data", bus->GetPPU()->m_OAMData.data(), bus->GetPPU()->m_OAMData.size());
+
+    if (m_bShowNametableMemoryViewer && bus->HasCartridgeLoaded())
+        m_pNametableMemoryViewer->DrawWindow("Nametables", bus->GetPPU()->m_VRAM.data(), bus->GetPPU()->m_VRAM.size());
 
     if (m_bShowImGuiDemoWindow)
         ImGui::ShowDemoWindow(&m_bShowImGuiDemoWindow);
@@ -129,9 +136,16 @@ void UIManager::DrawMainMenu()
         {
             ImGui::MenuItem("Enable Single-Step Mode", NULL, &m_bEnableSingleStepMode);
             ImGui::MenuItem("Enable CPU Status Overlay", NULL, &m_bShowCpuStatusOverlay);
-            ImGui::MenuItem("Enable Memory Viewer", NULL, &m_bShowMemoryViewer);
+            ImGui::Separator();
+
+            ImGui::MenuItem("Enable Work RAM Viewer", NULL, &m_bWorkRAMMemoryViewer);
             ImGui::MenuItem("Enable Program RAM Viewer", NULL, &m_bShowProgramMemoryViewer);
             ImGui::MenuItem("Enable Character RAM Viewer", NULL, &m_bShowCharacterMemoryViewer);
+
+            ImGui::Separator();
+
+            ImGui::MenuItem("Enable OAM Data Viewer", NULL, &m_bShowOAMDataMemoryViewer);
+            ImGui::MenuItem("Enable Nametable Viewer", NULL, &m_bShowNametableMemoryViewer);
 
             ImGui::EndMenu();
         }
