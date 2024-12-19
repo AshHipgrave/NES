@@ -53,11 +53,17 @@ void Cpu::Reset()
 
     m_Registers.StackPointer -= 3;
 
+// TEMP - Set to '1' to emulate standard NES reset behaviour. Set to '0' to run the nestest ROM in headless mode (we have no PPU so can't run it as a standard NES ROM).
+#if 0
     const uint8_t newLow = m_pDataBus->ReadData(0xFFFC);
     const uint8_t newHigh = m_pDataBus->ReadData(0xFFFD);
 
     m_Registers.StackPointer = 0xFD;
     m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
+#else
+    m_Registers.StackPointer = 0xFD;
+    m_Registers.ProgramCounter = 0xC000;
+#endif
 
     m_CycleCount += 7;
 }
@@ -753,17 +759,16 @@ uint8_t Cpu::RTS(const OpCode& InOpCode)
 uint8_t Cpu::BCC(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-    const int8_t offset = m_pDataBus->ReadData(address);
-
-    m_Registers.ProgramCounter += InOpCode.Size;
+    const uint16_t branchAddress = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
     if (m_Registers.IsFlagSet(ECpuFlag::Carry) == false)
     {
-        m_Registers.ProgramCounter += offset;
+        m_Registers.ProgramCounter = branchAddress;
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
+
+    m_Registers.ProgramCounter += InOpCode.Size;
 
     return InOpCode.CycleCount;
 }
@@ -771,17 +776,16 @@ uint8_t Cpu::BCC(const OpCode& InOpCode)
 uint8_t Cpu::BCS(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-    const int8_t offset = m_pDataBus->ReadData(address);
-
-    m_Registers.ProgramCounter += InOpCode.Size;
+    const uint16_t branchAddress = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
     if (m_Registers.IsFlagSet(ECpuFlag::Carry) == true)
     {
-        m_Registers.ProgramCounter += offset;
+        m_Registers.ProgramCounter = branchAddress;
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
+
+    m_Registers.ProgramCounter += InOpCode.Size;
 
     return InOpCode.CycleCount;
 }
@@ -789,17 +793,16 @@ uint8_t Cpu::BCS(const OpCode& InOpCode)
 uint8_t Cpu::BEQ(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-    const int8_t offset = m_pDataBus->ReadData(address);
-
-    m_Registers.ProgramCounter += InOpCode.Size;
+    const uint16_t branchAddress = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
     if (m_Registers.IsFlagSet(ECpuFlag::Zero) == true)
     {
-        m_Registers.ProgramCounter += offset;
+        m_Registers.ProgramCounter = branchAddress;
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
+
+    m_Registers.ProgramCounter += InOpCode.Size;
 
     return InOpCode.CycleCount;
 }
@@ -807,17 +810,16 @@ uint8_t Cpu::BEQ(const OpCode& InOpCode)
 uint8_t Cpu::BMI(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-    const int8_t offset = m_pDataBus->ReadData(address);
-
-    m_Registers.ProgramCounter += InOpCode.Size;
+    const uint16_t branchAddress = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
     if (m_Registers.IsFlagSet(ECpuFlag::Negative) == true)
     {
-        m_Registers.ProgramCounter += offset;
+        m_Registers.ProgramCounter = branchAddress;
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
+
+    m_Registers.ProgramCounter += InOpCode.Size;
 
     return InOpCode.CycleCount;
 }
@@ -825,17 +827,16 @@ uint8_t Cpu::BMI(const OpCode& InOpCode)
 uint8_t Cpu::BNE(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-    const int8_t offset = m_pDataBus->ReadData(address);
-
-    m_Registers.ProgramCounter += InOpCode.Size;
+    const uint16_t branchAddress = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
     if (m_Registers.IsFlagSet(ECpuFlag::Zero) == false)
     {
-        m_Registers.ProgramCounter += offset;
+        m_Registers.ProgramCounter = branchAddress;
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
+
+    m_Registers.ProgramCounter += InOpCode.Size;
 
     return InOpCode.CycleCount;
 }
@@ -843,17 +844,16 @@ uint8_t Cpu::BNE(const OpCode& InOpCode)
 uint8_t Cpu::BPL(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-    const int8_t offset = m_pDataBus->ReadData(address);
-
-    m_Registers.ProgramCounter += InOpCode.Size;
+    const uint16_t branchAddress = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
     if (m_Registers.IsFlagSet(ECpuFlag::Negative) == false)
     {
-        m_Registers.ProgramCounter += offset;
+        m_Registers.ProgramCounter = branchAddress;
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
+
+    m_Registers.ProgramCounter += InOpCode.Size;
 
     return InOpCode.CycleCount;
 }
@@ -861,17 +861,16 @@ uint8_t Cpu::BPL(const OpCode& InOpCode)
 uint8_t Cpu::BVC(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-    const int8_t offset = m_pDataBus->ReadData(address);
-
-    m_Registers.ProgramCounter += InOpCode.Size;
+    const uint16_t branchAddress = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
     if (m_Registers.IsFlagSet(ECpuFlag::Overflow) == false)
     {
-        m_Registers.ProgramCounter += offset;
+        m_Registers.ProgramCounter = branchAddress;
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
+
+    m_Registers.ProgramCounter += InOpCode.Size;
 
     return InOpCode.CycleCount;
 }
@@ -879,17 +878,16 @@ uint8_t Cpu::BVC(const OpCode& InOpCode)
 uint8_t Cpu::BVS(const OpCode& InOpCode)
 {
     bool bDidCrossPageBoundry = false;
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
-    const int8_t offset = m_pDataBus->ReadData(address);
-
-    m_Registers.ProgramCounter += InOpCode.Size;
+    const uint16_t branchAddress = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
     if (m_Registers.IsFlagSet(ECpuFlag::Overflow) == true)
     {
-        m_Registers.ProgramCounter += offset;
+        m_Registers.ProgramCounter = branchAddress;
 
         return InOpCode.CycleCount + 1 + (bDidCrossPageBoundry ? 1 : 0);
     }
+
+    m_Registers.ProgramCounter += InOpCode.Size;
 
     return InOpCode.CycleCount;
 }
@@ -1290,8 +1288,7 @@ uint16_t Cpu::GetAddressByAddressingMode(const EAddressingMode InAddressingMode,
                 *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(baseProgramCounter, branchedProgramCounter);
             }
 
-            // TODO: Return the final branched address
-            return offsetAddress;
+            return branchedProgramCounter;
         }
         case EAddressingMode::ZeroPage:
         {
