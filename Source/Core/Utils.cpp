@@ -23,8 +23,8 @@ const std::vector<std::string> OpCodeStrings =
      "BCS",  "LDA", "*JAM", "*LAX", "LDY",  "LDA", "LDX", "*LAX", "CLV", "LDA",  "TSX",  "*LAS",  "LDX",  "LDA", "LDX",  "*LAX",
      "CPY",  "CMP", "*NOP", "*DCP", "CPY",  "CMP", "DEC", "*DCP", "INY", "CMP",  "DEX",  "*SBX",  "CPY",  "CMP", "DEC",  "*DCP",
      "BNE",  "CMP", "*JAM", "*DCP", "*NOP", "CMP", "DEC", "*DCP", "CLD", "CMP",  "*NOP", "*DCP",  "*NOP", "CMP", "DEC",  "*DCP",
-     "CPX",  "SBC", "*NOP", "*ISC", "CPX",  "SBC", "INC", "*ISC", "INX", "SBC",  "NOP",  "*USBC", "CPX",  "SBC", "INC",  "*ISC",
-     "BEQ",  "SBC", "*JAM", "*ISC", "*NOP", "SBC", "INC", "*ISC", "SED", "SBC",  "*NOP", "*ISC",  "*NOP", "SBC", "INC",  "*ISC"
+     "CPX",  "SBC", "*NOP", "*ISB", "CPX",  "SBC", "INC", "*ISB", "INX", "SBC",  "NOP",  "*USBC", "CPX",  "SBC", "INC",  "*ISB",
+     "BEQ",  "SBC", "*JAM", "*ISB", "*NOP", "SBC", "INC", "*ISB", "SED", "SBC",  "*NOP", "*ISB",  "*NOP", "SBC", "INC",  "*ISB"
 };
 
 std::string Utils::ConvertToHex(const uint16_t InInteger)

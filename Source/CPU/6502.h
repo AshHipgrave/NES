@@ -32,7 +32,7 @@ public:
     /**
      * Executes a single CPU instruction.
      */
-    void Tick();
+    uint8_t Tick();
 
     /**
      * Returns a copy of the CPU register state
@@ -128,6 +128,7 @@ private:
     /// 
     
     uint8_t DCP(const OpCode& InOpCode);
+    uint8_t ISB(const OpCode& InOpCode);
     uint8_t LAX(const OpCode& InOpCode);
     uint8_t RLA(const OpCode& InOpCode);
     uint8_t RRA(const OpCode& InOpCode);

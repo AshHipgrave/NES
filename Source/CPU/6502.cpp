@@ -17,7 +17,7 @@ Cpu::Cpu(Bus* InDataBus)
     m_Registers.Flags = 36;
 
     m_Registers.StackPointer = 0xFD;
-    m_Registers.ProgramCounter = 0xC000; //0xFFFC;
+    m_Registers.ProgramCounter = 0xFFFC;
 
     // https://www.masswerk.at/6502/6502_instruction_set.html
     m_InstructionTable =
@@ -36,8 +36,8 @@ Cpu::Cpu(Bus* InDataBus)
         { BCS_Relative,      &Cpu::BCS }, { LDA_IndirectY, &Cpu::LDA }, { OP_NotImplemented, &Cpu::INV }, { LAX_IndirectY,     &Cpu::LAX }, { LDY_ZeroPageX, &Cpu::LDY }, { LDA_ZeroPageX, &Cpu::LDA }, { LDX_ZeroPageY, &Cpu::LDX }, { LAX_ZeroPageY,     &Cpu::LAX }, { CLV_Implied, &Cpu::CLV }, { LDA_AbsoluteY, &Cpu::LDA }, { TSX_Implied,     &Cpu::TSX }, { OP_NotImplemented, &Cpu::INV }, { LDY_AbsoluteX, &Cpu::LDY }, { LDA_AbsoluteX, &Cpu::LDA }, { LDX_AbsoluteY,     &Cpu::LDX }, { LAX_AbsoluteY,     &Cpu::LAX },
         { CPY_Immediate,     &Cpu::CPY }, { CMP_IndirectX, &Cpu::CMP }, { NOP_Immediate,     &Cpu::NOP }, { DCP_IndirectX,     &Cpu::DCP }, { CPY_ZeroPage,  &Cpu::CPY }, { CMP_ZeroPage,  &Cpu::CMP }, { DEC_ZeroPage,  &Cpu::DEC }, { DCP_ZeroPage,      &Cpu::DCP }, { INY_Implied, &Cpu::INY }, { CMP_Immediate, &Cpu::CMP }, { DEX_Implied,     &Cpu::DEX }, { OP_NotImplemented, &Cpu::INV }, { CPY_Absolute,  &Cpu::CPY }, { CMP_Absolute,  &Cpu::CMP }, { DEC_Absolute,      &Cpu::DEC }, { DCP_Absolute,      &Cpu::DCP },
         { BNE_Relative,      &Cpu::BNE }, { CMP_IndirectY, &Cpu::CMP }, { OP_NotImplemented, &Cpu::INV }, { DCP_IndirectY,     &Cpu::DCP }, { NOP_ZeroPageX, &Cpu::NOP }, { CMP_ZeroPageX, &Cpu::CMP }, { DEC_ZeroPageX, &Cpu::DEC }, { DCP_ZeroPageX,     &Cpu::DCP }, { CLD_Implied, &Cpu::CLD }, { CMP_AbsoluteY, &Cpu::CMP }, { NOP_Implied,     &Cpu::NOP }, { DCP_AbsoluteY,     &Cpu::DCP }, { NOP_AbsoluteX, &Cpu::NOP }, { CMP_AbsoluteX, &Cpu::CMP }, { DEC_AbsoluteX,     &Cpu::DEC }, { DCP_AbsoluteX,     &Cpu::DCP },
-        { CPX_Immediate,     &Cpu::CPX }, { SBC_IndirectX, &Cpu::SBC }, { NOP_Immediate,     &Cpu::NOP }, { OP_NotImplemented, &Cpu::INV }, { CPX_ZeroPage,  &Cpu::CPX }, { SBC_ZeroPage,  &Cpu::SBC }, { INC_ZeroPage,  &Cpu::INC }, { OP_NotImplemented, &Cpu::INV }, { INX_Implied, &Cpu::INX }, { SBC_Immediate, &Cpu::SBC }, { NOP_Implied,     &Cpu::NOP }, { SBC_Immediate,     &Cpu::SBC }, { CPX_Absolute,  &Cpu::CPX }, { SBC_Absolute,  &Cpu::SBC }, { INC_Absolute,      &Cpu::INC }, { OP_NotImplemented, &Cpu::INV },
-        { BEQ_Relative,      &Cpu::BEQ }, { SBC_IndirectY, &Cpu::SBC }, { OP_NotImplemented, &Cpu::INV }, { OP_NotImplemented, &Cpu::INV }, { NOP_ZeroPageX, &Cpu::NOP }, { SBC_ZeroPageX, &Cpu::SBC }, { INC_ZeroPageX, &Cpu::INC }, { OP_NotImplemented, &Cpu::INV }, { SED_Implied, &Cpu::SED }, { SBC_AbsoluteY, &Cpu::SBC }, { NOP_Implied,     &Cpu::NOP }, { OP_NotImplemented, &Cpu::INV }, { NOP_AbsoluteX, &Cpu::NOP }, { SBC_AbsoluteX, &Cpu::SBC }, { INC_AbsoluteX,     &Cpu::INC }, { OP_NotImplemented, &Cpu::INV }
+        { CPX_Immediate,     &Cpu::CPX }, { SBC_IndirectX, &Cpu::SBC }, { NOP_Immediate,     &Cpu::NOP }, { ISB_IndirectX,     &Cpu::ISB }, { CPX_ZeroPage,  &Cpu::CPX }, { SBC_ZeroPage,  &Cpu::SBC }, { INC_ZeroPage,  &Cpu::INC }, { ISB_ZeroPage,      &Cpu::ISB }, { INX_Implied, &Cpu::INX }, { SBC_Immediate, &Cpu::SBC }, { NOP_Implied,     &Cpu::NOP }, { SBC_Immediate,     &Cpu::SBC }, { CPX_Absolute,  &Cpu::CPX }, { SBC_Absolute,  &Cpu::SBC }, { INC_Absolute,      &Cpu::INC }, { ISB_Absolute,      &Cpu::ISB },
+        { BEQ_Relative,      &Cpu::BEQ }, { SBC_IndirectY, &Cpu::SBC }, { OP_NotImplemented, &Cpu::INV }, { ISB_IndirectY,     &Cpu::ISB }, { NOP_ZeroPageX, &Cpu::NOP }, { SBC_ZeroPageX, &Cpu::SBC }, { INC_ZeroPageX, &Cpu::INC }, { ISB_ZeroPageX,     &Cpu::ISB }, { SED_Implied, &Cpu::SED }, { SBC_AbsoluteY, &Cpu::SBC }, { NOP_Implied,     &Cpu::NOP }, { ISB_AbsoluteY,     &Cpu::ISB }, { NOP_AbsoluteX, &Cpu::NOP }, { SBC_AbsoluteX, &Cpu::SBC }, { INC_AbsoluteX,     &Cpu::INC }, { ISB_AbsoluteX,     &Cpu::ISB }
     };
 }
 
@@ -56,16 +56,12 @@ void Cpu::Reset()
     const uint8_t newLow = m_pDataBus->ReadData(0xFFFC);
     const uint8_t newHigh = m_pDataBus->ReadData(0xFFFD);
 
+    m_Registers.StackPointer = 0xFD;
     m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
 }
 
 void Cpu::IRQ()
 {
-    if (m_Registers.IsFlagSet(ECpuFlag::InterruptDisable))
-    {
-        return;
-    }
-
     const uint8_t lowbyte = Utils::GetLowByte(m_Registers.ProgramCounter);
     const uint8_t highbyte = Utils::GetHighByte(m_Registers.ProgramCounter);
 
@@ -94,19 +90,26 @@ void Cpu::NMI()
     m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
 }
 
-void Cpu::Tick()
+uint8_t Cpu::Tick()
 {
+    static bool bIsFirstOp = true;
+
     const CpuRegisters registersBefore = m_Registers;
 
     const uint8_t opcode = m_pDataBus->ReadData(m_Registers.ProgramCounter);
     const Instruction instruction = m_InstructionTable[opcode];
     
-    const uint8_t cycles = (this->*instruction.PFN_OpCodeHandlerFunction)(instruction.Code);
+    uint8_t cycles = (this->*instruction.PFN_OpCodeHandlerFunction)(instruction.Code);
+
+    if (bIsFirstOp)
+    {
+        bIsFirstOp = false;
+        cycles += 4;
+    }
 
     Utils::LogInstruction(instruction.Code, registersBefore, cycles);
 
-    // TODO: Delay for how long the previous instruction took (e.g. if it took 3 cycles, delay for the equivelent of 3 cycles).
-    UNUSED_PARAMETER(cycles);
+    return cycles;
 }
 
 CpuRegisters Cpu::GetRegisters() const
@@ -1005,20 +1008,43 @@ uint8_t Cpu::INV(const OpCode& InOpCode)
 uint8_t Cpu::DCP(const OpCode& InOpCode)
 {
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
-    const uint8_t value = m_pDataBus->ReadData(address);
+    uint8_t value = m_pDataBus->ReadData(address);
+    value--;
 
-    const uint8_t memoryResult = value - 1;
-    const uint8_t accumulatorResult = m_Registers.Accumulator - value;
+    m_pDataBus->WriteData(value, address);
 
-   m_pDataBus->WriteData(memoryResult, memoryResult);
+    const int result = m_Registers.Accumulator - value;
 
-   m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == memoryResult);
-   m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(accumulatorResult, 7));
-   m_Registers.SetFlag(ECpuFlag::Carry, memoryResult <= m_Registers.Accumulator);
+    m_Registers.SetFlag(ECpuFlag::Zero, result == 0);
+    m_Registers.SetFlag(ECpuFlag::Carry, m_Registers.Accumulator >= value);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(result, 7));
 
-   m_Registers.ProgramCounter += InOpCode.Size;
+    m_Registers.ProgramCounter += InOpCode.Size;
 
-   return InOpCode.CycleCount;
+    return InOpCode.CycleCount;
+}
+
+uint8_t Cpu::ISB(const OpCode& InOpCode)
+{
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+    uint8_t value = m_pDataBus->ReadData(address);
+    value++;
+
+    m_pDataBus->WriteData(value, address);
+
+    const int16_t result = m_Registers.Accumulator - value - (m_Registers.IsFlagSet(ECpuFlag::Carry) ? 0 : 1);
+
+    m_Registers.SetFlag(ECpuFlag::Overflow, ((m_Registers.Accumulator ^ value) & (m_Registers.Accumulator ^ result) & 0x80));
+    m_Registers.SetFlag(ECpuFlag::Carry, (result & 0xFF00) == 0);
+
+    m_Registers.Accumulator = result & 0xFF;
+
+    m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
+
+    m_Registers.ProgramCounter += InOpCode.Size;
+
+    return InOpCode.CycleCount;
 }
 
 uint8_t Cpu::LAX(const OpCode& InOpCode)
@@ -1067,35 +1093,31 @@ uint8_t Cpu::RLA(const OpCode& InOpCode)
 uint8_t Cpu::RRA(const OpCode& InOpCode)
 {
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
-    const uint8_t value = m_pDataBus->ReadData(address);
-
-    uint8_t result = value >> 1;
+    uint8_t value = m_pDataBus->ReadData(address);
 
     const bool bCarrySetBefore = m_Registers.IsFlagSet(ECpuFlag::Carry);
-    const bool bOverflowStateBefore = Utils::IsBitSet(m_Registers.Accumulator, 7); // TODO: Not sure which value to check here.
-
     m_Registers.SetFlag(ECpuFlag::Carry, Utils::IsBitSet(value, 0));
+
+    value >>= 1;
 
     if (bCarrySetBefore)
     {
-        result |= 0x80;
+        value |= 0x80;
     }
 
-    m_pDataBus->WriteData(result, address);
+    m_pDataBus->WriteData(value, address);
 
-    const uint16_t tempResult = m_Registers.Accumulator + result + m_Registers.IsFlagSet(ECpuFlag::Carry) ? 1 : 0;
+    uint16_t result = m_Registers.Accumulator + value + (m_Registers.IsFlagSet(ECpuFlag::Carry) ? 1 : 0);
 
-    m_Registers.Accumulator += result + m_Registers.IsFlagSet(ECpuFlag::Carry) ? 1 : 0;
+    m_Registers.Accumulator = result & 0xFF;
 
-    const bool bOverflowStateAfter = Utils::IsBitSet(m_Registers.Accumulator, 7);
-
-    m_Registers.SetFlag(ECpuFlag::Carry, tempResult > 255);
+    m_Registers.SetFlag(ECpuFlag::Carry, result > 255);
     m_Registers.SetFlag(ECpuFlag::Zero, m_Registers.Accumulator == 0);
-    m_Registers.SetFlag(ECpuFlag::Negative, bOverflowStateAfter);
-    m_Registers.SetFlag(ECpuFlag::Overflow, bOverflowStateBefore != bOverflowStateAfter);
+    m_Registers.SetFlag(ECpuFlag::Negative, Utils::IsBitSet(m_Registers.Accumulator, 7));
+    m_Registers.SetFlag(ECpuFlag::Overflow, ((m_Registers.Accumulator ^ value) & (m_Registers.Accumulator ^ result) & 0x80));
 
     m_Registers.ProgramCounter += InOpCode.Size;
-    
+
     return InOpCode.CycleCount;
 }
 

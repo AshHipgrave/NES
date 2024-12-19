@@ -316,6 +316,18 @@ constexpr OpCode DCP_IndirectX = { 2, 8, EAddressingMode::IndirectX };
 constexpr OpCode DCP_IndirectY = { 2, 8, EAddressingMode::IndirectY };
 
 ///
+/// Illegal ISB/ISC
+/// 
+
+constexpr OpCode ISB_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
+constexpr OpCode ISB_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
+constexpr OpCode ISB_Absolute  = { 3, 6, EAddressingMode::Absolute  };
+constexpr OpCode ISB_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
+constexpr OpCode ISB_AbsoluteY = { 3, 7, EAddressingMode::AbsoluteY };
+constexpr OpCode ISB_IndirectX = { 2, 8, EAddressingMode::IndirectX };
+constexpr OpCode ISB_IndirectY = { 2, 8, EAddressingMode::IndirectY };
+
+///
 /// Illegal LAX
 ///
 
