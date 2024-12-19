@@ -53,11 +53,13 @@ void Cpu::Reset()
 
     m_Registers.StackPointer -= 3;
 
-    const uint8_t newLow = m_pDataBus->ReadData(0xFFFC);
-    const uint8_t newHigh = m_pDataBus->ReadData(0xFFFD);
+    //const uint8_t newLow = m_pDataBus->ReadData(0xFFFC);
+    //const uint8_t newHigh = m_pDataBus->ReadData(0xFFFD);
 
     m_Registers.StackPointer = 0xFD;
-    m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
+    m_Registers.ProgramCounter = 0xC000; // Utils::MakeDword(newLow, newHigh);
+
+    m_CycleCount += 7;
 }
 
 void Cpu::IRQ()
@@ -73,6 +75,8 @@ void Cpu::IRQ()
     const uint8_t newHigh = m_pDataBus->ReadData(0xFFEF);
 
     m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
+
+    m_CycleCount += 7;
 }
 
 void Cpu::NMI()
@@ -92,22 +96,17 @@ void Cpu::NMI()
 
 uint8_t Cpu::Tick()
 {
-    static bool bIsFirstOp = true;
-
     const CpuRegisters registersBefore = m_Registers;
 
     const uint8_t opcode = m_pDataBus->ReadData(m_Registers.ProgramCounter);
     const Instruction instruction = m_InstructionTable[opcode];
     
-    uint8_t cycles = (this->*instruction.PFN_OpCodeHandlerFunction)(instruction.Code);
+    const uint64_t cyclesBefore = m_CycleCount;
 
-    if (bIsFirstOp)
-    {
-        bIsFirstOp = false;
-        cycles += 4;
-    }
+    const uint8_t cycles = (this->*instruction.PFN_OpCodeHandlerFunction)(instruction.Code);
+    m_CycleCount += cycles;
 
-    Utils::LogInstruction(instruction.Code, registersBefore, cycles);
+    Utils::LogInstruction(instruction.Code, registersBefore, cyclesBefore);
 
     return cycles;
 }
@@ -134,6 +133,12 @@ uint8_t Cpu::PopStack()
 
 uint8_t Cpu::LDA(const OpCode& InOpCode)
 {
+    if (m_Registers.ProgramCounter == 0xD922)
+    {
+        int a = 0;
+        a++;
+    }
+
     bool bDidCrossPageBoundry = false;
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
@@ -978,9 +983,22 @@ uint8_t Cpu::BRK(const OpCode& InOpCode)
 
 uint8_t Cpu::NOP(const OpCode& InOpCode)
 {
-    m_Registers.ProgramCounter += InOpCode.Size;
+    // Undocumented NOPs can trigger a memory operations across a page boundry which incurs a performance penalty
+    if (InOpCode.AddressingMode == EAddressingMode::AbsoluteX)
+    {
+        bool bDidCrossPageBoundry = false;
+        GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
-    return InOpCode.CycleCount;
+        m_Registers.ProgramCounter += InOpCode.Size;
+
+        return bDidCrossPageBoundry ? InOpCode.CycleCount + 1 : InOpCode.CycleCount;
+    }
+    else
+    {
+        m_Registers.ProgramCounter += InOpCode.Size;
+
+        return InOpCode.CycleCount;
+    }
 }
 
 uint8_t Cpu::RTI(const OpCode& InOpCode)
@@ -1049,7 +1067,8 @@ uint8_t Cpu::ISB(const OpCode& InOpCode)
 
 uint8_t Cpu::LAX(const OpCode& InOpCode)
 {
-    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode);
+    bool bDidCrossPageBoundry = false;
+    const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
     const uint8_t value = m_pDataBus->ReadData(address);
 
     m_Registers.X = value;
@@ -1060,7 +1079,7 @@ uint8_t Cpu::LAX(const OpCode& InOpCode)
 
     m_Registers.ProgramCounter += InOpCode.Size;
 
-    return InOpCode.CycleCount;
+    return bDidCrossPageBoundry ? InOpCode.CycleCount + 1 : InOpCode.CycleCount;
 }
 
 uint8_t Cpu::RLA(const OpCode& InOpCode)
@@ -1191,30 +1210,30 @@ uint16_t Cpu::GetAddressByAddressingMode(const EAddressingMode InAddressingMode,
             const uint8_t lowbyte =m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
             const uint8_t highbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 2);
 
-            uint16_t address = Utils::MakeDword(lowbyte, highbyte);
-            address += m_Registers.X;
+            const uint16_t baseAddress = Utils::MakeDword(lowbyte, highbyte);
+            const uint16_t finalAddress = baseAddress + m_Registers.X;
 
             if (bOutDidCrossPageBoundry != nullptr)
             {
-                *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(m_Registers.ProgramCounter, address);
+                *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(baseAddress, finalAddress);
             }
 
-            return address;
+            return finalAddress;
         }
         case EAddressingMode::AbsoluteY:
         {
             const uint8_t lowbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
             const uint8_t highbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 2);
 
-            uint16_t address = Utils::MakeDword(lowbyte, highbyte);
-            address += m_Registers.Y;
+            const uint16_t baseAddress = Utils::MakeDword(lowbyte, highbyte);
+            const uint16_t finalAddress = baseAddress + m_Registers.Y;
 
             if (bOutDidCrossPageBoundry != nullptr)
             {
-                *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(m_Registers.ProgramCounter, address);
+                *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(baseAddress, finalAddress);
             }
 
-            return address;
+            return finalAddress;
         }
         case EAddressingMode::Immediate:
         {
@@ -1256,25 +1275,30 @@ uint16_t Cpu::GetAddressByAddressingMode(const EAddressingMode InAddressingMode,
             const uint8_t highbyte = m_pDataBus->ReadData((zpAddress + 1) & 0xFF);
 
             const uint16_t baseAddress = Utils::MakeDword(lowbyte, highbyte);
-            const uint16_t address = baseAddress + m_Registers.Y;
+            const uint16_t finalAddress = baseAddress + m_Registers.Y;
 
             if (bOutDidCrossPageBoundry != nullptr)
             {
-                *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(m_Registers.ProgramCounter, address);
-            }
-
-            return address;
-        }
-        case EAddressingMode::Relative:
-        {
-            const uint16_t finalAddress = m_Registers.ProgramCounter + 1;
-
-            if (bOutDidCrossPageBoundry != nullptr)
-            {
-                *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(m_Registers.ProgramCounter, finalAddress);
+                *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(baseAddress, finalAddress);
             }
 
             return finalAddress;
+        }
+        case EAddressingMode::Relative:
+        {
+            const uint16_t offsetAddress = m_Registers.ProgramCounter + 1;
+            const int8_t offset = m_pDataBus->ReadData(offsetAddress);
+            
+            const uint16_t baseProgramCounter = m_Registers.ProgramCounter + 2;
+            const uint16_t branchedProgramCounter = baseProgramCounter + offset;
+
+            if (bOutDidCrossPageBoundry != nullptr)
+            {
+                *bOutDidCrossPageBoundry = Utils::DidCrossPageBoundry(baseProgramCounter, branchedProgramCounter);
+            }
+
+            // TODO: Return the final branched address
+            return offsetAddress;
         }
         case EAddressingMode::ZeroPage:
         {

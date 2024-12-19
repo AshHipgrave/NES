@@ -143,6 +143,8 @@ private:
     uint16_t GetAddressByAddressingMode(const EAddressingMode InAddressingMode, bool* bOutDidCrossPageBoundry = nullptr) const;
 
 private:
+    uint64_t m_CycleCount = 0;
+
     CpuRegisters m_Registers;
 
     Bus* m_pDataBus;

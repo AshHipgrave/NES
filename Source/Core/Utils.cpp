@@ -78,11 +78,8 @@ std::string Utils::ConvertOpcodeToString(const uint8_t InOpcode)
     return OpCodeStrings[InOpcode];
 }
 
-std::string Utils::LogInstruction(const OpCode InOpCode, const CpuRegisters CpuStateBefore, const uint8_t InTakenCycles)
+std::string Utils::LogInstruction(const OpCode InOpCode, const CpuRegisters CpuStateBefore, const uint64_t InTotalCycles)
 {
-    static uint64_t totalCycles = 0;
-    totalCycles += InTakenCycles;
-
     std::stringstream ss;
 
     ss << std::left << std::setw(6) << Utils::ConvertToHex(CpuStateBefore.ProgramCounter);
@@ -123,7 +120,7 @@ std::string Utils::LogInstruction(const OpCode InOpCode, const CpuRegisters CpuS
     ss << "P:" << ConvertToHex(CpuStateBefore.GetFlags()) << " ";
     ss << "SP:" << ConvertToHex(CpuStateBefore.StackPointer) << " ";
     ss << "PPU: " << "0,0" << " "; // TODO: PPU hasn't been implemented yet so this will always be wrong when compared to the example log.
-    ss << "CYC:" << totalCycles;   // TODO: Cycle accurate timing hasn't been implemented yet so this will always be wrong when compared to the example log.
+    ss << "CYC:" << InTotalCycles;
 
     std::cout << ss.str() << std::endl;
     return ss.str();

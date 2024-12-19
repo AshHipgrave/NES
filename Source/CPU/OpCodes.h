@@ -366,10 +366,10 @@ constexpr OpCode RRA_IndirectY = { 2, 8, EAddressingMode::IndirectY };
 /// Illegal SAX
 /// 
 
-constexpr OpCode SAX_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
-constexpr OpCode SAX_ZeroPageY = { 2, 6, EAddressingMode::ZeroPageY };
-constexpr OpCode SAX_Absolute  = { 3, 6, EAddressingMode::Absolute  };
-constexpr OpCode SAX_IndirectX = { 2, 8, EAddressingMode::IndirectX };
+constexpr OpCode SAX_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
+constexpr OpCode SAX_ZeroPageY = { 2, 4, EAddressingMode::ZeroPageY };
+constexpr OpCode SAX_Absolute  = { 3, 4, EAddressingMode::Absolute  };
+constexpr OpCode SAX_IndirectX = { 2, 6, EAddressingMode::IndirectX };
 
 ///
 /// Illegal SLO
