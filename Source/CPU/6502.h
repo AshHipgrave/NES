@@ -48,7 +48,7 @@ private:
 
     /**
      * Reads the value at the top of the stack.
-     * The stack pointer will be incremented once the operation completes
+     * The stack pointer will be incremented before the read operation.
      */
     uint8_t PopStack();
 
