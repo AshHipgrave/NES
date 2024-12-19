@@ -132,12 +132,6 @@ uint8_t Cpu::PopStack()
 
 uint8_t Cpu::LDA(const OpCode& InOpCode)
 {
-    if (m_Registers.ProgramCounter == 0xD922)
-    {
-        int a = 0;
-        a++;
-    }
-
     bool bDidCrossPageBoundry = false;
     const uint16_t address = GetAddressByAddressingMode(InOpCode.AddressingMode, &bDidCrossPageBoundry);
 
