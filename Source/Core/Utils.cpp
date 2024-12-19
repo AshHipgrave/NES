@@ -2,6 +2,7 @@
 #include "Core/Utils.h"
 #include "Core/Types.h"
 #include "System/Bus.h"
+#include "System/PPU.h"
 
 /**
  * String representation of all opcodes.
@@ -119,7 +120,7 @@ std::string Utils::LogInstruction(const OpCode InOpCode, const CpuRegisters CpuS
     ss << "Y:" << ConvertToHex(CpuStateBefore.Y) << " ";
     ss << "P:" << ConvertToHex(CpuStateBefore.GetFlags()) << " ";
     ss << "SP:" << ConvertToHex(CpuStateBefore.StackPointer) << " ";
-    ss << "PPU: " << "0,0" << " "; // TODO: PPU hasn't been implemented yet so this will always be wrong when compared to the example log.
+    ss << "PPU: " << dataBus->GetPPU()->GetCurrentScanLine() << "," << dataBus->GetPPU()->GetCurrentCycle() << " "; // TODO: PPU hasn't been implemented yet so this will always be wrong when compared to the example log.
     ss << "CYC:" << InTotalCycles;
 
     std::cout << ss.str() << std::endl;

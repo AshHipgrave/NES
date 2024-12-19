@@ -154,6 +154,16 @@ uint8_t PPU::ReadData(const uint16_t InAddress)
     return 0;
 }
 
+int16_t PPU::GetCurrentScanLine() const
+{
+    return m_ScanLine;
+}
+
+uint16_t PPU::GetCurrentCycle() const
+{
+    return m_CurrentCycle;
+}
+
 uint8_t PPU::InternalReadData(const uint16_t InAddress) const
 {
     // TODO: Read from other memory sources? (VRAM, OAM etc).

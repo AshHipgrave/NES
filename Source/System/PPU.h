@@ -21,6 +21,9 @@ public:
     void WriteData(const uint8_t InData, const uint16_t InAddress);
     uint8_t ReadData(const uint16_t InAddress);
 
+    int16_t GetCurrentScanLine() const;
+    uint16_t GetCurrentCycle() const;
+
 private:
     uint8_t InternalReadData(const uint16_t InAddress) const;
 
