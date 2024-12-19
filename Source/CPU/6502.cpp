@@ -53,11 +53,11 @@ void Cpu::Reset()
 
     m_Registers.StackPointer -= 3;
 
-    //const uint8_t newLow = m_pDataBus->ReadData(0xFFFC);
-    //const uint8_t newHigh = m_pDataBus->ReadData(0xFFFD);
+    const uint8_t newLow = m_pDataBus->ReadData(0xFFFC);
+    const uint8_t newHigh = m_pDataBus->ReadData(0xFFFD);
 
     m_Registers.StackPointer = 0xFD;
-    m_Registers.ProgramCounter = 0xC000; // Utils::MakeDword(newLow, newHigh);
+    m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
 
     m_CycleCount += 7;
 }
@@ -97,12 +97,11 @@ void Cpu::NMI()
 uint8_t Cpu::Tick()
 {
     const CpuRegisters registersBefore = m_Registers;
+    const uint64_t cyclesBefore = m_CycleCount;
 
     const uint8_t opcode = m_pDataBus->ReadData(m_Registers.ProgramCounter);
     const Instruction instruction = m_InstructionTable[opcode];
     
-    const uint64_t cyclesBefore = m_CycleCount;
-
     const uint8_t cycles = (this->*instruction.PFN_OpCodeHandlerFunction)(instruction.Code);
     m_CycleCount += cycles;
 
