@@ -12,19 +12,21 @@ PPU::PPU(Bus* InDataBus)
     m_CurrentCycle = 0;
     m_LastReadBuffer = 0;
 
-    m_VRAM.resize(2048); // TODO: Make larger?
-    m_OAMData.resize(256);
-    m_PaletteTable.resize(32);
+    m_VRAM.fill(0);
+    m_OAMData.fill(0);
+    m_PaletteTable.fill(0);
+    m_pNametablePointers.fill(0);
+
+    for (int i = 0; i < 4; i++)
+    {
+        m_pNametablePointers[i] = nullptr;
+    }
 
     m_Registers = PPURegisters();
 }
 
 PPU::~PPU()
 {
-    m_VRAM.clear();
-    m_OAMData.clear();
-    m_PaletteTable.clear();
-
     m_pCartridge = nullptr;
 }
 
@@ -37,9 +39,13 @@ void PPU::Tick()
         m_CurrentCycle = 0;
         m_ScanLine++;
 
-        if (m_ScanLine >= 261)
+        if (m_ScanLine == 241)
         {
-            m_ScanLine = -1;
+            m_pDataBus->NotifyVBlank();
+        }
+        else if (m_ScanLine == 262)
+        {
+            m_ScanLine = 0;
 
             m_pDataBus->NotifyFrameComplete();
         }
@@ -54,6 +60,8 @@ void PPU::Draw()
 void PPU::LoadCartridge(Cartridge* InCartridge)
 {
     m_pCartridge = InCartridge;
+
+    ConfigureMirroring(InCartridge->GetMirrorMode());
 }
 
 void PPU::WriteData(const uint8_t InData, const uint16_t InAddress)
@@ -70,19 +78,14 @@ void PPU::WriteData(const uint8_t InData, const uint16_t InAddress)
             m_Registers.Mask = InData;
             break;
         }
-        case 0x0002:
+        case 0x0003:
         {
             m_Registers.OAMAddress = InData;
             break;
         }
-        case 0x0003:
-        {
-            m_Registers.OAMData = InData;
-            break;
-        }
         case 0x0004:
         {
-            m_OAMData[m_Registers.OAMAddress++] = InData;
+            m_OAMData[m_Registers.OAMAddress] = InData;
             break;
         }
         case 0x0005:
@@ -106,7 +109,7 @@ void PPU::WriteData(const uint8_t InData, const uint16_t InAddress)
         }
         case 0x0007:
         {
-            m_VRAM[m_Registers.PPUAddress] = InData;
+            InternalWriteData(InData, m_Registers.PPUAddress);
 
             const bool bIsInVerticalIncrementMode = Utils::IsBitSet(m_Registers.Control, 2);
             const uint8_t incrementAmount = bIsInVerticalIncrementMode ? 32 : 1;
@@ -129,21 +132,26 @@ uint8_t PPU::ReadData(const uint16_t InAddress)
     {
         case 0x0002:
         {
-            return m_Registers.Status;
+            const uint8_t result = (m_Registers.GetFlags() & 0xE0) | (m_LastReadBuffer & 0x1F);
+
+            m_Registers.SetFlag(EPPUStatusFlag::VBlank, false);
+
+            return result;
         }
         case 0x0004:
         {
-            return m_Registers.OAMData;
+            return m_OAMData[m_Registers.OAMAddress];
         }
         case 0x0007:
         {
-            // PPU reads are delayed by 1 cycle because the PPU needs to fetch it from external RAM.
-            // The CPU will usually therefore request the data twice (the first time is a dummy read).
-            const uint8_t lastRead = m_LastReadBuffer;
+            const uint8_t data = InternalReadData(m_Registers.PPUAddress);
 
-            m_LastReadBuffer = m_VRAM[m_Registers.PPUAddress];
+            const bool bIsInVerticalIncrementMode = Utils::IsBitSet(m_Registers.Control, 2);
+            const uint8_t incrementAmount = bIsInVerticalIncrementMode ? 32 : 1;
 
-            return lastRead;
+            m_Registers.PPUAddress += incrementAmount;
+
+            return data;
         }
     }
 
@@ -164,9 +172,86 @@ uint16_t PPU::GetCurrentCycle() const
     return m_CurrentCycle;
 }
 
-uint8_t PPU::InternalReadData(const uint16_t InAddress) const
+uint8_t PPU::InternalReadData(const uint16_t InAddress)
 {
-    // TODO: Read from other memory sources? (VRAM, OAM etc).
+    if (InAddress >= 0x0000 && InAddress <= 0x1FFF)
+    {
+        return m_pCartridge->ReadCharacterData(InAddress);
+    }
+    else if (InAddress >= 0x2000 && InAddress <= 0x2FFF)
+    {
+        const uint16_t index = (InAddress - 0x2000) % 0x1000;
+        const uint16_t nametableIndex = index / 0x0400;
+        const uint16_t offset = index % 0x0400;
 
-    return m_pCartridge->ReadCharacterData(InAddress);
+        // PPU reads are delayed by 1 cycle because the PPU needs to fetch it from external RAM.
+        // The CPU will usually therefore request the data twice (the first time is a dummy read).
+        const uint8_t lastRead = m_LastReadBuffer;
+
+        m_LastReadBuffer = m_pNametablePointers[nametableIndex][offset];
+
+        return lastRead;
+    }
+    else if (InAddress >= 0x3F00 && InAddress <= 0x3FFF)
+    {
+        return m_PaletteTable[InAddress - 0x3F00];
+    }
+    else
+    {
+        std::cout << "ERROR: PPU attempted to read from an invalid address." << std::endl;
+
+        EMULATOR_DEBUG_BREAK();
+
+        return 0;
+    }
+}
+
+void PPU::InternalWriteData(const uint8_t InData, const uint16_t InAddress)
+{
+    // TODO: Support additional write locations (currently this is only called for VRAM/Nametable writes).
+
+    const uint16_t index = (InAddress - 0x2000) % 0x1000;
+    const uint16_t nametableIndex = index / 0x0400;
+    const uint16_t offset = index % 0x0400;
+
+    m_pNametablePointers[nametableIndex][offset] = InData;
+}
+
+void PPU::ConfigureMirroring(const EMirrorMode InMirroringMode)
+{
+    switch (InMirroringMode)
+    {
+        case EMirrorMode::Horizontal:
+            m_pNametablePointers[0] = m_VRAM.data();
+            m_pNametablePointers[1] = m_VRAM.data();
+            m_pNametablePointers[2] = m_VRAM.data() + 0x0400;
+            m_pNametablePointers[3] = m_VRAM.data() + 0x0400;
+            break;
+
+        case EMirrorMode::Vertical:
+            m_pNametablePointers[0] = m_VRAM.data();
+            m_pNametablePointers[1] = m_VRAM.data() + 0x0400;
+            m_pNametablePointers[2] = m_VRAM.data();
+            m_pNametablePointers[3] = m_VRAM.data() + 0x0400;
+            break;
+
+        case EMirrorMode::FourScreen:
+            // TODO.
+            EMULATOR_DEBUG_BREAK();
+            break;
+
+        case EMirrorMode::OneScreenLower:
+            m_pNametablePointers[0] = m_VRAM.data();
+            m_pNametablePointers[1] = m_VRAM.data();
+            m_pNametablePointers[2] = m_VRAM.data();
+            m_pNametablePointers[3] = m_VRAM.data();
+            break;
+
+        case EMirrorMode::OneScreenUpper:
+            m_pNametablePointers[0] = m_VRAM.data() + 0x0400;
+            m_pNametablePointers[1] = m_VRAM.data() + 0x0400;
+            m_pNametablePointers[2] = m_VRAM.data() + 0x0400;
+            m_pNametablePointers[3] = m_VRAM.data() + 0x0400;
+            break;
+    }
 }

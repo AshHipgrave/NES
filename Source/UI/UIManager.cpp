@@ -52,6 +52,12 @@ void UIManager::Init(SDL_Window* InWindow, SDL_Renderer* InRenderer)
 
     m_pCharacterMemoryViewer = new MemoryEditor();
     m_pCharacterMemoryViewer->ReadOnly = true;
+
+    m_pNametableMemoryViewer = new MemoryEditor();
+    m_pNametableMemoryViewer->ReadOnly = true;
+
+    m_pOAMDataMemoryViewer = new MemoryEditor();
+    m_pOAMDataMemoryViewer->ReadOnly = true;
 }
 
 void UIManager::HandleUIEvents(const SDL_Event* InEvent)
@@ -94,7 +100,7 @@ void UIManager::Draw()
         m_pProgramMemoryViewer->DrawWindow("Character RAM", bus->GetCartridge()->m_CharacterROM.data(), bus->GetCartridge()->m_CharacterROM.size());
 
     if (m_bShowOAMDataMemoryViewer && bus->HasCartridgeLoaded())
-        m_pNametableMemoryViewer->DrawWindow("OAM Data", bus->GetPPU()->m_OAMData.data(), bus->GetPPU()->m_OAMData.size());
+        m_pOAMDataMemoryViewer->DrawWindow("OAM Data", bus->GetPPU()->m_OAMData.data(), bus->GetPPU()->m_OAMData.size());
 
     if (m_bShowNametableMemoryViewer && bus->HasCartridgeLoaded())
         m_pNametableMemoryViewer->DrawWindow("Nametables", bus->GetPPU()->m_VRAM.data(), bus->GetPPU()->m_VRAM.size());

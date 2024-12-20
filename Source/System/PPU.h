@@ -25,7 +25,10 @@ public:
     uint16_t GetCurrentCycle() const;
 
 private:
-    uint8_t InternalReadData(const uint16_t InAddress) const;
+    uint8_t InternalReadData(const uint16_t InAddress);
+    void InternalWriteData(const uint8_t InData, const uint16_t InAddress);
+    
+    void ConfigureMirroring(const EMirrorMode InMirroringMode);
 
 private:
     int16_t m_ScanLine;
@@ -35,9 +38,10 @@ private:
 
     PPURegisters m_Registers;
 
-    std::vector<uint8_t> m_VRAM; //aka nametables
-    std::vector<uint8_t> m_OAMData;
-    std::vector<uint8_t> m_PaletteTable;
+    std::array<uint8_t, 2048> m_VRAM; //aka nametables
+    std::array<uint8_t, 256> m_OAMData;
+    std::array<uint8_t, 32> m_PaletteTable;
+    std::array<uint8_t*, 4> m_pNametablePointers;
 
     Bus* m_pDataBus = nullptr;
     Cartridge* m_pCartridge = nullptr;

@@ -39,7 +39,7 @@ Cartridge* Cartridge::LoadFromFile(const std::string& InFileName)
 
     // Mapper and mirroring
     cartridge->m_MapperID = (header[6] >> 4) | (header[7] & 0xF0);
-    cartridge->m_bUseVerticalMirroring = header[6] & 0x01;
+    cartridge->m_MirrorMode = static_cast<EMirrorMode>(header[6] & 0x01);
 
     // Load PRG-ROM
     cartridge->m_ProgramROM.resize(programROMSize);
@@ -63,4 +63,9 @@ uint8_t Cartridge::ReadProgramData(const uint16_t InAddress) const
 uint8_t Cartridge::ReadCharacterData(const uint16_t InAddress) const
 {
     return m_CharacterROM[InAddress];
+}
+
+EMirrorMode Cartridge::GetMirrorMode() const
+{
+    return m_MirrorMode;
 }

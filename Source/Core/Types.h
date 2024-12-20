@@ -51,6 +51,17 @@ enum class ECpuFlag : uint8_t
 };
 
 /**
+ * TODO
+ */
+enum class EPPUStatusFlag : uint8_t
+{
+    VBlank = 7,
+    SpriteZeroHit = 6,
+    SpriteOverflow = 5,
+    OpenBus = 4
+};
+
+/**
  * Represents different addressing modes supported by the 6502 CPU.
  * Depending on the addressing mode specified will change where the value the CPU instruction operates on is fetched from.
  */
@@ -252,8 +263,9 @@ struct PPURegisters
 
     /**
      * 8-bit status register which reflects the state of rendering related events and is primarily used for timing.
+     * Only the first four bits are used.
      */
-    uint8_t Status = 0;
+    std::bitset<8> Status = 0;
 
     /**
      * 8-bit register which holds to address of the OAM (Object Attribute Memory) being accessed.
@@ -280,4 +292,19 @@ struct PPURegisters
      * 8-bit CPU register that suspends the CPU so it can quickly copy a page of CPU memory to PPU OAM using DMA
      */
     uint8_t OAMDMA = 0;
+
+    // TODO: Commenting.
+
+    uint8_t GetFlags() const;
+    void SetFlag(const EPPUStatusFlag InFlag, const bool bInShouldSet);
+    bool IsFlagSet(const EPPUStatusFlag InFlag) const;
+};
+
+enum class EMirrorMode : uint8_t
+{
+    Vertical       = 0,
+    Horizontal     = 1,
+    FourScreen     = 2,
+    OneScreenLower = 3,
+    OneScreenUpper = 4
 };

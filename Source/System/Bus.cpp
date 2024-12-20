@@ -108,9 +108,14 @@ bool Bus::HasCartridgeLoaded() const
     return m_pCartridge != nullptr;
 }
 
-void Bus::NotifyFrameComplete()
+void Bus::NotifyVBlank()
 {
     m_pCpu->NMI();
+}
+
+void Bus::NotifyFrameComplete()
+{
+    // TODO ?!
 }
 
 void Bus::WriteData(const uint8_t InData, const uint16_t InAddress)

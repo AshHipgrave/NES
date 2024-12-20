@@ -45,6 +45,11 @@ public:
     /**
      * Called by the PPU to trigger an NMI on the next CPU cycle
      */
+    void NotifyVBlank();
+
+    /**
+     * Called by the PPU when it completes rendering a full frame
+     */
     void NotifyFrameComplete();
 
     /**

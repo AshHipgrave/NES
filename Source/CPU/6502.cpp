@@ -52,7 +52,7 @@ void Cpu::Reset()
     m_Registers.SetFlag(ECpuFlag::InterruptDisable, true);
 
 // TEMP - Set to '1' to emulate standard NES reset behaviour. Set to '0' to run the nestest ROM in headless mode (we have no PPU so can't run it as a standard NES ROM).
-#if 0
+#if 1
     m_Registers.StackPointer -= 3;
 
     const uint8_t newLow = m_pDataBus->ReadData(0xFFFC);
