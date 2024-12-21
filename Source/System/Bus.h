@@ -65,7 +65,7 @@ public:
     uint8_t ReadData(const uint16_t InAddress) const;
 
     /**
-    * [Debug] Returns true if the emulator is in single-step mode (only executes 1 opcode before waiting).
+    * [Debug] Returns true if the emulator is in single-step mode (only executes 1 opcode before waiting for the F5 key to be pressed).
     * Designed to allow for debugging the execution of a single instruction to confirm it's executed and set the emulator state as expected.
     */
     bool GetIsSingleStepEnabled() const;
@@ -89,8 +89,8 @@ private:
     Memory* m_pMemory = nullptr;
     Cartridge* m_pCartridge = nullptr;
 
-    bool m_bEnableSingleStepMode = false;
     bool m_bCanSingleStep = false;
+    bool m_bEnableSingleStepMode = false;
 
     static Bus* g_pBus;
 };

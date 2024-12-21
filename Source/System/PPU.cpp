@@ -250,22 +250,10 @@ void PPU::ConfigureMirroring(const EMirrorMode InMirroringMode)
             break;
 
         case EMirrorMode::FourScreen:
+        case EMirrorMode::SingleScreen:
+        default:
             // TODO.
             EMULATOR_DEBUG_BREAK();
-            break;
-
-        case EMirrorMode::OneScreenLower:
-            m_pNametablePointers[0] = m_NametableVRAM.data();
-            m_pNametablePointers[1] = m_NametableVRAM.data();
-            m_pNametablePointers[2] = m_NametableVRAM.data();
-            m_pNametablePointers[3] = m_NametableVRAM.data();
-            break;
-
-        case EMirrorMode::OneScreenUpper:
-            m_pNametablePointers[0] = m_NametableVRAM.data() + 0x0400;
-            m_pNametablePointers[1] = m_NametableVRAM.data() + 0x0400;
-            m_pNametablePointers[2] = m_NametableVRAM.data() + 0x0400;
-            m_pNametablePointers[3] = m_NametableVRAM.data() + 0x0400;
             break;
     }
 }

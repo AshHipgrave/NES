@@ -9,7 +9,7 @@
 
 /**
  * String representation of all opcodes.
- * Opcodes prefixed with an asterisk are illegal/invalid opcodes.
+ * Opcodes prefixed with an asterisk are illegal/undocumented opcodes.
  */
 const std::vector<std::string> OpCodeStrings = 
 {

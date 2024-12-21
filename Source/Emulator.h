@@ -1,9 +1,6 @@
 #pragma once
 
-class Cpu;
-class PPU;
 class Bus;
-class Memory;
 class UIManager;
 
 struct SDL_Window;
