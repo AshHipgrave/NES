@@ -1,8 +1,11 @@
 #include "pch.h"
 #include "Core/Utils.h"
-#include "Core/Types.h"
 #include "System/Bus.h"
 #include "System/PPU.h"
+#include "Types/OpCode.h"
+#include "Enums/CpuFlags.h"
+#include "Types/CpuRegisters.h"
+#include "Enums/AddressingMode.h"
 
 /**
  * String representation of all opcodes.

@@ -2,8 +2,10 @@
 #include "CPU/6502.h"
 #include "Core/Core.h"
 #include "Core/Utils.h"
-#include "CPU/OpCodes.h"
 #include "System/Bus.h"
+#include "CPU/OpCodes.h"
+#include "Enums/CpuFlags.h"
+#include "Types/CpuRegisters.h"
 
 Cpu::Cpu(Bus* InDataBus)
     : m_pDataBus(InDataBus)
@@ -14,7 +16,7 @@ Cpu::Cpu(Bus* InDataBus)
     m_Registers.Y = 0;
     m_Registers.Accumulator = 0;
 
-    m_Registers.Flags = 36;
+    m_Registers.Flags = 36; //36 = 00100100 in binary which sets all flags to 0 except the 'Unused' and 'Interrupt Disable' flags which default to 1 when the NES is powered on
 
     m_Registers.StackPointer = 0xFD;
     m_Registers.ProgramCounter = 0xFFFC;

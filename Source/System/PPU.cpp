@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "System/PPU.h"
-#include "System/Bus.h"
 #include "Core/Core.h"
+#include "System/Bus.h"
 #include "Core/Utils.h"
+#include "Enums/PPUFlags.h"
+#include "Enums/MirrorMode.h"
 #include "System/Cartridge.h"
 
 PPU::PPU(Bus* InDataBus)
@@ -12,7 +14,7 @@ PPU::PPU(Bus* InDataBus)
     m_CurrentCycle = 0;
     m_LastReadBuffer = 0;
 
-    m_VRAM.fill(0);
+    m_NametableVRAM.fill(0);
     m_OAMData.fill(0);
     m_PaletteTable.fill(0);
     m_pNametablePointers.fill(0);
@@ -32,7 +34,14 @@ PPU::~PPU()
 
 void PPU::Tick()
 {
+    if (m_ScanLine == 0 && m_CurrentCycle == 1)
+    {
+        m_Registers.SetFlag(m_Registers.Status, EPPUStatusFlag::VBlank, false);
+    }
+
     m_CurrentCycle++;
+
+
 
     if (m_CurrentCycle >= 341)
     {
@@ -41,11 +50,16 @@ void PPU::Tick()
 
         if (m_ScanLine == 241)
         {
-            m_pDataBus->NotifyVBlank();
+            m_Registers.SetFlag(m_Registers.Status, EPPUStatusFlag::VBlank, true);
+
+            if (m_Registers.IsFlagSet(m_Registers.Control, EPPUControlFlags::VBlankNMIEnable))
+            {
+                m_pDataBus->NotifyVBlank();
+            }
         }
         else if (m_ScanLine == 262)
         {
-            m_ScanLine = 0;
+            m_ScanLine = -1;
 
             m_pDataBus->NotifyFrameComplete();
         }
@@ -111,7 +125,7 @@ void PPU::WriteData(const uint8_t InData, const uint16_t InAddress)
         {
             InternalWriteData(InData, m_Registers.PPUAddress);
 
-            const bool bIsInVerticalIncrementMode = Utils::IsBitSet(m_Registers.Control, 2);
+            const bool bIsInVerticalIncrementMode = m_Registers.IsFlagSet(m_Registers.Control, EPPUControlFlags::VRAMIncrement);
             const uint8_t incrementAmount = bIsInVerticalIncrementMode ? 32 : 1;
 
             m_Registers.PPUAddress += incrementAmount;
@@ -132,9 +146,9 @@ uint8_t PPU::ReadData(const uint16_t InAddress)
     {
         case 0x0002:
         {
-            const uint8_t result = (m_Registers.GetFlags() & 0xE0) | (m_LastReadBuffer & 0x1F);
+            const uint8_t result = (m_Registers.GetStatusFlags() & 0xE0) | (m_LastReadBuffer & 0x1F);
 
-            m_Registers.SetFlag(EPPUStatusFlag::VBlank, false);
+            m_Registers.SetFlag(m_Registers.Status, EPPUStatusFlag::VBlank, false);
 
             return result;
         }
@@ -146,7 +160,7 @@ uint8_t PPU::ReadData(const uint16_t InAddress)
         {
             const uint8_t data = InternalReadData(m_Registers.PPUAddress);
 
-            const bool bIsInVerticalIncrementMode = Utils::IsBitSet(m_Registers.Control, 2);
+            const bool bIsInVerticalIncrementMode = m_Registers.IsFlagSet(m_Registers.Control, EPPUControlFlags::VRAMIncrement);
             const uint8_t incrementAmount = bIsInVerticalIncrementMode ? 32 : 1;
 
             m_Registers.PPUAddress += incrementAmount;
@@ -222,17 +236,17 @@ void PPU::ConfigureMirroring(const EMirrorMode InMirroringMode)
     switch (InMirroringMode)
     {
         case EMirrorMode::Horizontal:
-            m_pNametablePointers[0] = m_VRAM.data();
-            m_pNametablePointers[1] = m_VRAM.data();
-            m_pNametablePointers[2] = m_VRAM.data() + 0x0400;
-            m_pNametablePointers[3] = m_VRAM.data() + 0x0400;
+            m_pNametablePointers[0] = m_NametableVRAM.data();
+            m_pNametablePointers[1] = m_NametableVRAM.data();
+            m_pNametablePointers[2] = m_NametableVRAM.data() + 0x0400;
+            m_pNametablePointers[3] = m_NametableVRAM.data() + 0x0400;
             break;
 
         case EMirrorMode::Vertical:
-            m_pNametablePointers[0] = m_VRAM.data();
-            m_pNametablePointers[1] = m_VRAM.data() + 0x0400;
-            m_pNametablePointers[2] = m_VRAM.data();
-            m_pNametablePointers[3] = m_VRAM.data() + 0x0400;
+            m_pNametablePointers[0] = m_NametableVRAM.data();
+            m_pNametablePointers[1] = m_NametableVRAM.data() + 0x0400;
+            m_pNametablePointers[2] = m_NametableVRAM.data();
+            m_pNametablePointers[3] = m_NametableVRAM.data() + 0x0400;
             break;
 
         case EMirrorMode::FourScreen:
@@ -241,17 +255,17 @@ void PPU::ConfigureMirroring(const EMirrorMode InMirroringMode)
             break;
 
         case EMirrorMode::OneScreenLower:
-            m_pNametablePointers[0] = m_VRAM.data();
-            m_pNametablePointers[1] = m_VRAM.data();
-            m_pNametablePointers[2] = m_VRAM.data();
-            m_pNametablePointers[3] = m_VRAM.data();
+            m_pNametablePointers[0] = m_NametableVRAM.data();
+            m_pNametablePointers[1] = m_NametableVRAM.data();
+            m_pNametablePointers[2] = m_NametableVRAM.data();
+            m_pNametablePointers[3] = m_NametableVRAM.data();
             break;
 
         case EMirrorMode::OneScreenUpper:
-            m_pNametablePointers[0] = m_VRAM.data() + 0x0400;
-            m_pNametablePointers[1] = m_VRAM.data() + 0x0400;
-            m_pNametablePointers[2] = m_VRAM.data() + 0x0400;
-            m_pNametablePointers[3] = m_VRAM.data() + 0x0400;
+            m_pNametablePointers[0] = m_NametableVRAM.data() + 0x0400;
+            m_pNametablePointers[1] = m_NametableVRAM.data() + 0x0400;
+            m_pNametablePointers[2] = m_NametableVRAM.data() + 0x0400;
+            m_pNametablePointers[3] = m_NametableVRAM.data() + 0x0400;
             break;
     }
 }

@@ -1,6 +1,9 @@
 #pragma once
 
-#include "Core/Types.h"
+struct OpCode;
+struct CpuRegisters;
+
+enum class ECpuFlag : uint8_t;
 
 /**
  * Common utility functions that don't belong to a single component.

@@ -1,7 +1,7 @@
 #pragma once
 
 ///
-/// Standard Template Library
+/// C++ Standard Template Library
 /// 
 
 #include <cstdint>
@@ -22,7 +22,8 @@
 
 ///
 /// ImGui
-/// 
+///
+#include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_sdl2.h"
 #include "ImGui/imgui_impl_sdlrenderer2.h"
 #include "ImGui/imgui_memory_editor.h"

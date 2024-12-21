@@ -1,8 +1,13 @@
 #pragma once
 
-#include "Core/Types.h"
+#include "Types/OpCode.h"
+#include "Types/CpuRegisters.h"
 
 class Bus;
+struct OpCode;
+struct CpuRegisters;
+
+enum class EAddressingMode : uint8_t;
 
 class Cpu
 {

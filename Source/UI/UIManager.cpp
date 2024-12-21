@@ -103,7 +103,7 @@ void UIManager::Draw()
         m_pOAMDataMemoryViewer->DrawWindow("OAM Data", bus->GetPPU()->m_OAMData.data(), bus->GetPPU()->m_OAMData.size());
 
     if (m_bShowNametableMemoryViewer && bus->HasCartridgeLoaded())
-        m_pNametableMemoryViewer->DrawWindow("Nametables", bus->GetPPU()->m_VRAM.data(), bus->GetPPU()->m_VRAM.size());
+        m_pNametableMemoryViewer->DrawWindow("Nametables", bus->GetPPU()->m_NametableVRAM.data(), bus->GetPPU()->m_NametableVRAM.size());
 
     if (m_bShowImGuiDemoWindow)
         ImGui::ShowDemoWindow(&m_bShowImGuiDemoWindow);

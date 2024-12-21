@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Core/Types.h"
+#include "Types/OpCode.h"
+#include "Enums/AddressingMode.h"
 
 /// 
 /// Load Accumulator

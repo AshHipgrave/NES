@@ -62,6 +62,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -86,6 +87,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -106,6 +108,10 @@
     <ClCompile Include="CPU\6502.cpp" />
     <ClCompile Include="CPU\OpCodes.cpp" />
     <ClCompile Include="Emulator.cpp" />
+    <ClCompile Include="Enums\AddressingMode.cpp" />
+    <ClCompile Include="Enums\CpuFlags.cpp" />
+    <ClCompile Include="Enums\MirrorMode.cpp" />
+    <ClCompile Include="Enums\PPUFlags.cpp" />
     <ClCompile Include="ImGui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -155,6 +161,9 @@
     <ClCompile Include="System\Cartridge.cpp" />
     <ClCompile Include="System\Memory.cpp" />
     <ClCompile Include="System\PPU.cpp" />
+    <ClCompile Include="Types\CpuRegisters.cpp" />
+    <ClCompile Include="Types\OpCode.cpp" />
+    <ClCompile Include="Types\PPURegisters.cpp" />
     <ClCompile Include="UI\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +173,10 @@
     <ClInclude Include="CPU\6502.h" />
     <ClInclude Include="CPU\OpCodes.h" />
     <ClInclude Include="Emulator.h" />
+    <ClInclude Include="Enums\AddressingMode.h" />
+    <ClInclude Include="Enums\CpuFlags.h" />
+    <ClInclude Include="Enums\MirrorMode.h" />
+    <ClInclude Include="Enums\PPUFlags.h" />
     <ClInclude Include="ImGui\dirent\dirent.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
@@ -184,6 +197,9 @@
     <ClInclude Include="System\Memory.h" />
     <ClInclude Include="ImGui\imgui_memory_editor.h" />
     <ClInclude Include="System\PPU.h" />
+    <ClInclude Include="Types\CpuRegisters.h" />
+    <ClInclude Include="Types\OpCode.h" />
+    <ClInclude Include="Types\PPURegisters.h" />
     <ClInclude Include="UI\UIManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

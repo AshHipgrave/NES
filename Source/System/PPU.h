@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Core/Types.h"
+#include "Types/PPURegisters.h"
 
 class Bus;
 class Cartridge;
+
+enum class EMirrorMode : uint8_t;
 
 class PPU
 {
@@ -38,15 +40,16 @@ private:
 
     PPURegisters m_Registers;
 
-    std::array<uint8_t, 2048> m_VRAM; //aka nametables
     std::array<uint8_t, 256> m_OAMData;
     std::array<uint8_t, 32> m_PaletteTable;
+
+    std::array<uint8_t, 2048> m_NametableVRAM;
     std::array<uint8_t*, 4> m_pNametablePointers;
 
     Bus* m_pDataBus = nullptr;
     Cartridge* m_pCartridge = nullptr;
 
-    // Tracks if we should write the PPUADDR high bit or low bit.
-    // We can only set 8-bits at once so the first time we set the high bit and the second time the low bit.
+    // Tracks if we should access the PPUADDR high bit or low bit.
+    // We can only access 8-bits per-read/write so the first time we access the high bit and the second time the low bit.
     bool m_bWriteAddressHighBit = true;
 };
