@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Types/OpCode.h"
+#include "Types/OpCodes.h"
 #include "Types/CpuRegisters.h"
 
 class Bus;

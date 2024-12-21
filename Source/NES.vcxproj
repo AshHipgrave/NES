@@ -105,8 +105,7 @@
     <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="Core\Types.cpp" />
     <ClCompile Include="Core\Utils.cpp" />
-    <ClCompile Include="CPU\6502.cpp" />
-    <ClCompile Include="CPU\OpCodes.cpp" />
+    <ClCompile Include="System\Cpu.cpp" />
     <ClCompile Include="Emulator.cpp" />
     <ClCompile Include="Enums\AddressingMode.cpp" />
     <ClCompile Include="Enums\CpuFlags.cpp" />
@@ -162,7 +161,7 @@
     <ClCompile Include="System\Memory.cpp" />
     <ClCompile Include="System\PPU.cpp" />
     <ClCompile Include="Types\CpuRegisters.cpp" />
-    <ClCompile Include="Types\OpCode.cpp" />
+    <ClCompile Include="Types\OpCodes.cpp" />
     <ClCompile Include="Types\PPURegisters.cpp" />
     <ClCompile Include="UI\UIManager.cpp" />
   </ItemGroup>
@@ -170,8 +169,7 @@
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\Types.h" />
     <ClInclude Include="Core\Utils.h" />
-    <ClInclude Include="CPU\6502.h" />
-    <ClInclude Include="CPU\OpCodes.h" />
+    <ClInclude Include="System\Cpu.h" />
     <ClInclude Include="Emulator.h" />
     <ClInclude Include="Enums\AddressingMode.h" />
     <ClInclude Include="Enums\CpuFlags.h" />
@@ -198,7 +196,7 @@
     <ClInclude Include="ImGui\imgui_memory_editor.h" />
     <ClInclude Include="System\PPU.h" />
     <ClInclude Include="Types\CpuRegisters.h" />
-    <ClInclude Include="Types\OpCode.h" />
+    <ClInclude Include="Types\OpCodes.h" />
     <ClInclude Include="Types\PPURegisters.h" />
     <ClInclude Include="UI\UIManager.h" />
   </ItemGroup>

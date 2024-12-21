@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "UI/UIManager.h"
-#include "CPU/6502.h"
 #include "Core/Core.h"
+#include "System/Cpu.h"
 #include "Core/Utils.h"
 #include "System/Bus.h"
 #include "System/PPU.h"

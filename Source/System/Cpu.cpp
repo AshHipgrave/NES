@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "CPU/6502.h"
+#include "System/Cpu.h"
 #include "Core/Core.h"
 #include "Core/Utils.h"
 #include "System/Bus.h"
-#include "CPU/OpCodes.h"
+#include "Types/OpCodes.h"
 #include "Enums/CpuFlags.h"
 #include "Types/CpuRegisters.h"
 

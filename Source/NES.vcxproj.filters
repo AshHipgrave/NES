@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\CPU">
-      <UniqueIdentifier>{835243dc-272e-4bed-9ba9-d0958aa7258e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\CPU">
-      <UniqueIdentifier>{8dbcba43-8dcc-4a9b-8fc1-776fb4274287}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Core">
       <UniqueIdentifier>{d71d28ae-b881-4798-a796-fb5dade719c1}</UniqueIdentifier>
     </Filter>
@@ -78,14 +72,8 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CPU\6502.cpp">
-      <Filter>Source Files\CPU</Filter>
-    </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CPU\OpCodes.cpp">
-      <Filter>Source Files\CPU</Filter>
     </ClCompile>
     <ClCompile Include="System\Memory.cpp">
       <Filter>Source Files\System</Filter>
@@ -156,7 +144,7 @@
     <ClCompile Include="Enums\AddressingMode.cpp">
       <Filter>Source Files\Enums</Filter>
     </ClCompile>
-    <ClCompile Include="Types\OpCode.cpp">
+    <ClCompile Include="Types\OpCodes.cpp">
       <Filter>Source Files\Types</Filter>
     </ClCompile>
     <ClCompile Include="Types\CpuRegisters.cpp">
@@ -165,19 +153,16 @@
     <ClCompile Include="Types\PPURegisters.cpp">
       <Filter>Source Files\Types</Filter>
     </ClCompile>
+    <ClCompile Include="System\Cpu.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CPU\6502.h">
-      <Filter>Header Files\CPU</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Core.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CPU\OpCodes.h">
-      <Filter>Header Files\CPU</Filter>
     </ClInclude>
     <ClInclude Include="System\Memory.h">
       <Filter>Header Files\System</Filter>
@@ -260,7 +245,7 @@
     <ClInclude Include="Enums\AddressingMode.h">
       <Filter>Header Files\Enums</Filter>
     </ClInclude>
-    <ClInclude Include="Types\OpCode.h">
+    <ClInclude Include="Types\OpCodes.h">
       <Filter>Header Files\Types</Filter>
     </ClInclude>
     <ClInclude Include="Types\CpuRegisters.h">
@@ -268,6 +253,9 @@
     </ClInclude>
     <ClInclude Include="Types\PPURegisters.h">
       <Filter>Header Files\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="System\Cpu.h">
+      <Filter>Header Files\System</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

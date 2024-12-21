@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "System/Bus.h"
+#include "System/Cpu.h"
 #include "System/PPU.h"
 #include "System/Memory.h"
 #include "System/Cartridge.h"
-#include "CPU/6502.h"
 #include "Core/Core.h"
 
 Bus* Bus::g_pBus = nullptr;

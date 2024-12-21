@@ -2,7 +2,7 @@
 #include "Core/Utils.h"
 #include "System/Bus.h"
 #include "System/PPU.h"
-#include "Types/OpCode.h"
+#include "Types/OpCodes.h"
 #include "Enums/CpuFlags.h"
 #include "Types/CpuRegisters.h"
 #include "Enums/AddressingMode.h"
