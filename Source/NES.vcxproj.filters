@@ -117,9 +117,6 @@
     <ClCompile Include="System\Bus.cpp">
       <Filter>Source Files\System</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Types.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="UI\UIManager.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
@@ -217,9 +214,6 @@
     </ClInclude>
     <ClInclude Include="System\Bus.h">
       <Filter>Header Files\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Types.h">
-      <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="UI\UIManager.h">
       <Filter>Header Files\UI</Filter>
