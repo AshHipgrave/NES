@@ -7,6 +7,11 @@
 #include "System/PPU.h"
 #include "System/Memory.h"
 #include "System/Cartridge.h"
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_sdl2.h"
+#include "ImGui/imgui_impl_sdlrenderer2.h"
+#include "ImGui/imgui_memory_editor.h"
+#include "ImGui/ImGuiFileDialog.h"
 
 UIManager::UIManager()
 {

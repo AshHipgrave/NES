@@ -33,6 +33,7 @@ SOFTWARE.
 
 #pragma endregion
 
+#include "pch.h"
 #include "ImGuiFileDialog.h"
 
 #ifdef __cplusplus
