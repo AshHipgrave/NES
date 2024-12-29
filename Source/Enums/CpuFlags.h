@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * Represents the status flags of the CPU
+ * Represents the status flags of the 6502 CPU
  */
 enum class ECpuFlag : uint8_t
 {
@@ -21,7 +21,8 @@ enum class ECpuFlag : uint8_t
     InterruptDisable = 2,
 
     /**
-    * When set the CPU will obey the rules of 'Binary Coded Decimal (BCD)' artuhmetic during addition and subtraction.
+    * When set the CPU will obey the rules of 'Binary Coded Decimal (BCD)' arithmetic during addition and subtraction.
+    * Note: For the NES this flag is ignored/unused.
     */
     DecimalMode = 3,
 
@@ -43,7 +44,8 @@ enum class ECpuFlag : uint8_t
     Overflow = 6,
 
     /**
-    * Set if the result of the last operation had bit 7 set to a one.
+    * Set if the result of the last operation has bit 7 set to a one.
+    * When set this indicates the result was a negative value.
     */
     Negative = 7,
 };

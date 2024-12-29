@@ -1,5 +1,15 @@
 #pragma once
 
+struct PPUAddressRegister
+{
+    uint16_t CoarseXScroll = 0;
+    uint16_t CoarseYScroll = 0;
+
+    uint8_t NametableSelect = 0;
+
+    uint16_t FineYScroll = 0;
+};
+
 /**
  * Represents the memory mapped registers used by the PPU.
  */
@@ -47,6 +57,16 @@ struct PPURegisters
      * 8-bit CPU register that suspends the CPU so it can quickly copy a page of CPU memory to PPU OAM using DMA
      */
     uint8_t OAMDMA = 0;
+
+    /**
+     * TODO
+     */
+    PPUAddressRegister VRegister;
+
+    /**
+     * TODO
+     */
+    PPUAddressRegister TRegister;
 
     /**
      * Returns the current PPUMASK flags

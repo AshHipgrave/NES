@@ -2,12 +2,12 @@
 
 /**
  * Represents different addressing modes supported by the 6502 CPU.
- * Depending on the addressing mode specified will change where the value the CPU instruction operates on is fetched from.
+ * Different addressing modes will change where the value the CPU instruction operates on is fetched from.
  */
 enum class EAddressingMode : uint8_t
 {
     /**
-    * The memory address is implied within the instruction itself.
+    * The memory address is implied within the instruction itself (or the instruction does not operate on any memory location).
     * For example: The 'CLC' instruction doesn't operate on any memory and instead clears the carry flag.
     */
     Implied = 0,
@@ -18,7 +18,7 @@ enum class EAddressingMode : uint8_t
     Accumulator = 1,
 
     /**
-    * The instruction operates directly on an 8-bit constant.
+    * The instruction operates directly on an 8-bit constant, which will be the next byte in RAM.
     * For example: In source this would be written as "LDA #10" which would load the value 0x10 into the Accumulator
     */
     Immediate = 2,

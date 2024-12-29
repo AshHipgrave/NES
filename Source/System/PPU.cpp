@@ -25,6 +25,12 @@ PPU::PPU(Bus* InDataBus)
     }
 
     m_Registers = PPURegisters();
+
+    m_Registers.SetFlag(m_Registers.Status, EPPUStatusFlag::VBlank, true);
+    m_Registers.SetFlag(m_Registers.Status, EPPUStatusFlag::SpriteOverflow, true);
+
+    m_bEvenOddFlag = false;
+    m_bWriteLatchStatus = false;
 }
 
 PPU::~PPU()
@@ -32,20 +38,29 @@ PPU::~PPU()
     m_pCartridge = nullptr;
 }
 
+void PPU::Reset()
+{
+    m_ScanLine = -1;
+    m_CurrentCycle = 0;
+    m_LastReadBuffer = 0;
+
+    m_Registers.Mask = 0;
+    m_Registers.Scroll = 0;
+    m_Registers.Control = 0;
+
+    m_bEvenOddFlag = false;
+    m_bWriteLatchStatus = false;
+}
+
 void PPU::Tick()
 {
-    if (m_ScanLine == 0 && m_CurrentCycle == 1)
-    {
-        m_Registers.SetFlag(m_Registers.Status, EPPUStatusFlag::VBlank, false);
-    }
-
+    m_bEvenOddFlag = !m_bEvenOddFlag;
     m_CurrentCycle++;
 
-
+    // TODO: Fetch the pixel to draw from VRAM.
 
     if (m_CurrentCycle >= 341)
     {
-        m_CurrentCycle = 0;
         m_ScanLine++;
 
         if (m_ScanLine == 241)
@@ -57,9 +72,16 @@ void PPU::Tick()
                 m_pDataBus->NotifyVBlank();
             }
         }
+        else if (m_ScanLine == 261)
+        {
+            // TODO: Shift registers
+        }
         else if (m_ScanLine == 262)
         {
+            // TODO: Handle scrolling
+
             m_ScanLine = -1;
+            m_Registers.SetFlag(m_Registers.Status, EPPUStatusFlag::VBlank, false);
 
             m_pDataBus->NotifyFrameComplete();
         }
@@ -73,6 +95,8 @@ void PPU::Draw()
 
 void PPU::LoadCartridge(Cartridge* InCartridge)
 {
+    Reset();
+
     m_pCartridge = InCartridge;
 
     ConfigureMirroring(InCartridge->GetMirrorMode());
@@ -84,7 +108,18 @@ void PPU::WriteData(const uint8_t InData, const uint16_t InAddress)
     {
         case 0x0000:
         {
+            const bool bWasNMIEnabledBefore = m_Registers.IsFlagSet(m_Registers.Control, EPPUControlFlags::VBlankNMIEnable);
+
             m_Registers.Control = InData;
+
+            const bool bIsNMIEnabledAfter = m_Registers.IsFlagSet(m_Registers.Control, EPPUControlFlags::VBlankNMIEnable);
+            const bool bIsInVBlank = m_Registers.IsFlagSet(m_Registers.Status, EPPUStatusFlag::VBlank);
+
+            // NMIEnable was changed from disabled to enabled during VBlank. Doing so should trigger an NMI immediately
+            if (bWasNMIEnabledBefore == false && bIsNMIEnabledAfter == true && bIsInVBlank == true)
+            {
+                m_pDataBus->NotifyVBlank();
+            }
             break;
         }
         case 0x0001:
@@ -99,25 +134,27 @@ void PPU::WriteData(const uint8_t InData, const uint16_t InAddress)
         }
         case 0x0004:
         {
-            m_OAMData[m_Registers.OAMAddress] = InData;
+            m_OAMData[m_Registers.OAMAddress++] = InData;
             break;
         }
         case 0x0005:
         {
             m_Registers.Scroll = InData;
+            m_bWriteLatchStatus = !m_bWriteLatchStatus;
+
             break;
         }
         case 0x0006:
         {
-            if (m_bWriteAddressHighBit)
+            if (m_bWriteLatchStatus)
             {
                 m_Registers.PPUAddress = (m_Registers.PPUAddress & 0x00FF) | (InData << 8);
-                m_bWriteAddressHighBit = false;
+                m_bWriteLatchStatus = false;
             }
             else
             {
                 m_Registers.PPUAddress = (m_Registers.PPUAddress & 0x00FF) | InData;
-                m_bWriteAddressHighBit = true;
+                m_bWriteLatchStatus = true;
             }
             break;
         }
@@ -149,6 +186,7 @@ uint8_t PPU::ReadData(const uint16_t InAddress)
             const uint8_t result = (m_Registers.GetStatusFlags() & 0xE0) | (m_LastReadBuffer & 0x1F);
 
             m_Registers.SetFlag(m_Registers.Status, EPPUStatusFlag::VBlank, false);
+            m_bWriteLatchStatus = false;
 
             return result;
         }

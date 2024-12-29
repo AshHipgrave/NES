@@ -146,7 +146,7 @@ private:
      * Optionally will also notify if the address will cross a page boundry and should incur a performance penalty.
      * 
      * For the 'Relative' addressing mode we will return the final 'Branch To' address, this is worked out by this function as part of 
-     * the calcuations to determine if a page boundry was crossed, so it makes sense to just return this if we've already figured it out.
+     * the calcuations to determine if a page boundry was crossed so it makes sense to just return this if we've already figured it out.
      */
     uint16_t GetAddressByAddressingMode(const EAddressingMode InAddressingMode, bool* bOutDidCrossPageBoundry = nullptr) const;
 

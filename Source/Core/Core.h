@@ -38,7 +38,7 @@
 /// 
 #if EMULATOR_DEBUG_BUILD
     #if COMPILER_MSVC
-        // __nop() is used to prevent VS skipping over breakpoints when single-stepping through code under the debugger
+        // __nop() is used to work around a VS bug where it can mistakenly skip over a breakpoint when single-stepping through code
         #define EMULATOR_DEBUG_BREAK() (__nop(), __debugbreak())
     #elif COMPILER_CLANG || COMPILER_GCC
         #define EMULATOR_DEBUG_BREAK() asm("int $3")

@@ -15,6 +15,8 @@ public:
     PPU(Bus* InDataBus);
     ~PPU();
 
+    void Reset();
+
     void Tick();
     void Draw();
 
@@ -49,7 +51,9 @@ private:
     Bus* m_pDataBus = nullptr;
     Cartridge* m_pCartridge = nullptr;
 
-    // Tracks if we should access the PPUADDR high bit or low bit.
-    // We can only access 8-bits per-read/write so the first time we access the high bit and the second time the low bit.
-    bool m_bWriteAddressHighBit = true;
+    // On the NES this would be an internal 1-bit 'W Register' which is used to track if the scroll register is writing X-scroll bits or Y-scroll bits.
+    // It's also used when writing to PPUADDR to track if we should write to the high bit or low bit. For our purposes we can just use a bool to represent this.
+    bool m_bWriteLatchStatus = false;
+
+    bool m_bEvenOddFlag = false;
 };

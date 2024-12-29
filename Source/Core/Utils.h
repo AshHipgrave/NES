@@ -23,7 +23,7 @@ namespace Utils
     /**
      * Converts the specified integer into a hexadecimal string. 
      * The output string will be padded according to the size of the type.
-     * For example, a uint8_t of 255 will become FF, but a uint16_t would be 00FF
+     * For example, a uint8_t of 255 will become FF, but for uint16_t it would become 00FF
      */
     std::string ConvertToHex(const uint16_t InInteger);
 
@@ -41,19 +41,19 @@ namespace Utils
 
     /**
      * Combines the provided low and high bytes into a single 16-bit value.
-     * For example: If low = 0xAA and high=0xFF this will return 0xFFAA
+     * For example: If low = 0xFF and high=0xAA this will return 0xAAFF
      */
     uint16_t MakeDword(const uint8_t InLowByte, const uint8_t InHighByte);
 
     /**
      * Checks if the specified memory operation crossed a page boundry.
-     * The 6502 groups memory into 256 byte "pages". If an operation crosses the boundry between one page and another it can incur a performance penalty
+     * The 6502 CPU groups memory into 256 byte "pages". If an operation crosses the boundry between one page and another it can incur a performance penalty
      */
     bool DidCrossPageBoundry(const uint16_t InStartAddress, const uint16_t InEndAddress);
 
     /**
-     * Converts the specified flag enum into a string representation of how it appears in 6502 manuals.
-     * For example: The 'Overflow' flag is returned as the string "V" as this is how it appears in the CPU manual.
+     * Converts the specified flag enum into a string. The string is representative of how it would appear in 6502 manuals.
+     * For example: The 'Overflow' flag enum is returned as the string "V" as this is how it appears in the CPU manual.
      */
     std::string ConvertFlagToString(const ECpuFlag InFlag);
 

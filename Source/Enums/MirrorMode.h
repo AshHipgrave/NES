@@ -48,8 +48,8 @@ enum class EMirrorMode : uint8_t
     Horizontal     = 1,
 
     /**
-     * With additional RAM and/or PPU address mapping present on the cartridge
-     * four unique nametables can be addressed through the PPU bus, creating a 64x60 tilemap.
+     * With additional RAM and/or PPU address mapping present on the cartridge four 
+     * unique nametables can be addressed through the PPU bus, creating a 64x60 tilemap.
      *
      *  --------------- ---------------
      * |               |               |

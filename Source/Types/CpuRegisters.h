@@ -3,7 +3,7 @@
 enum class ECpuFlag : uint8_t;
 
 /**
- * Represents the 'Registers' contained within a 6502 CPU.
+ * Represents the registers available in a 6502 CPU.
  */
 struct CpuRegisters
 {
@@ -36,6 +36,7 @@ struct CpuRegisters
 
     /**
      * Represents a set of CPU status flags that are set or cleared as instructions execute to record the result of the operation.
+     * The flags themselves are encapsulated by the 'ECpuFlag' enum.
      */
     std::bitset<8> Flags = 0;
 
@@ -51,7 +52,7 @@ struct CpuRegisters
     void SetFlag(const ECpuFlag InFlag, const bool bInShouldSet);
 
     /**
-     * Tests if the specified flag is set or not
+     * Checks if the specified flag is set or not
      */
     bool IsFlagSet(const ECpuFlag InFlag) const;
 };
