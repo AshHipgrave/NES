@@ -10,7 +10,7 @@
 PPU::PPU(Bus* InDataBus)
     : m_pDataBus(InDataBus)
 {
-    m_ScanLine = -1;
+    m_ScanLine = 0;
     m_CurrentCycle = 0;
     m_LastReadBuffer = 0;
 
@@ -40,8 +40,8 @@ PPU::~PPU()
 
 void PPU::Reset()
 {
-    m_ScanLine = -1;
-    m_CurrentCycle = 0;
+    m_ScanLine = 0;
+    m_CurrentCycle = 21;
     m_LastReadBuffer = 0;
 
     m_Registers.Mask = 0;
@@ -80,7 +80,9 @@ void PPU::Tick()
         {
             // TODO: Handle scrolling
 
-            m_ScanLine = -1;
+            m_ScanLine = 0;
+            m_CurrentCycle = 0;
+
             m_Registers.SetFlag(m_Registers.Status, EPPUStatusFlag::VBlank, false);
 
             m_pDataBus->NotifyFrameComplete();
@@ -90,7 +92,7 @@ void PPU::Tick()
 
 void PPU::Draw()
 {
-    // TODO - Convert the NES framebuffer into an SDLTexture and draw to the screen.
+    // TODO - Convert the NES framebuffer into an SDL_Texture and draw to the screen.
 }
 
 void PPU::LoadCartridge(Cartridge* InCartridge)

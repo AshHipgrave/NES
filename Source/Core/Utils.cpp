@@ -54,56 +54,28 @@ std::string Utils::ConvertFlagToString(const ECpuFlag InFlag)
     return "-";
 }
 
-std::string Utils::LogInstruction(const OpCode InOpCode, const CpuRegisters InCpuStateBefore, const uint64_t InTotalCycles)
+void Utils::LogInstruction(const OpCode InOpCode, const CpuRegisters InCpuRegisters, const uint64_t InTotalCycles)
 {
-    std::string output;
-
     const Bus* dataBus = Bus::Get();
-    //const PPU* ppu = dataBus->GetPPU();
+    const PPU* ppu = dataBus->GetPPU();
 
-    std::stringstream ss;
+    std::string memoryStr[3] = { "  ", "  ", "  " };
 
-    ss << std::left << std::setw(6) << Utils::ConvertToHexString(InCpuStateBefore.ProgramCounter);
-
-    for (uint16_t i = 0; i < InOpCode.Size; i++)
+    for (uint8_t i = 0; i < InOpCode.Size; i++)
     {
-        const uint8_t value = dataBus->ReadData(InCpuStateBefore.ProgramCounter + i);
-        ss << std::left << std::setw(3) << Utils::ConvertToHexString(value);
+        const uint8_t value = dataBus->ReadData(InCpuRegisters.ProgramCounter + i);
+        memoryStr[i] = ConvertToHexString(value);
     }
 
-    /*
-    // TODO: fix using 'setw()'
-    if (InOpCode.Size == 1)
-    {
-        ss << "       ";
-    }
-    else if (InOpCode.Size == 2)
-    {
-        ss << "    ";
-    }
-    else
-    {
-        ss << " ";
-    }
-    */
+    const std::string assemblyStr = DecompileInstruction(InOpCode, InCpuRegisters);
+    const std::string programCounterStr = ConvertToHexString(InCpuRegisters.ProgramCounter);
 
-    //ss << std::left << std::setw() << InOpCode.ToString();
+    const std::string output = std::format("{}  {} {} {}  {:<30}  {} PPU: {:>2},{:>3} CYC:{}", programCounterStr, memoryStr[0], memoryStr[1], memoryStr[2], assemblyStr, InCpuRegisters.ToString(), ppu->GetCurrentScanLine(), ppu->GetCurrentCycle(), InTotalCycles);
 
-    ss << " " << DecompileInstruction(InOpCode, InCpuStateBefore) << " ";
-
-    ss << "A:" << ConvertToHexString(InCpuStateBefore.Accumulator) << " ";
-    ss << "X:" << ConvertToHexString(InCpuStateBefore.X) << " ";
-    ss << "Y:" << ConvertToHexString(InCpuStateBefore.Y) << " ";
-    ss << "P:" << ConvertToHexString(InCpuStateBefore.GetFlags()) << " ";
-    ss << "SP:" << ConvertToHexString(InCpuStateBefore.StackPointer) << " ";
-    ss << "PPU: " << dataBus->GetPPU()->GetCurrentScanLine() << "," << dataBus->GetPPU()->GetCurrentCycle() << " "; // TODO: PPU hasn't been implemented yet so this will always be wrong when compared to the example log.
-    ss << "CYC:" << InTotalCycles;
-
-    std::cout << ss.str() << std::endl;
-    return ss.str();
+    std::cout << output << std::endl;
 }
 
-std::string Utils::DecompileInstruction(const OpCode InOpCode, const CpuRegisters InRegisters)
+std::string Utils::DecompileInstruction(const OpCode InOpCode, const CpuRegisters InCpuRegisters)
 {
     const Bus* dataBus = Bus::Get();
 
@@ -112,7 +84,7 @@ std::string Utils::DecompileInstruction(const OpCode InOpCode, const CpuRegister
 
     for (uint8_t i = 0; i < InOpCode.Size; i++)
     {
-        opData[i] = dataBus->ReadData(InRegisters.ProgramCounter + i);
+        opData[i] = dataBus->ReadData(InCpuRegisters.ProgramCounter + i);
         opDataStr[i] = ConvertToHexString(opData[i]);
     }
 
@@ -132,10 +104,10 @@ std::string Utils::DecompileInstruction(const OpCode InOpCode, const CpuRegister
         };
         case EAddressingMode::Relative:
         {
-            const uint16_t offsetAddress = InRegisters.ProgramCounter + 1;
+            const uint16_t offsetAddress = InCpuRegisters.ProgramCounter + 1;
             const int8_t offset = dataBus->ReadData(offsetAddress);
 
-            const uint16_t baseProgramCounter = InRegisters.ProgramCounter + 2;
+            const uint16_t baseProgramCounter = InCpuRegisters.ProgramCounter + 2;
             const uint16_t branchedProgramCounter = baseProgramCounter + offset;
 
             const std::string branchedPCStr = ConvertToHexString(branchedProgramCounter);
@@ -144,14 +116,16 @@ std::string Utils::DecompileInstruction(const OpCode InOpCode, const CpuRegister
         }
         case EAddressingMode::ZeroPage:
         {
-            const uint16_t address = InRegisters.ProgramCounter + 1;
+            uint16_t address = dataBus->ReadData(InCpuRegisters.ProgramCounter + 1);
+            address &= 0xFF;
+
             const std::string data = ConvertToHexString(dataBus->ReadData(address));
 
             return std::format("{} ${} = {}", InOpCode.ToString(), opDataStr[1], data);
         };
         case EAddressingMode::ZeroPageX:
         {
-            const uint8_t address = (InRegisters.X + opData[1]) & 0xFF;
+            const uint8_t address = (InCpuRegisters.X + opData[1]) & 0xFF;
             const uint8_t data = dataBus->ReadData(address);
 
             const std::string addressStr = ConvertToHexString(address);
@@ -161,7 +135,7 @@ std::string Utils::DecompileInstruction(const OpCode InOpCode, const CpuRegister
         };
         case EAddressingMode::ZeroPageY:
         {
-            const uint8_t address = (InRegisters.Y + opData[1]) & 0xFF;
+            const uint8_t address = (InCpuRegisters.Y + opData[1]) & 0xFF;
             const uint8_t data = dataBus->ReadData(address);
 
             const std::string addressStr = ConvertToHexString(address);
@@ -171,7 +145,7 @@ std::string Utils::DecompileInstruction(const OpCode InOpCode, const CpuRegister
         };
         case EAddressingMode::IndirectX:
         {
-            const uint8_t zpAddress = (InRegisters.X + opData[1]) & 0xFF;
+            const uint8_t zpAddress = (InCpuRegisters.X + opData[1]) & 0xFF;
             const std::string zpAddressStr = ConvertToHexString(zpAddress);
 
             const uint8_t lowbyte = dataBus->ReadData(zpAddress);
@@ -186,13 +160,13 @@ std::string Utils::DecompileInstruction(const OpCode InOpCode, const CpuRegister
         };
         case EAddressingMode::IndirectY:
         {
-            const uint8_t zpAddress = (InRegisters.X + opData[1]) & 0xFF;
+            const uint8_t zpAddress = (InCpuRegisters.X + opData[1]) & 0xFF;
             const std::string zpAddressStr = ConvertToHexString(zpAddress);
 
             const uint8_t lowbyte = dataBus->ReadData(zpAddress);
             const uint8_t highbyte = dataBus->ReadData((zpAddress + 1) & 0xFF);
 
-            const uint16_t finalAddress = Utils::MakeWord(lowbyte, highbyte) + InRegisters.Y;
+            const uint16_t finalAddress = Utils::MakeWord(lowbyte, highbyte) + InCpuRegisters.Y;
 
             const std::string finalAddressStr = ConvertToHexString(finalAddress);
             const std::string dataStr = ConvertToHexString(dataBus->ReadData(finalAddress));
@@ -224,7 +198,7 @@ std::string Utils::DecompileInstruction(const OpCode InOpCode, const CpuRegister
         case EAddressingMode::AbsoluteX:
         {
             const uint16_t baseAddress = MakeWord(opData[1], opData[2]);
-            const uint16_t finalAddress = baseAddress + InRegisters.X;
+            const uint16_t finalAddress = baseAddress + InCpuRegisters.X;
 
             const std::string finalAddressStr = ConvertToHexString(finalAddress);
 
@@ -233,7 +207,7 @@ std::string Utils::DecompileInstruction(const OpCode InOpCode, const CpuRegister
         case EAddressingMode::AbsoluteY:
         {
             const uint16_t baseAddress = MakeWord(opData[1], opData[2]);
-            const uint16_t finalAddress = baseAddress + InRegisters.Y;
+            const uint16_t finalAddress = baseAddress + InCpuRegisters.Y;
 
             const std::string finalAddressStr = ConvertToHexString(finalAddress);
 

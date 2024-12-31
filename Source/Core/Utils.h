@@ -68,12 +68,12 @@ namespace Utils
      *     C5F7  86 00     STX $00 = 00        A:00 X:00 Y:00 P:26 SP:FD PPU:  0, 36 CYC:12
      * 
      * The format used is:
-     *     'Program Counter' 'Instruction Memory' 'Decompiled Assembly Code' 'CPU Registers' 'PPU Scanline' 'PPU Cycle Number' 'Total CPU Cycles'
+     *     'Program Counter' 'Instruction Memory' 'Decompiled Assembly Code' 'CPU Registers' 'PPU Scanline' 'PPU Cycle' 'Total CPU Cycles'
      */
-    std::string LogInstruction(const OpCode InOpCode, const CpuRegisters InCpuStateBefore, const uint64_t InTotalCycles);
+    void LogInstruction(const OpCode InOpCode, const CpuRegisters InCpuRegisters, const uint64_t InTotalCycles);
 
     /**
      * Decompiles the specified CPU instruction into an assembly code string so that it can be printed to a log.
      */
-    std::string DecompileInstruction(const OpCode InOpCode, const CpuRegisters InRegisters);
+    std::string DecompileInstruction(const OpCode InOpCode, const CpuRegisters InCpuRegisters);
 }
