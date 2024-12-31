@@ -3,6 +3,7 @@
 #include "Core/Core.h"
 #include "System/Bus.h"
 #include "System/PPU.h"
+#include "Logging/Log.h"
 #include "Types/OpCodes.h"
 #include "Enums/CpuFlags.h"
 #include "Types/CpuRegisters.h"
@@ -72,7 +73,7 @@ void Utils::LogInstruction(const OpCode InOpCode, const CpuRegisters InCpuRegist
 
     const std::string output = std::format("{}  {} {} {}  {:<30}  {} PPU: {:>2},{:>3} CYC:{}", programCounterStr, memoryStr[0], memoryStr[1], memoryStr[2], assemblyStr, InCpuRegisters.ToString(), ppu->GetCurrentScanLine(), ppu->GetCurrentCycle(), InTotalCycles);
 
-    std::cout << output << std::endl;
+    EMULATOR_LOG_TRACE(output);
 }
 
 std::string Utils::DecompileInstruction(const OpCode InOpCode, const CpuRegisters InCpuRegisters)

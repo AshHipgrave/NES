@@ -67,6 +67,12 @@
     <Filter Include="Source Files\Types">
       <UniqueIdentifier>{4f849f1d-11d0-43f2-90f4-d2ee1e37f131}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Logging">
+      <UniqueIdentifier>{2f2d1af0-de0a-413e-a1e3-f9d04f7521e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logging">
+      <UniqueIdentifier>{3f6956af-b491-4681-9123-30a850a5f4f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -152,6 +158,9 @@
     </ClCompile>
     <ClCompile Include="System\Cpu.cpp">
       <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\Log.cpp">
+      <Filter>Source Files\Logging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -250,6 +259,9 @@
     </ClInclude>
     <ClInclude Include="System\Cpu.h">
       <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\Log.h">
+      <Filter>Header Files\Logging</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

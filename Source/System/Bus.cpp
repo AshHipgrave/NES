@@ -1,10 +1,11 @@
 #include "pch.h"
+#include "Core/Core.h"
 #include "System/Bus.h"
 #include "System/Cpu.h"
 #include "System/PPU.h"
+#include "Logging/Log.h"
 #include "System/Memory.h"
 #include "System/Cartridge.h"
-#include "Core/Core.h"
 
 Bus* Bus::g_pBus = nullptr;
 
@@ -143,9 +144,7 @@ void Bus::WriteData(const uint8_t InData, const uint16_t InAddress)
     }
     else
     {
-        std::cout << "Error: Segmentation fault! Attempting to write outside of bounds." << std::endl;
-
-        EMULATOR_DEBUG_BREAK();
+        EMULATOR_LOG_FATAL("Segmentation fault! Attempting to write outside of bounds.");
     }
 }
 
@@ -170,10 +169,6 @@ uint8_t Bus::ReadData(const uint16_t InAddress) const
     }
     else
     {
-        std::cout << "Error: Segmentation fault! Attempting to read outside of bounds." << std::endl;
-
-        EMULATOR_DEBUG_BREAK();
+        EMULATOR_LOG_FATAL("Segmentation fault! Attempting to read outside of bounds.");
     }
-
-    return 0;
 }

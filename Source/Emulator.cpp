@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Emulator.h"
 #include "System/Bus.h"
+#include "Logging/Log.h"
 #include "UI/UIManager.h"
 
 Emulator::Emulator()
@@ -34,8 +35,7 @@ void Emulator::Run()
 {
     if (Init() == false)
     {
-        std::cout << "Error: Failed to initialise emualtor. See output for more information." << std::endl;
-        return;
+        EMULATOR_LOG_FATAL("Failed to initialise emulator. See output for more information.");
     }
 
     m_bIsRunning = true;
@@ -91,8 +91,7 @@ bool Emulator::InitSDL()
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
-        std::cout << "Error: Failed to initialise SDL2: " << SDL_GetError() << std::endl;
-        return false;
+        EMULATOR_LOG_FATAL("Failed to initialise SDL2: {}", SDL_GetError());
     }
 
     m_pWindow.reset(
@@ -100,8 +99,7 @@ bool Emulator::InitSDL()
 
     if (m_pWindow == nullptr)
     {
-        std::cout << "Error: Failed to create an SDL2 window: " << SDL_GetError() << std::endl;
-        return false;
+        EMULATOR_LOG_FATAL("Failed to create an SDL2 window: {}", SDL_GetError());
     }
 
     m_pRenderer.reset(
@@ -109,8 +107,7 @@ bool Emulator::InitSDL()
 
     if (m_pRenderer == nullptr)
     {
-        std::cout << "Error: Failed to initialise SDL2 renderer: " << SDL_GetError() << std::endl;
-        return false;
+        EMULATOR_LOG_FATAL("Failed to initialise SDL2 renderer: {}", SDL_GetError());
     }
 
     SDL_SetRenderDrawColor(m_pRenderer.get(), 100, 149, 237, 255);

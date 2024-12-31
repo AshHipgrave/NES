@@ -3,6 +3,7 @@
 #include "Core/Core.h"
 #include "System/Bus.h"
 #include "Core/Utils.h"
+#include "Logging/Log.h"
 #include "Enums/PPUFlags.h"
 #include "Enums/MirrorMode.h"
 #include "System/Cartridge.h"
@@ -173,8 +174,7 @@ void PPU::WriteData(const uint8_t InData, const uint16_t InAddress)
         }
         default:
         {
-            std::cout << "ERROR: Attempted to write to an invalid PPU memory address" << std::endl;
-            EMULATOR_DEBUG_BREAK();
+            EMULATOR_LOG_FATAL("Segmentation Fault! Attempted to write to an invalid PPU memory address.");
         }
     }
 }
@@ -209,11 +209,7 @@ uint8_t PPU::ReadData(const uint16_t InAddress)
         }
     }
 
-    std::cout << "ERROR: Attempted to read from an invalid PPU memory address" << std::endl;
-
-    EMULATOR_DEBUG_BREAK();
-
-    return 0;
+    EMULATOR_LOG_FATAL("Segmentation Fault! Attempted to read from an invalid PPU memory address.");
 }
 
 int16_t PPU::GetCurrentScanLine() const
@@ -252,11 +248,8 @@ uint8_t PPU::InternalReadData(const uint16_t InAddress)
     }
     else
     {
-        std::cout << "ERROR: PPU attempted to read from an invalid address." << std::endl;
 
-        EMULATOR_DEBUG_BREAK();
-
-        return 0;
+        EMULATOR_LOG_FATAL("Segmentation Fault! PPU attempted to read from an invalid memory address.");
     }
 }
 

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "System/Cartridge.h"
+#include "Logging/Log.h"
 
 Cartridge::Cartridge()
 {
@@ -19,7 +20,7 @@ Cartridge* Cartridge::LoadFromFile(const std::string& InFileName)
 
     if (!romFile)
     {
-        std::cout << "Error: Failed to load ROM file " << InFileName.c_str() << std::endl;
+        EMULATOR_LOG_ERROR("Failed to load ROM file '{}'", InFileName.c_str());
         return nullptr;
     }
 
@@ -29,7 +30,7 @@ Cartridge* Cartridge::LoadFromFile(const std::string& InFileName)
 
     if (header[0] != 'N' || header[1] != 'E' || header[2] != 'S' || header[3] != 0x1A)
     {
-        std::cout << "Error: Failed to load ROM file " << InFileName.c_str() << " it does not appear to be a valid NES ROM (missing magic header)." << std::endl;
+        EMULATOR_LOG_ERROR("Failed to load ROM file '{}', it does not appear to be a valid NES ROM(missing magic header).", InFileName.c_str());
         return nullptr;
     }
 

@@ -3,6 +3,7 @@
 #include "Core/Core.h"
 #include "Core/Utils.h"
 #include "System/Bus.h"
+#include "Logging/Log.h"
 #include "Types/OpCodes.h"
 #include "Enums/CpuFlags.h"
 #include "Types/CpuRegisters.h"
@@ -1005,8 +1006,7 @@ uint8_t Cpu::RTI(const OpCode& InOpCode)
 
 uint8_t Cpu::INV(const OpCode& InOpCode)
 {
-    std::cout << "ERROR: Attempted to execute an illegal opcode." << std::endl;
-
+    EMULATOR_LOG_ERROR("Error: Attempted to execute an illegal opcode!");
     EMULATOR_DEBUG_BREAK();
 
     return InOpCode.CycleCount;
@@ -1311,7 +1311,7 @@ uint16_t Cpu::GetAddressByAddressingMode(const EAddressingMode InAddressingMode,
         }
     }
 
-    std::cout << "Error: Unimplemented address mode" << std::endl;
+    EMULATOR_LOG_ERROR("Error: Unimplemented address mode!");
     EMULATOR_DEBUG_BREAK();
 
     return 0;

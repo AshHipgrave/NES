@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "System/Memory.h"
 #include "Core/Core.h"
+#include "Logging/Log.h"
 
 Memory::Memory()
 {
@@ -18,11 +19,7 @@ uint8_t Memory::ReadByte(const uint16_t InAddress) const
         return m_MemoryBuffer[InAddress];
     }
 
-    std::cout << "Error: Segmentation fault! Attempting to read outside of memory bounds." << std::endl;
-
-    EMULATOR_DEBUG_BREAK();
-
-    return 0;
+    EMULATOR_LOG_FATAL("Segmentation fault! Attempting to read outside of memory bounds.");
 }
 
 void Memory::WriteByte(const uint8_t InData, const uint16_t InAddress)
@@ -33,7 +30,6 @@ void Memory::WriteByte(const uint8_t InData, const uint16_t InAddress)
     }
     else
     {
-        std::cout << "Error: Segmentation fault! Attempting to write outside of memory bounds." << std::endl;
-        EMULATOR_DEBUG_BREAK();
+        EMULATOR_LOG_FATAL("Segmentation fault! Attempting to write outside of memory bounds.");
     }
 }
