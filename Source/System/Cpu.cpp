@@ -103,16 +103,13 @@ void Cpu::NMI()
 
 uint8_t Cpu::Tick()
 {
-    const CpuRegisters registersBefore = m_Registers;
-    const uint64_t cyclesBefore = m_CycleCount;
-
     const uint8_t opcode = m_pDataBus->ReadData(m_Registers.ProgramCounter);
     const Instruction instruction = m_InstructionTable[opcode];
-    
+
+    Utils::LogInstruction(instruction.Code, m_Registers, m_CycleCount);
+
     const uint8_t cycles = (this->*instruction.PFN_OpCodeHandlerFunction)(instruction.Code);
     m_CycleCount += cycles;
-
-    Utils::LogInstruction(instruction.Code, registersBefore, cyclesBefore);
 
     return cycles;
 }
@@ -1293,7 +1290,10 @@ uint16_t Cpu::GetAddressByAddressingMode(const EAddressingMode InAddressingMode,
         }
         case EAddressingMode::ZeroPage:
         {
-            return m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
+            const uint16_t baseAddress = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
+            const uint16_t finalAddress = baseAddress & 0xFF;
+
+            return finalAddress;
         }
         case EAddressingMode::ZeroPageX:
         {
