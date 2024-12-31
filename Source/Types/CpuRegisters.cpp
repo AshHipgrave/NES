@@ -20,13 +20,13 @@ bool CpuRegisters::IsFlagSet(const ECpuFlag InFlag) const
 
 std::string CpuRegisters::ToString() const
 {
-    const std::string x = Utils::ConvertToHexString(X);
-    const std::string y = Utils::ConvertToHexString(Y);
+    const std::string x = std::format("{:02X}", X);
+    const std::string y = std::format("{:02X}", Y);
 
-    const std::string accumulator = Utils::ConvertToHexString(Accumulator);
-    const std::string stackPointer = Utils::ConvertToHexString(StackPointer);
+    const std::string accumulator = std::format("{:02X}", Accumulator);
+    const std::string stackPointer = std::format("{:02X}", StackPointer);
 
-    const std::string programRegister = Utils::ConvertToHexString(GetFlags());
+    const std::string programRegister = std::format("{:02X}", GetFlags());
 
     return std::format("A:{} X:{} Y:{} P:{} SP:{}", accumulator, x, y, programRegister, stackPointer);
 }

@@ -21,14 +21,6 @@ namespace Utils
     }
 
     /**
-     * Converts the specified integer into a hexadecimal string. The output string will be padded according to the size of the type.
-     * For example, a uint8_t of 255 will become FF, but for uint16_t it would become 00FF
-     *
-     * Note: uint8_t values are implicitly cast to a uint16_t because uint8_t is an alias for unsigned char, which doesn't work correctly with the formatting we want to use.
-     */
-    std::string ConvertToHexString(const uint16_t InInteger);
-
-    /**
      * Returns the high byte of a 16-bit value.
      * For example: if 0xAAFF is provided this will return 0xAA
      */

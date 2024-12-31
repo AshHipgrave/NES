@@ -216,7 +216,7 @@ void UIManager::DrawCpuStatusOverlay()
         ImGui::SameLine();
         ImGui::Text(format_byte_space, yReg);
 
-        const std::string statusReg = Utils::ConvertToHexString(registers.GetFlags());
+        const std::string statusReg = std::format("{:02X}", registers.GetFlags());
         ImGui::Text("P Register:        ");
         ImGui::SameLine();
         ImGui::Text(statusReg.c_str());
