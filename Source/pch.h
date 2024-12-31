@@ -48,6 +48,7 @@
 #include <utility>
 #include <functional>
 #include <unordered_map>
+#include <format>
 
 ///
 /// Windows API (used by an ImGui dependency)

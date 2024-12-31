@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Core/Utils.h"
+#include "Core/Core.h"
 #include "System/Bus.h"
 #include "System/PPU.h"
 #include "Types/OpCodes.h"
@@ -7,31 +8,7 @@
 #include "Types/CpuRegisters.h"
 #include "Enums/AddressingMode.h"
 
-/**
- * String representation of all opcodes.
- * Opcodes prefixed with an asterisk are illegal/undocumented opcodes.
- */
-const std::vector<std::string> OpCodeStrings = 
-{
-     "BRK",  "ORA", "*JAM", "*SLO", "*NOP", "ORA", "ASL", "*SLO", "PHP", "ORA",  "ASL",  "*ANC",  "*NOP", "ORA", "ASL",  "*SLO",
-     "BPL",  "ORA", "*JAM", "*SLO", "*NOP", "ORA", "ASL", "*SLO", "CLC", "ORA",  "*NOP", "*SLO",  "*NOP", "ORA", "ASL",  "*SLO",
-     "JSR",  "AND", "*JAM", "*RLA", "BIT",  "AND", "ROL", "*RLA", "PLP", "AND",  "ROL",  "*ANC",  "BIT",  "AND", "ROL",  "*RLA",
-     "BMI",  "AND", "*JAM", "*RLA", "*NOP", "AND", "ROL", "*RLA", "SEC", "AND",  "*NOP", "*RLA",  "*NOP", "AND", "ROL",  "*RLA",
-     "RTI",  "EOR", "*JAM", "*SRE", "*NOP", "EOR", "LSR", "*SRE", "PHA", "EOR",  "LSR",  "*ALR",  "JMP",  "EOR", "LSR",  "*SRE",
-     "BVC",  "EOR", "*JAM", "*SRE", "*NOP", "EOR", "LSR", "*SRE", "CLI", "EOR",  "*NOP", "*SRE",  "*NOP", "EOR", "LSR",  "*SRE",
-     "RTS",  "ADC", "*JAM", "*RRA", "*NOP", "ADC", "ROR", "*RRA", "PLA", "ADC",  "ROR",  "*ARR",  "JMP",  "ADC", "ROR",  "*RRA",
-     "BVS",  "ADC", "*JAM", "*RRA", "*NOP", "ADC", "ROR", "*RRA", "SEI", "ADC",  "*NOP", "*RRA",  "*NOP", "ADC", "ROR",  "*RRA",
-     "*NOP", "STA", "*NOP", "*SAX", "STY",  "STA", "STX", "*SAX", "DEY", "*NOP", "TXA",  "*ANE",  "STY",  "STA", "STX",  "*SAX",
-     "BCC",  "STA", "*JAM", "*SHA", "STY",  "STA", "STX", "*SAX", "TYA", "STA",  "TXS",  "*TAS",  "*SHY", "STA", "*SHX", "*SHA",
-     "LDY",  "LDA", "LDX",  "*LAX", "LDY",  "LDA", "LDX", "*LAX", "TAY", "LDA",  "TAX",  "*LXA",  "LDY",  "LDA", "LDX",  "*LAX",
-     "BCS",  "LDA", "*JAM", "*LAX", "LDY",  "LDA", "LDX", "*LAX", "CLV", "LDA",  "TSX",  "*LAS",  "LDX",  "LDA", "LDX",  "*LAX",
-     "CPY",  "CMP", "*NOP", "*DCP", "CPY",  "CMP", "DEC", "*DCP", "INY", "CMP",  "DEX",  "*SBX",  "CPY",  "CMP", "DEC",  "*DCP",
-     "BNE",  "CMP", "*JAM", "*DCP", "*NOP", "CMP", "DEC", "*DCP", "CLD", "CMP",  "*NOP", "*DCP",  "*NOP", "CMP", "DEC",  "*DCP",
-     "CPX",  "SBC", "*NOP", "*ISB", "CPX",  "SBC", "INC", "*ISB", "INX", "SBC",  "NOP",  "*USBC", "CPX",  "SBC", "INC",  "*ISB",
-     "BEQ",  "SBC", "*JAM", "*ISB", "*NOP", "SBC", "INC", "*ISB", "SED", "SBC",  "*NOP", "*ISB",  "*NOP", "SBC", "INC",  "*ISB"
-};
-
-std::string Utils::ConvertToHex(const uint16_t InInteger)
+std::string Utils::ConvertToHexString(const uint16_t InInteger)
 {
     std::stringstream stream;
 
@@ -50,7 +27,7 @@ uint8_t Utils::GetLowByte(const uint16_t InValue)
     return InValue & 0xFF;
 }
 
-uint16_t Utils::MakeDword(const uint8_t InLowByte, const uint8_t InHighByte)
+uint16_t Utils::MakeWord(const uint8_t InLowByte, const uint8_t InHighByte)
 {
     return (static_cast<uint16_t>(InHighByte) << 8) | InLowByte;
 }
@@ -77,25 +54,24 @@ std::string Utils::ConvertFlagToString(const ECpuFlag InFlag)
     return "-";
 }
 
-std::string Utils::ConvertOpcodeToString(const uint8_t InOpcode)
+std::string Utils::LogInstruction(const OpCode InOpCode, const CpuRegisters InCpuStateBefore, const uint64_t InTotalCycles)
 {
-    return OpCodeStrings[InOpcode];
-}
+    std::string output;
 
-std::string Utils::LogInstruction(const OpCode InOpCode, const CpuRegisters CpuStateBefore, const uint64_t InTotalCycles)
-{
+    const Bus* dataBus = Bus::Get();
+    //const PPU* ppu = dataBus->GetPPU();
+
     std::stringstream ss;
 
-    ss << std::left << std::setw(6) << Utils::ConvertToHex(CpuStateBefore.ProgramCounter);
-
-    Bus* dataBus = Bus::Get();
+    ss << std::left << std::setw(6) << Utils::ConvertToHexString(InCpuStateBefore.ProgramCounter);
 
     for (uint16_t i = 0; i < InOpCode.Size; i++)
     {
-        const uint8_t value = dataBus->ReadData(CpuStateBefore.ProgramCounter + i);
-        ss << std::left << std::setw(3) << Utils::ConvertToHex(value);
+        const uint8_t value = dataBus->ReadData(InCpuStateBefore.ProgramCounter + i);
+        ss << std::left << std::setw(3) << Utils::ConvertToHexString(value);
     }
 
+    /*
     // TODO: fix using 'setw()'
     if (InOpCode.Size == 1)
     {
@@ -109,23 +85,161 @@ std::string Utils::LogInstruction(const OpCode InOpCode, const CpuRegisters CpuS
     {
         ss << " ";
     }
+    */
 
-    const uint8_t opcodeHex = dataBus->ReadData(CpuStateBefore.ProgramCounter);
-    ss << std::left << std::setw(30) << ConvertOpcodeToString(opcodeHex);
+    //ss << std::left << std::setw() << InOpCode.ToString();
 
-    if (InOpCode.AddressingMode != EAddressingMode::Implied)
-    {
-        // TODO: Print the ASM representation of the operation, taking into account the addressing mode so it's formatted correctly.
-    }
+    ss << " " << DecompileInstruction(InOpCode, InCpuStateBefore) << " ";
 
-    ss << "A:" << ConvertToHex(CpuStateBefore.Accumulator) << " ";
-    ss << "X:" << ConvertToHex(CpuStateBefore.X) << " ";
-    ss << "Y:" << ConvertToHex(CpuStateBefore.Y) << " ";
-    ss << "P:" << ConvertToHex(CpuStateBefore.GetFlags()) << " ";
-    ss << "SP:" << ConvertToHex(CpuStateBefore.StackPointer) << " ";
+    ss << "A:" << ConvertToHexString(InCpuStateBefore.Accumulator) << " ";
+    ss << "X:" << ConvertToHexString(InCpuStateBefore.X) << " ";
+    ss << "Y:" << ConvertToHexString(InCpuStateBefore.Y) << " ";
+    ss << "P:" << ConvertToHexString(InCpuStateBefore.GetFlags()) << " ";
+    ss << "SP:" << ConvertToHexString(InCpuStateBefore.StackPointer) << " ";
     ss << "PPU: " << dataBus->GetPPU()->GetCurrentScanLine() << "," << dataBus->GetPPU()->GetCurrentCycle() << " "; // TODO: PPU hasn't been implemented yet so this will always be wrong when compared to the example log.
     ss << "CYC:" << InTotalCycles;
 
     std::cout << ss.str() << std::endl;
     return ss.str();
+}
+
+std::string Utils::DecompileInstruction(const OpCode InOpCode, const CpuRegisters InRegisters)
+{
+    const Bus* dataBus = Bus::Get();
+
+    uint8_t opData[3] = { 0, 0 , 0 };
+    std::string opDataStr[3] = { "", "", "" };
+
+    for (uint8_t i = 0; i < InOpCode.Size; i++)
+    {
+        opData[i] = dataBus->ReadData(InRegisters.ProgramCounter + i);
+        opDataStr[i] = ConvertToHexString(opData[i]);
+    }
+
+    switch (InOpCode.AddressingMode)
+    {
+        case EAddressingMode::Implied:
+        {
+            return InOpCode.ToString();
+        }
+        case EAddressingMode::Accumulator:
+        {
+            return std::format("{} A", InOpCode.ToString());
+        };
+        case EAddressingMode::Immediate:
+        {
+            return std::format("{} #${}", InOpCode.ToString(), opDataStr[1]);
+        };
+        case EAddressingMode::Relative:
+        {
+            const uint16_t offsetAddress = InRegisters.ProgramCounter + 1;
+            const int8_t offset = dataBus->ReadData(offsetAddress);
+
+            const uint16_t baseProgramCounter = InRegisters.ProgramCounter + 2;
+            const uint16_t branchedProgramCounter = baseProgramCounter + offset;
+
+            const std::string branchedPCStr = ConvertToHexString(branchedProgramCounter);
+
+            return std::format("{} ${}", InOpCode.ToString(), branchedPCStr);
+        }
+        case EAddressingMode::ZeroPage:
+        {
+            const uint16_t address = InRegisters.ProgramCounter + 1;
+            const std::string data = ConvertToHexString(dataBus->ReadData(address));
+
+            return std::format("{} ${} = {}", InOpCode.ToString(), opDataStr[1], data);
+        };
+        case EAddressingMode::ZeroPageX:
+        {
+            const uint8_t address = (InRegisters.X + opData[1]) & 0xFF;
+            const uint8_t data = dataBus->ReadData(address);
+
+            const std::string addressStr = ConvertToHexString(address);
+            const std::string dataStr = ConvertToHexString(data);
+
+            return std::format("{} ${},X @ {} = {}", InOpCode.ToString(), opDataStr[1], addressStr, data);
+        };
+        case EAddressingMode::ZeroPageY:
+        {
+            const uint8_t address = (InRegisters.Y + opData[1]) & 0xFF;
+            const uint8_t data = dataBus->ReadData(address);
+
+            const std::string addressStr = ConvertToHexString(address);
+            const std::string dataStr = ConvertToHexString(data);
+
+            return std::format("{} ${},X @ {} = {}", InOpCode.ToString(), opDataStr[1], addressStr, data);
+        };
+        case EAddressingMode::IndirectX:
+        {
+            const uint8_t zpAddress = (InRegisters.X + opData[1]) & 0xFF;
+            const std::string zpAddressStr = ConvertToHexString(zpAddress);
+
+            const uint8_t lowbyte = dataBus->ReadData(zpAddress);
+            const uint8_t highbyte = dataBus->ReadData((zpAddress + 1) & 0xFF);
+
+            const uint16_t finalAddress = Utils::MakeWord(lowbyte, highbyte);
+
+            const std::string finalAddressStr = ConvertToHexString(finalAddress);
+            const std::string dataStr = ConvertToHexString(dataBus->ReadData(finalAddress));
+
+            return std::format("{} (${},X) @ {} = {} = {}", InOpCode.ToString(), opDataStr[1], zpAddressStr, finalAddressStr, dataStr);
+        };
+        case EAddressingMode::IndirectY:
+        {
+            const uint8_t zpAddress = (InRegisters.X + opData[1]) & 0xFF;
+            const std::string zpAddressStr = ConvertToHexString(zpAddress);
+
+            const uint8_t lowbyte = dataBus->ReadData(zpAddress);
+            const uint8_t highbyte = dataBus->ReadData((zpAddress + 1) & 0xFF);
+
+            const uint16_t finalAddress = Utils::MakeWord(lowbyte, highbyte) + InRegisters.Y;
+
+            const std::string finalAddressStr = ConvertToHexString(finalAddress);
+            const std::string dataStr = ConvertToHexString(dataBus->ReadData(finalAddress));
+
+            return std::format("{} (${},Y) @ {} = {} = {}", InOpCode.ToString(), opDataStr[1], zpAddressStr, finalAddressStr, dataStr);
+        };
+        case EAddressingMode::Absolute:
+        {
+            return std::format("{} ${}{}", InOpCode.ToString(), opDataStr[2], opDataStr[1]);
+        };
+        case EAddressingMode::Indirect:
+        {
+            const uint8_t pointerLow = dataBus->ReadData(opData[1]);
+            const uint8_t pointerHigh = dataBus->ReadData(opData[2]);
+
+            const uint16_t pointer = MakeWord(pointerLow, pointerHigh);
+
+            const uint8_t lowbyte = dataBus->ReadData(pointer);
+
+            const uint16_t highbyteAddress = (pointer & 0xFF) == 0xFF ? (pointer & 0xFF00) : (pointer + 1);
+            const uint8_t highbyte = dataBus->ReadData(highbyteAddress);
+
+            const uint16_t address = MakeWord(lowbyte, highbyte);
+            
+            const std::string addressStr = ConvertToHexString(address);
+
+            return std::format("{} (${})", InOpCode.ToString(), addressStr);
+        };
+        case EAddressingMode::AbsoluteX:
+        {
+            const uint16_t baseAddress = MakeWord(opData[1], opData[2]);
+            const uint16_t finalAddress = baseAddress + InRegisters.X;
+
+            const std::string finalAddressStr = ConvertToHexString(finalAddress);
+
+            return std::format("{} ${},X", InOpCode.ToString(), finalAddressStr);
+        };
+        case EAddressingMode::AbsoluteY:
+        {
+            const uint16_t baseAddress = MakeWord(opData[1], opData[2]);
+            const uint16_t finalAddress = baseAddress + InRegisters.Y;
+
+            const std::string finalAddressStr = ConvertToHexString(finalAddress);
+
+            return std::format("{} ${},Y", InOpCode.ToString(), finalAddressStr);
+        };
+    }
+
+    return InOpCode.ToString();
 }

@@ -10,6 +10,11 @@ class Cpu;
 struct OpCode
 {
     /**
+     * Assembly code representation of this opcode.
+     */
+    std::string AssemblyCodeString = "";
+
+    /**
     * The size of this opcode. This value is used to increment the program counter when the opcode executes.
     * Some opcodes may increment by more than this value (e.g. if they crossed a page boundry).
     */
@@ -24,6 +29,14 @@ struct OpCode
      * The addressing mode used by this opcode. This will be used to retrieve the correct value from RAM for the CPU to operate on.
      */
     EAddressingMode AddressingMode;
+
+    /**
+     * Returns the assembly code string representation of this opcode.
+     */
+    std::string ToString() const
+    {
+        return AssemblyCodeString;
+    }
 };
 
 /**
@@ -47,407 +60,407 @@ struct Instruction
 /// Load Accumulator
 /// 
 
-constexpr OpCode LDA_Immediate = { 2, 2, EAddressingMode::Immediate };
-constexpr OpCode LDA_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode LDA_ZeroPageX = { 2, 4, EAddressingMode::ZeroPageX };
-constexpr OpCode LDA_Absolute  = { 3, 4, EAddressingMode::Absolute  };
-constexpr OpCode LDA_AbsoluteX = { 3, 4, EAddressingMode::AbsoluteX };
-constexpr OpCode LDA_AbsoluteY = { 3, 4, EAddressingMode::AbsoluteY };
-constexpr OpCode LDA_IndirectX = { 2, 6, EAddressingMode::IndirectX };
-constexpr OpCode LDA_IndirectY = { 2, 5, EAddressingMode::IndirectY };
+const OpCode LDA_Immediate = { "LDA", 2, 2, EAddressingMode::Immediate };
+const OpCode LDA_ZeroPage  = { "LDA", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode LDA_ZeroPageX = { "LDA", 2, 4, EAddressingMode::ZeroPageX };
+const OpCode LDA_Absolute  = { "LDA", 3, 4, EAddressingMode::Absolute  };
+const OpCode LDA_AbsoluteX = { "LDA", 3, 4, EAddressingMode::AbsoluteX };
+const OpCode LDA_AbsoluteY = { "LDA", 3, 4, EAddressingMode::AbsoluteY };
+const OpCode LDA_IndirectX = { "LDA", 2, 6, EAddressingMode::IndirectX };
+const OpCode LDA_IndirectY = { "LDA", 2, 5, EAddressingMode::IndirectY };
 
 /// 
 /// Load X Register
 /// 
 
-constexpr OpCode LDX_Immediate = { 2, 2, EAddressingMode::Immediate };
-constexpr OpCode LDX_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode LDX_ZeroPageY = { 2, 4, EAddressingMode::ZeroPageY };
-constexpr OpCode LDX_Absolute  = { 3, 4, EAddressingMode::Absolute  };
-constexpr OpCode LDX_AbsoluteY = { 3, 4, EAddressingMode::AbsoluteY };
+const OpCode LDX_Immediate = { "LDX", 2, 2, EAddressingMode::Immediate };
+const OpCode LDX_ZeroPage  = { "LDX", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode LDX_ZeroPageY = { "LDX", 2, 4, EAddressingMode::ZeroPageY };
+const OpCode LDX_Absolute  = { "LDX", 3, 4, EAddressingMode::Absolute  };
+const OpCode LDX_AbsoluteY = { "LDX", 3, 4, EAddressingMode::AbsoluteY };
 
 /// 
 /// Load Y Register
 /// 
 
-constexpr OpCode LDY_Immediate = { 2, 2, EAddressingMode::Immediate };
-constexpr OpCode LDY_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode LDY_ZeroPageX = { 2, 4, EAddressingMode::ZeroPageX };
-constexpr OpCode LDY_Absolute  = { 3, 4, EAddressingMode::Absolute  };
-constexpr OpCode LDY_AbsoluteX = { 3, 4, EAddressingMode::AbsoluteX };
+const OpCode LDY_Immediate = { "LDY", 2, 2, EAddressingMode::Immediate };
+const OpCode LDY_ZeroPage  = { "LDY", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode LDY_ZeroPageX = { "LDY", 2, 4, EAddressingMode::ZeroPageX };
+const OpCode LDY_Absolute  = { "LDY", 3, 4, EAddressingMode::Absolute  };
+const OpCode LDY_AbsoluteX = { "LDY", 3, 4, EAddressingMode::AbsoluteX };
 
 /// 
 /// Store Accumulator
 /// 
 
-constexpr OpCode STA_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode STA_ZeroPageX = { 2, 4, EAddressingMode::ZeroPageX };
-constexpr OpCode STA_Absolute  = { 3, 4, EAddressingMode::Absolute  };
-constexpr OpCode STA_AbsoluteX = { 3, 5, EAddressingMode::AbsoluteX };
-constexpr OpCode STA_AbsoluteY = { 3, 5, EAddressingMode::AbsoluteY };
-constexpr OpCode STA_IndirectX = { 2, 6, EAddressingMode::IndirectX };
-constexpr OpCode STA_IndirectY = { 2, 6, EAddressingMode::IndirectY };
+const OpCode STA_ZeroPage  = { "STA", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode STA_ZeroPageX = { "STA", 2, 4, EAddressingMode::ZeroPageX };
+const OpCode STA_Absolute  = { "STA", 3, 4, EAddressingMode::Absolute  };
+const OpCode STA_AbsoluteX = { "STA", 3, 5, EAddressingMode::AbsoluteX };
+const OpCode STA_AbsoluteY = { "STA", 3, 5, EAddressingMode::AbsoluteY };
+const OpCode STA_IndirectX = { "STA", 2, 6, EAddressingMode::IndirectX };
+const OpCode STA_IndirectY = { "STA", 2, 6, EAddressingMode::IndirectY };
 
 /// 
 /// Store X Register
 /// 
 
-constexpr OpCode STX_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode STX_ZeroPageY = { 2, 4, EAddressingMode::ZeroPageY };
-constexpr OpCode STX_Absolute  = { 3, 4, EAddressingMode::Absolute  };
+const OpCode STX_ZeroPage  = { "STX", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode STX_ZeroPageY = { "STX", 2, 4, EAddressingMode::ZeroPageY };
+const OpCode STX_Absolute  = { "STX", 3, 4, EAddressingMode::Absolute  };
 
 /// 
 /// Store Y Register
 /// 
 
-constexpr OpCode STY_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode STY_ZeroPageX = { 2, 4, EAddressingMode::ZeroPageX };
-constexpr OpCode STY_Absolute  = { 3, 4, EAddressingMode::Absolute  };
+const OpCode STY_ZeroPage  = { "STY", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode STY_ZeroPageX = { "STY", 2, 4, EAddressingMode::ZeroPageX };
+const OpCode STY_Absolute  = { "STY", 3, 4, EAddressingMode::Absolute  };
 
 ///
 /// Transfer Register
 ///
 
-constexpr OpCode TAX_Implied = { 1, 2, EAddressingMode::Implied };
-constexpr OpCode TAY_Implied = { 1, 2, EAddressingMode::Implied };
-constexpr OpCode TXA_Implied = { 1, 2, EAddressingMode::Implied };
-constexpr OpCode TYA_Implied = { 1, 2, EAddressingMode::Implied };
+const OpCode TAX_Implied = { "TAX", 1, 2, EAddressingMode::Implied };
+const OpCode TAY_Implied = { "TAY", 1, 2, EAddressingMode::Implied };
+const OpCode TXA_Implied = { "TXA", 1, 2, EAddressingMode::Implied };
+const OpCode TYA_Implied = { "TYA", 1, 2, EAddressingMode::Implied };
 
 ///
 /// Stack Operations
 ///
 
-constexpr OpCode TSX_Implied = { 1, 2, EAddressingMode::Implied };
-constexpr OpCode TXS_Implied = { 1, 2, EAddressingMode::Implied };
-constexpr OpCode PHA_Implied = { 1, 3, EAddressingMode::Implied };
-constexpr OpCode PHP_Implied = { 1, 3, EAddressingMode::Implied };
-constexpr OpCode PLA_Implied = { 1, 4, EAddressingMode::Implied };
-constexpr OpCode PLP_Implied = { 1, 4, EAddressingMode::Implied };
+const OpCode TSX_Implied = { "TSX", 1, 2, EAddressingMode::Implied };
+const OpCode TXS_Implied = { "TXS", 1, 2, EAddressingMode::Implied };
+const OpCode PHA_Implied = { "PHA", 1, 3, EAddressingMode::Implied };
+const OpCode PHP_Implied = { "PHP", 1, 3, EAddressingMode::Implied };
+const OpCode PLA_Implied = { "PLA", 1, 4, EAddressingMode::Implied };
+const OpCode PLP_Implied = { "PLP", 1, 4, EAddressingMode::Implied };
 
 ///
 /// Logical AND
 ///
 
-constexpr OpCode AND_Immediate = { 2, 2, EAddressingMode::Immediate };
-constexpr OpCode AND_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode AND_ZeroPageX = { 2, 4, EAddressingMode::ZeroPageX };
-constexpr OpCode AND_Absolute  = { 3, 4, EAddressingMode::Absolute  };
-constexpr OpCode AND_AbsoluteX = { 3, 4, EAddressingMode::AbsoluteX };
-constexpr OpCode AND_AbsoluteY = { 3, 4, EAddressingMode::AbsoluteY };
-constexpr OpCode AND_IndirectX = { 2, 6, EAddressingMode::IndirectX };
-constexpr OpCode AND_IndirectY = { 2, 5, EAddressingMode::IndirectY };
+const OpCode AND_Immediate = { "AND", 2, 2, EAddressingMode::Immediate };
+const OpCode AND_ZeroPage  = { "AND", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode AND_ZeroPageX = { "AND", 2, 4, EAddressingMode::ZeroPageX };
+const OpCode AND_Absolute  = { "AND", 3, 4, EAddressingMode::Absolute  };
+const OpCode AND_AbsoluteX = { "AND", 3, 4, EAddressingMode::AbsoluteX };
+const OpCode AND_AbsoluteY = { "AND", 3, 4, EAddressingMode::AbsoluteY };
+const OpCode AND_IndirectX = { "AND", 2, 6, EAddressingMode::IndirectX };
+const OpCode AND_IndirectY = { "AND", 2, 5, EAddressingMode::IndirectY };
 
 ///
 /// Logical EOR (Exclusive OR)
 ///
 
-constexpr OpCode EOR_Immediate = { 2, 2, EAddressingMode::Immediate };
-constexpr OpCode EOR_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode EOR_ZeroPageX = { 2, 4, EAddressingMode::ZeroPageX };
-constexpr OpCode EOR_Absolute  = { 3, 4, EAddressingMode::Absolute  };
-constexpr OpCode EOR_AbsoluteX = { 3, 4, EAddressingMode::AbsoluteX };
-constexpr OpCode EOR_AbsoluteY = { 3, 4, EAddressingMode::AbsoluteY };
-constexpr OpCode EOR_IndirectX = { 2, 6, EAddressingMode::IndirectX };
-constexpr OpCode EOR_IndirectY = { 2, 5, EAddressingMode::IndirectY };
+const OpCode EOR_Immediate = { "EOR", 2, 2, EAddressingMode::Immediate };
+const OpCode EOR_ZeroPage  = { "EOR", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode EOR_ZeroPageX = { "EOR", 2, 4, EAddressingMode::ZeroPageX };
+const OpCode EOR_Absolute  = { "EOR", 3, 4, EAddressingMode::Absolute  };
+const OpCode EOR_AbsoluteX = { "EOR", 3, 4, EAddressingMode::AbsoluteX };
+const OpCode EOR_AbsoluteY = { "EOR", 3, 4, EAddressingMode::AbsoluteY };
+const OpCode EOR_IndirectX = { "EOR", 2, 6, EAddressingMode::IndirectX };
+const OpCode EOR_IndirectY = { "EOR", 2, 5, EAddressingMode::IndirectY };
 
 ///
 /// Logical ORA (Inclusive OR)
 ///
 
-constexpr OpCode ORA_Immediate = { 2, 2, EAddressingMode::Immediate };
-constexpr OpCode ORA_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode ORA_ZeroPageX = { 2, 4, EAddressingMode::ZeroPageX };
-constexpr OpCode ORA_Absolute  = { 3, 4, EAddressingMode::Absolute  };
-constexpr OpCode ORA_AbsoluteX = { 3, 4, EAddressingMode::AbsoluteX };
-constexpr OpCode ORA_AbsoluteY = { 3, 4, EAddressingMode::AbsoluteY };
-constexpr OpCode ORA_IndirectX = { 2, 6, EAddressingMode::IndirectX };
-constexpr OpCode ORA_IndirectY = { 2, 5, EAddressingMode::IndirectY };
+const OpCode ORA_Immediate = { "ORA", 2, 2, EAddressingMode::Immediate };
+const OpCode ORA_ZeroPage  = { "ORA", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode ORA_ZeroPageX = { "ORA", 2, 4, EAddressingMode::ZeroPageX };
+const OpCode ORA_Absolute  = { "ORA", 3, 4, EAddressingMode::Absolute  };
+const OpCode ORA_AbsoluteX = { "ORA", 3, 4, EAddressingMode::AbsoluteX };
+const OpCode ORA_AbsoluteY = { "ORA", 3, 4, EAddressingMode::AbsoluteY };
+const OpCode ORA_IndirectX = { "ORA", 2, 6, EAddressingMode::IndirectX };
+const OpCode ORA_IndirectY = { "ORA", 2, 5, EAddressingMode::IndirectY };
 
 ///
 /// Bit Test 
 ///
 
-constexpr OpCode BIT_ZeroPage = { 2, 3, EAddressingMode::ZeroPage };
-constexpr OpCode BIT_Absolute = { 3, 4, EAddressingMode::Absolute };
+const OpCode BIT_ZeroPage = { "BIT", 2, 3, EAddressingMode::ZeroPage };
+const OpCode BIT_Absolute = { "BIT", 3, 4, EAddressingMode::Absolute };
 
 ///
 /// Add With Carry 
 ///
 
-constexpr OpCode ADC_Immediate = { 2, 2, EAddressingMode::Immediate };
-constexpr OpCode ADC_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode ADC_ZeroPageX = { 2, 4, EAddressingMode::ZeroPageX };
-constexpr OpCode ADC_Absolute  = { 3, 4, EAddressingMode::Absolute  };
-constexpr OpCode ADC_AbsoluteX = { 3, 4, EAddressingMode::AbsoluteX };
-constexpr OpCode ADC_AbsoluteY = { 3, 4, EAddressingMode::AbsoluteY };
-constexpr OpCode ADC_IndirectX = { 2, 6, EAddressingMode::IndirectX };
-constexpr OpCode ADC_IndirectY = { 2, 5, EAddressingMode::IndirectY };
+const OpCode ADC_Immediate = { "ADC", 2, 2, EAddressingMode::Immediate };
+const OpCode ADC_ZeroPage  = { "ADC", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode ADC_ZeroPageX = { "ADC", 2, 4, EAddressingMode::ZeroPageX };
+const OpCode ADC_Absolute  = { "ADC", 3, 4, EAddressingMode::Absolute  };
+const OpCode ADC_AbsoluteX = { "ADC", 3, 4, EAddressingMode::AbsoluteX };
+const OpCode ADC_AbsoluteY = { "ADC", 3, 4, EAddressingMode::AbsoluteY };
+const OpCode ADC_IndirectX = { "ADC", 2, 6, EAddressingMode::IndirectX };
+const OpCode ADC_IndirectY = { "ADC", 2, 5, EAddressingMode::IndirectY };
 
 ///                                
 /// Subtract With Carry            
 ///                                
 
-constexpr OpCode SBC_Immediate = { 2, 2, EAddressingMode::Immediate };
-constexpr OpCode SBC_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode SBC_ZeroPageX = { 2, 4, EAddressingMode::ZeroPageX };
-constexpr OpCode SBC_Absolute  = { 3, 4, EAddressingMode::Absolute  };
-constexpr OpCode SBC_AbsoluteX = { 3, 4, EAddressingMode::AbsoluteX };
-constexpr OpCode SBC_AbsoluteY = { 3, 4, EAddressingMode::AbsoluteY };
-constexpr OpCode SBC_IndirectX = { 2, 6, EAddressingMode::IndirectX };
-constexpr OpCode SBC_IndirectY = { 2, 5, EAddressingMode::IndirectY };
+const OpCode SBC_Immediate = { "SBC", 2, 2, EAddressingMode::Immediate };
+const OpCode SBC_ZeroPage  = { "SBC", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode SBC_ZeroPageX = { "SBC", 2, 4, EAddressingMode::ZeroPageX };
+const OpCode SBC_Absolute  = { "SBC", 3, 4, EAddressingMode::Absolute  };
+const OpCode SBC_AbsoluteX = { "SBC", 3, 4, EAddressingMode::AbsoluteX };
+const OpCode SBC_AbsoluteY = { "SBC", 3, 4, EAddressingMode::AbsoluteY };
+const OpCode SBC_IndirectX = { "SBC", 2, 6, EAddressingMode::IndirectX };
+const OpCode SBC_IndirectY = { "SBC", 2, 5, EAddressingMode::IndirectY };
 
 ///                                
 /// Compare                        
 ///                                
 
-constexpr OpCode CMP_Immediate = { 2, 2, EAddressingMode::Immediate };
-constexpr OpCode CMP_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode CMP_ZeroPageX = { 2, 4, EAddressingMode::ZeroPageX };
-constexpr OpCode CMP_Absolute  = { 3, 4, EAddressingMode::Absolute  };
-constexpr OpCode CMP_AbsoluteX = { 3, 4, EAddressingMode::AbsoluteX };
-constexpr OpCode CMP_AbsoluteY = { 3, 4, EAddressingMode::AbsoluteY };
-constexpr OpCode CMP_IndirectX = { 2, 6, EAddressingMode::IndirectX };
-constexpr OpCode CMP_IndirectY = { 2, 5, EAddressingMode::IndirectY };
+const OpCode CMP_Immediate = { "CMP", 2, 2, EAddressingMode::Immediate };
+const OpCode CMP_ZeroPage  = { "CMP", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode CMP_ZeroPageX = { "CMP", 2, 4, EAddressingMode::ZeroPageX };
+const OpCode CMP_Absolute  = { "CMP", 3, 4, EAddressingMode::Absolute  };
+const OpCode CMP_AbsoluteX = { "CMP", 3, 4, EAddressingMode::AbsoluteX };
+const OpCode CMP_AbsoluteY = { "CMP", 3, 4, EAddressingMode::AbsoluteY };
+const OpCode CMP_IndirectX = { "CMP", 2, 6, EAddressingMode::IndirectX };
+const OpCode CMP_IndirectY = { "CMP", 2, 5, EAddressingMode::IndirectY };
 
 ///                                
 /// Compare X Register             
 ///                                
 
-constexpr OpCode CPX_Immediate = { 2, 2, EAddressingMode::Immediate };
-constexpr OpCode CPX_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode CPX_Absolute  = { 3, 4, EAddressingMode::Absolute  };
+const OpCode CPX_Immediate = { "CPX", 2, 2, EAddressingMode::Immediate };
+const OpCode CPX_ZeroPage  = { "CPX", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode CPX_Absolute  = { "CPX", 3, 4, EAddressingMode::Absolute  };
 
 ///                                
 /// Compare Y Register             
 ///                                
 
-constexpr OpCode CPY_Immediate = { 2, 2, EAddressingMode::Immediate };
-constexpr OpCode CPY_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode CPY_Absolute  = { 3, 4, EAddressingMode::Absolute  };
+const OpCode CPY_Immediate = { "CPY", 2, 2, EAddressingMode::Immediate };
+const OpCode CPY_ZeroPage  = { "CPY", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode CPY_Absolute  = { "CPY", 3, 4, EAddressingMode::Absolute  };
 
 ///                                
 /// Increment Memory Location      
 ///                                
 
-constexpr OpCode INC_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
-constexpr OpCode INC_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
-constexpr OpCode INC_Absolute  = { 3, 6, EAddressingMode::Absolute  };
-constexpr OpCode INC_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
+const OpCode INC_ZeroPage  = { "INC", 2, 5, EAddressingMode::ZeroPage  };
+const OpCode INC_ZeroPageX = { "INC", 2, 6, EAddressingMode::ZeroPageX };
+const OpCode INC_Absolute  = { "INC", 3, 6, EAddressingMode::Absolute  };
+const OpCode INC_AbsoluteX = { "INC", 3, 7, EAddressingMode::AbsoluteX };
 
 ///
 /// Increment Register
 /// 
 
-constexpr OpCode INX_Implied = { 1, 2, EAddressingMode::Implied };
-constexpr OpCode INY_Implied = { 1, 2, EAddressingMode::Implied };
+const OpCode INX_Implied = { "INX", 1, 2, EAddressingMode::Implied };
+const OpCode INY_Implied = { "INY", 1, 2, EAddressingMode::Implied };
 
 ///
 /// Decrement Memory Location
 ///
 
-constexpr OpCode DEC_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
-constexpr OpCode DEC_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
-constexpr OpCode DEC_Absolute  = { 3, 6, EAddressingMode::Absolute  };
-constexpr OpCode DEC_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
+const OpCode DEC_ZeroPage  = { "DEC", 2, 5, EAddressingMode::ZeroPage  };
+const OpCode DEC_ZeroPageX = { "DEC", 2, 6, EAddressingMode::ZeroPageX };
+const OpCode DEC_Absolute  = { "DEC", 3, 6, EAddressingMode::Absolute  };
+const OpCode DEC_AbsoluteX = { "DEC", 3, 7, EAddressingMode::AbsoluteX };
 
 ///
 /// Decrement Register
 /// 
 
-constexpr OpCode DEX_Implied = { 1, 2, EAddressingMode::Implied };
-constexpr OpCode DEY_Implied = { 1, 2, EAddressingMode::Implied };
+const OpCode DEX_Implied = { "DEX", 1, 2, EAddressingMode::Implied };
+const OpCode DEY_Implied = { "DEY", 1, 2, EAddressingMode::Implied };
 
 ///
 /// Arithmetic Shift Left
 ///
 
-constexpr OpCode ASL_Accumulator = { 1, 2, EAddressingMode::Accumulator };
-constexpr OpCode ASL_ZeroPage    = { 2, 5, EAddressingMode::ZeroPage    };
-constexpr OpCode ASL_ZeroPageX   = { 2, 6, EAddressingMode::ZeroPageX   };
-constexpr OpCode ASL_Absolute    = { 3, 6, EAddressingMode::Absolute    };
-constexpr OpCode ASL_AbsoluteX   = { 3, 7, EAddressingMode::AbsoluteX   };
+const OpCode ASL_Accumulator = { "ASL", 1, 2, EAddressingMode::Accumulator };
+const OpCode ASL_ZeroPage    = { "ASL", 2, 5, EAddressingMode::ZeroPage    };
+const OpCode ASL_ZeroPageX   = { "ASL", 2, 6, EAddressingMode::ZeroPageX   };
+const OpCode ASL_Absolute    = { "ASL", 3, 6, EAddressingMode::Absolute    };
+const OpCode ASL_AbsoluteX   = { "ASL", 3, 7, EAddressingMode::AbsoluteX   };
 
 ///
 /// Logical Shift Right
 ///
 
-constexpr OpCode LSR_Accumulator = { 1, 2, EAddressingMode::Accumulator };
-constexpr OpCode LSR_ZeroPage    = { 2, 5, EAddressingMode::ZeroPage    };
-constexpr OpCode LSR_ZeroPageX   = { 2, 6, EAddressingMode::ZeroPageX   };
-constexpr OpCode LSR_Absolute    = { 3, 6, EAddressingMode::Absolute    };
-constexpr OpCode LSR_AbsoluteX   = { 3, 7, EAddressingMode::AbsoluteX   };
+const OpCode LSR_Accumulator = { "LSR", 1, 2, EAddressingMode::Accumulator };
+const OpCode LSR_ZeroPage    = { "LSR", 2, 5, EAddressingMode::ZeroPage    };
+const OpCode LSR_ZeroPageX   = { "LSR", 2, 6, EAddressingMode::ZeroPageX   };
+const OpCode LSR_Absolute    = { "LSR", 3, 6, EAddressingMode::Absolute    };
+const OpCode LSR_AbsoluteX   = { "LSR", 3, 7, EAddressingMode::AbsoluteX   };
 
 ///
 /// Rotate Left
 ///
 
-constexpr OpCode ROL_Accumulator = { 1, 2, EAddressingMode::Accumulator };
-constexpr OpCode ROL_ZeroPage    = { 2, 5, EAddressingMode::ZeroPage    };
-constexpr OpCode ROL_ZeroPageX   = { 2, 6, EAddressingMode::ZeroPageX   };
-constexpr OpCode ROL_Absolute    = { 3, 6, EAddressingMode::Absolute    };
-constexpr OpCode ROL_AbsoluteX   = { 3, 7, EAddressingMode::AbsoluteX   };
+const OpCode ROL_Accumulator = { "ROL", 1, 2, EAddressingMode::Accumulator };
+const OpCode ROL_ZeroPage    = { "ROL", 2, 5, EAddressingMode::ZeroPage    };
+const OpCode ROL_ZeroPageX   = { "ROL", 2, 6, EAddressingMode::ZeroPageX   };
+const OpCode ROL_Absolute    = { "ROL", 3, 6, EAddressingMode::Absolute    };
+const OpCode ROL_AbsoluteX   = { "ROL", 3, 7, EAddressingMode::AbsoluteX   };
 
 ///
 /// Rotate Right
 ///
 
-constexpr OpCode ROR_Accumulator = { 1, 2, EAddressingMode::Accumulator };
-constexpr OpCode ROR_ZeroPage    = { 2, 5, EAddressingMode::ZeroPage    };
-constexpr OpCode ROR_ZeroPageX   = { 2, 6, EAddressingMode::ZeroPageX   };
-constexpr OpCode ROR_Absolute    = { 3, 6, EAddressingMode::Absolute    };
-constexpr OpCode ROR_AbsoluteX   = { 3, 7, EAddressingMode::AbsoluteX   };
+const OpCode ROR_Accumulator = { "ROR", 1, 2, EAddressingMode::Accumulator };
+const OpCode ROR_ZeroPage    = { "ROR", 2, 5, EAddressingMode::ZeroPage    };
+const OpCode ROR_ZeroPageX   = { "ROR", 2, 6, EAddressingMode::ZeroPageX   };
+const OpCode ROR_Absolute    = { "ROR", 3, 6, EAddressingMode::Absolute    };
+const OpCode ROR_AbsoluteX   = { "ROR", 3, 7, EAddressingMode::AbsoluteX   };
 
 ///
 /// Jumps
 /// 
 
-constexpr OpCode JMP_Absolute = { 3, 3, EAddressingMode::Absolute };
-constexpr OpCode JMP_Indirect = { 3, 5, EAddressingMode::Indirect };
-constexpr OpCode JSR_Absolute = { 3, 6, EAddressingMode::Absolute };
-constexpr OpCode RTS_Implied  = { 1, 6, EAddressingMode::Implied  };
+const OpCode JMP_Absolute = { "JMP", 3, 3, EAddressingMode::Absolute };
+const OpCode JMP_Indirect = { "JMP", 3, 5, EAddressingMode::Indirect };
+const OpCode JSR_Absolute = { "JSR", 3, 6, EAddressingMode::Absolute };
+const OpCode RTS_Implied  = { "RTS", 1, 6, EAddressingMode::Implied  };
 
 ///                               
 /// Branches                      
 ///                               
 
-constexpr OpCode BCC_Relative = { 2, 2, EAddressingMode::Relative };
-constexpr OpCode BCS_Relative = { 2, 2, EAddressingMode::Relative };
-constexpr OpCode BEQ_Relative = { 2, 2, EAddressingMode::Relative };
-constexpr OpCode BMI_Relative = { 2, 2, EAddressingMode::Relative };
-constexpr OpCode BNE_Relative = { 2, 2, EAddressingMode::Relative };
-constexpr OpCode BPL_Relative = { 2, 2, EAddressingMode::Relative };
-constexpr OpCode BVC_Relative = { 2, 2, EAddressingMode::Relative };
-constexpr OpCode BVS_Relative = { 2, 2, EAddressingMode::Relative };
+const OpCode BCC_Relative = { "BCC", 2, 2, EAddressingMode::Relative };
+const OpCode BCS_Relative = { "BCS", 2, 2, EAddressingMode::Relative };
+const OpCode BEQ_Relative = { "BEQ", 2, 2, EAddressingMode::Relative };
+const OpCode BMI_Relative = { "BMI", 2, 2, EAddressingMode::Relative };
+const OpCode BNE_Relative = { "BNE", 2, 2, EAddressingMode::Relative };
+const OpCode BPL_Relative = { "BPL", 2, 2, EAddressingMode::Relative };
+const OpCode BVC_Relative = { "BVC", 2, 2, EAddressingMode::Relative };
+const OpCode BVS_Relative = { "BVS", 2, 2, EAddressingMode::Relative };
 
 ///
 /// Clear Status Flags
 /// 
 
-constexpr OpCode CLC_Implied = { 1, 2, EAddressingMode::Implied };
-constexpr OpCode CLD_Implied = { 1, 2, EAddressingMode::Implied };
-constexpr OpCode CLI_Implied = { 1, 2, EAddressingMode::Implied };
-constexpr OpCode CLV_Implied = { 1, 2, EAddressingMode::Implied };
+const OpCode CLC_Implied = { "CLC", 1, 2, EAddressingMode::Implied };
+const OpCode CLD_Implied = { "CLD", 1, 2, EAddressingMode::Implied };
+const OpCode CLI_Implied = { "CLI", 1, 2, EAddressingMode::Implied };
+const OpCode CLV_Implied = { "CLV", 1, 2, EAddressingMode::Implied };
 
 ///                              
 /// Set Status Flags             
 ///                              
 
-constexpr OpCode SEC_Implied = { 1, 2, EAddressingMode::Implied };
-constexpr OpCode SED_Implied = { 1, 2, EAddressingMode::Implied };
-constexpr OpCode SEI_Implied = { 1, 2, EAddressingMode::Implied };
+const OpCode SEC_Implied = { "SEC", 1, 2, EAddressingMode::Implied };
+const OpCode SED_Implied = { "SED", 1, 2, EAddressingMode::Implied };
+const OpCode SEI_Implied = { "SEI", 1, 2, EAddressingMode::Implied };
 
 ///                              
 /// System Functions             
 ///                              
 
-constexpr OpCode BRK_Implied = { 1, 7, EAddressingMode::Implied };
-constexpr OpCode NOP_Implied = { 1, 2, EAddressingMode::Implied };
-constexpr OpCode RTI_Implied = { 1, 6, EAddressingMode::Implied };
+const OpCode BRK_Implied = { "BRK", 1, 7, EAddressingMode::Implied };
+const OpCode NOP_Implied = { "NOP", 1, 2, EAddressingMode::Implied };
+const OpCode RTI_Implied = { "RTI", 1, 6, EAddressingMode::Implied };
 
 ///
 /// Illegal DCP
 /// 
 
-constexpr OpCode DCP_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
-constexpr OpCode DCP_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
-constexpr OpCode DCP_Absolute  = { 3, 6, EAddressingMode::Absolute  };
-constexpr OpCode DCP_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
-constexpr OpCode DCP_AbsoluteY = { 3, 7, EAddressingMode::AbsoluteY };
-constexpr OpCode DCP_IndirectX = { 2, 8, EAddressingMode::IndirectX };
-constexpr OpCode DCP_IndirectY = { 2, 8, EAddressingMode::IndirectY };
+const OpCode DCP_ZeroPage  = { "*DCP", 2, 5, EAddressingMode::ZeroPage  };
+const OpCode DCP_ZeroPageX = { "*DCP", 2, 6, EAddressingMode::ZeroPageX };
+const OpCode DCP_Absolute  = { "*DCP", 3, 6, EAddressingMode::Absolute  };
+const OpCode DCP_AbsoluteX = { "*DCP", 3, 7, EAddressingMode::AbsoluteX };
+const OpCode DCP_AbsoluteY = { "*DCP", 3, 7, EAddressingMode::AbsoluteY };
+const OpCode DCP_IndirectX = { "*DCP", 2, 8, EAddressingMode::IndirectX };
+const OpCode DCP_IndirectY = { "*DCP", 2, 8, EAddressingMode::IndirectY };
 
 ///
 /// Illegal ISB/ISC
 /// 
 
-constexpr OpCode ISB_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
-constexpr OpCode ISB_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
-constexpr OpCode ISB_Absolute  = { 3, 6, EAddressingMode::Absolute  };
-constexpr OpCode ISB_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
-constexpr OpCode ISB_AbsoluteY = { 3, 7, EAddressingMode::AbsoluteY };
-constexpr OpCode ISB_IndirectX = { 2, 8, EAddressingMode::IndirectX };
-constexpr OpCode ISB_IndirectY = { 2, 8, EAddressingMode::IndirectY };
+const OpCode ISB_ZeroPage  = { "*ISB", 2, 5, EAddressingMode::ZeroPage  };
+const OpCode ISB_ZeroPageX = { "*ISB", 2, 6, EAddressingMode::ZeroPageX };
+const OpCode ISB_Absolute  = { "*ISB", 3, 6, EAddressingMode::Absolute  };
+const OpCode ISB_AbsoluteX = { "*ISB", 3, 7, EAddressingMode::AbsoluteX };
+const OpCode ISB_AbsoluteY = { "*ISB", 3, 7, EAddressingMode::AbsoluteY };
+const OpCode ISB_IndirectX = { "*ISB", 2, 8, EAddressingMode::IndirectX };
+const OpCode ISB_IndirectY = { "*ISB", 2, 8, EAddressingMode::IndirectY };
 
 ///
 /// Illegal LAX
 ///
 
-constexpr OpCode LAX_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode LAX_ZeroPageY = { 2, 4, EAddressingMode::ZeroPageY };
-constexpr OpCode LAX_Absolute  = { 3, 4, EAddressingMode::Absolute  };
-constexpr OpCode LAX_AbsoluteY = { 3, 4, EAddressingMode::AbsoluteY };
-constexpr OpCode LAX_IndirectX = { 2, 6, EAddressingMode::IndirectX };
-constexpr OpCode LAX_IndirectY = { 2, 5, EAddressingMode::IndirectY };
+const OpCode LAX_ZeroPage  = { "*LAX", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode LAX_ZeroPageY = { "*LAX", 2, 4, EAddressingMode::ZeroPageY };
+const OpCode LAX_Absolute  = { "*LAX", 3, 4, EAddressingMode::Absolute  };
+const OpCode LAX_AbsoluteY = { "*LAX", 3, 4, EAddressingMode::AbsoluteY };
+const OpCode LAX_IndirectX = { "*LAX", 2, 6, EAddressingMode::IndirectX };
+const OpCode LAX_IndirectY = { "*LAX", 2, 5, EAddressingMode::IndirectY };
 
 ///
 /// Illegal RLA
 /// 
 
-constexpr OpCode RLA_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
-constexpr OpCode RLA_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
-constexpr OpCode RLA_Absolute  = { 3, 6, EAddressingMode::Absolute  };
-constexpr OpCode RLA_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
-constexpr OpCode RLA_AbsoluteY = { 3, 7, EAddressingMode::AbsoluteY };
-constexpr OpCode RLA_IndirectX = { 2, 8, EAddressingMode::IndirectX };
-constexpr OpCode RLA_IndirectY = { 2, 8, EAddressingMode::IndirectY };
+const OpCode RLA_ZeroPage  = { "*RLA", 2, 5, EAddressingMode::ZeroPage  };
+const OpCode RLA_ZeroPageX = { "*RLA", 2, 6, EAddressingMode::ZeroPageX };
+const OpCode RLA_Absolute  = { "*RLA", 3, 6, EAddressingMode::Absolute  };
+const OpCode RLA_AbsoluteX = { "*RLA", 3, 7, EAddressingMode::AbsoluteX };
+const OpCode RLA_AbsoluteY = { "*RLA", 3, 7, EAddressingMode::AbsoluteY };
+const OpCode RLA_IndirectX = { "*RLA", 2, 8, EAddressingMode::IndirectX };
+const OpCode RLA_IndirectY = { "*RLA", 2, 8, EAddressingMode::IndirectY };
 
 ///
 /// Illegal RRA
 /// 
 
-constexpr OpCode RRA_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
-constexpr OpCode RRA_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
-constexpr OpCode RRA_Absolute  = { 3, 6, EAddressingMode::Absolute  };
-constexpr OpCode RRA_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
-constexpr OpCode RRA_AbsoluteY = { 3, 7, EAddressingMode::AbsoluteY };
-constexpr OpCode RRA_IndirectX = { 2, 8, EAddressingMode::IndirectX };
-constexpr OpCode RRA_IndirectY = { 2, 8, EAddressingMode::IndirectY };
+const OpCode RRA_ZeroPage  = { "*RRA", 2, 5, EAddressingMode::ZeroPage  };
+const OpCode RRA_ZeroPageX = { "*RRA", 2, 6, EAddressingMode::ZeroPageX };
+const OpCode RRA_Absolute  = { "*RRA", 3, 6, EAddressingMode::Absolute  };
+const OpCode RRA_AbsoluteX = { "*RRA", 3, 7, EAddressingMode::AbsoluteX };
+const OpCode RRA_AbsoluteY = { "*RRA", 3, 7, EAddressingMode::AbsoluteY };
+const OpCode RRA_IndirectX = { "*RRA", 2, 8, EAddressingMode::IndirectX };
+const OpCode RRA_IndirectY = { "*RRA", 2, 8, EAddressingMode::IndirectY };
 
 ///
 /// Illegal SAX
 /// 
 
-constexpr OpCode SAX_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode SAX_ZeroPageY = { 2, 4, EAddressingMode::ZeroPageY };
-constexpr OpCode SAX_Absolute  = { 3, 4, EAddressingMode::Absolute  };
-constexpr OpCode SAX_IndirectX = { 2, 6, EAddressingMode::IndirectX };
+const OpCode SAX_ZeroPage  = { "*SAX", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode SAX_ZeroPageY = { "*SAX", 2, 4, EAddressingMode::ZeroPageY };
+const OpCode SAX_Absolute  = { "*SAX", 3, 4, EAddressingMode::Absolute  };
+const OpCode SAX_IndirectX = { "*SAX", 2, 6, EAddressingMode::IndirectX };
 
 ///
 /// Illegal SLO
 /// 
 
-constexpr OpCode SLO_ZeroPage  = { 2, 5, EAddressingMode::ZeroPage  };
-constexpr OpCode SLO_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
-constexpr OpCode SLO_Absolute  = { 3, 6, EAddressingMode::Absolute  };
-constexpr OpCode SLO_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
-constexpr OpCode SLO_AbsoluteY = { 3, 7, EAddressingMode::AbsoluteY };
-constexpr OpCode SLO_IndirectX = { 2, 8, EAddressingMode::IndirectX };
-constexpr OpCode SLO_IndirectY = { 2, 8, EAddressingMode::IndirectY };
+const OpCode SLO_ZeroPage  = { "*SLO", 2, 5, EAddressingMode::ZeroPage  };
+const OpCode SLO_ZeroPageX = { "*SLO", 2, 6, EAddressingMode::ZeroPageX };
+const OpCode SLO_Absolute  = { "*SLO", 3, 6, EAddressingMode::Absolute  };
+const OpCode SLO_AbsoluteX = { "*SLO", 3, 7, EAddressingMode::AbsoluteX };
+const OpCode SLO_AbsoluteY = { "*SLO", 3, 7, EAddressingMode::AbsoluteY };
+const OpCode SLO_IndirectX = { "*SLO", 2, 8, EAddressingMode::IndirectX };
+const OpCode SLO_IndirectY = { "*SLO", 2, 8, EAddressingMode::IndirectY };
 
 ///
 /// Illegal SRE
 /// 
 
-constexpr OpCode SRE_ZeroPage = { 2, 5, EAddressingMode::ZeroPage   };
-constexpr OpCode SRE_ZeroPageX = { 2, 6, EAddressingMode::ZeroPageX };
-constexpr OpCode SRE_Absolute = { 3, 6, EAddressingMode::Absolute   };
-constexpr OpCode SRE_AbsoluteX = { 3, 7, EAddressingMode::AbsoluteX };
-constexpr OpCode SRE_AbsoluteY = { 3, 7, EAddressingMode::AbsoluteY };
-constexpr OpCode SRE_IndirectX = { 2, 8, EAddressingMode::IndirectX };
-constexpr OpCode SRE_IndirectY = { 2, 8, EAddressingMode::IndirectY };
+const OpCode SRE_ZeroPage  = { "*SRE", 2, 5, EAddressingMode::ZeroPage  };
+const OpCode SRE_ZeroPageX = { "*SRE", 2, 6, EAddressingMode::ZeroPageX };
+const OpCode SRE_Absolute  = { "*SRE", 3, 6, EAddressingMode::Absolute  };
+const OpCode SRE_AbsoluteX = { "*SRE", 3, 7, EAddressingMode::AbsoluteX };
+const OpCode SRE_AbsoluteY = { "*SRE", 3, 7, EAddressingMode::AbsoluteY };
+const OpCode SRE_IndirectX = { "*SRE", 2, 8, EAddressingMode::IndirectX };
+const OpCode SRE_IndirectY = { "*SRE", 2, 8, EAddressingMode::IndirectY };
 
 ///
 /// Illegal NOP
 ///
 
-constexpr OpCode NOP_Immediate = { 2, 2, EAddressingMode::Immediate };
-constexpr OpCode NOP_ZeroPage  = { 2, 3, EAddressingMode::ZeroPage  };
-constexpr OpCode NOP_ZeroPageX = { 2, 4, EAddressingMode::ZeroPageX };
-constexpr OpCode NOP_Absolute  = { 3, 4, EAddressingMode::Absolute  };
-constexpr OpCode NOP_AbsoluteX = { 3, 4, EAddressingMode::AbsoluteX };
+const OpCode NOP_Immediate = { "*NOP", 2, 2, EAddressingMode::Immediate };
+const OpCode NOP_ZeroPage  = { "*NOP", 2, 3, EAddressingMode::ZeroPage  };
+const OpCode NOP_ZeroPageX = { "*NOP", 2, 4, EAddressingMode::ZeroPageX };
+const OpCode NOP_Absolute  = { "*NOP", 3, 4, EAddressingMode::Absolute  };
+const OpCode NOP_AbsoluteX = { "*NOP", 3, 4, EAddressingMode::AbsoluteX };
 
 ///
 /// Unimplemented opcodes
 ///
 
-constexpr OpCode OP_NotImplemented = { 0, 0, EAddressingMode::Implied };
+const OpCode OP_NotImplemented = { "???", 0, 0, EAddressingMode::Implied };

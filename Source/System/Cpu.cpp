@@ -54,7 +54,7 @@ void Cpu::Reset()
     m_Registers.SetFlag(ECpuFlag::InterruptDisable, true);
 
 // TEMP - Set to '1' to emulate standard NES reset behaviour. Set to '0' to run the nestest ROM in headless mode (we have no PPU so can't run it as a standard NES ROM).
-#if 1
+#if 0
     m_Registers.StackPointer -= 3;
 
     const uint8_t newLow = m_pDataBus->ReadData(0xFFFC);
@@ -81,7 +81,7 @@ void Cpu::IRQ()
     const uint8_t newLow = m_pDataBus->ReadData(0xFFEE);
     const uint8_t newHigh = m_pDataBus->ReadData(0xFFEF);
 
-    m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
+    m_Registers.ProgramCounter = Utils::MakeWord(newLow, newHigh);
 
     m_CycleCount += 7;
 }
@@ -98,7 +98,7 @@ void Cpu::NMI()
     const uint8_t newLow = m_pDataBus->ReadData(0xFFFA);
     const uint8_t newHigh = m_pDataBus->ReadData(0xFFFB);
 
-    m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
+    m_Registers.ProgramCounter = Utils::MakeWord(newLow, newHigh);
 }
 
 uint8_t Cpu::Tick()
@@ -750,7 +750,7 @@ uint8_t Cpu::RTS(const OpCode& InOpCode)
     const uint8_t lowbyte = PopStack();
     const uint8_t highbyte = PopStack();
 
-    const uint16_t returnAddress = Utils::MakeDword(lowbyte, highbyte);
+    const uint16_t returnAddress = Utils::MakeWord(lowbyte, highbyte);
 
     m_Registers.ProgramCounter = returnAddress + 1;
 
@@ -968,7 +968,7 @@ uint8_t Cpu::BRK(const OpCode& InOpCode)
     const uint8_t newLow = m_pDataBus->ReadData(0xFFFE);
     const uint8_t newHigh = m_pDataBus->ReadData(0xFFFF);
 
-    m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
+    m_Registers.ProgramCounter = Utils::MakeWord(newLow, newHigh);
 
     return InOpCode.CycleCount;
 }
@@ -1001,7 +1001,7 @@ uint8_t Cpu::RTI(const OpCode& InOpCode)
     const uint8_t lowbyte = PopStack();
     const uint8_t highbyte = PopStack();
 
-    m_Registers.ProgramCounter = Utils::MakeDword(lowbyte, highbyte);
+    m_Registers.ProgramCounter = Utils::MakeWord(lowbyte, highbyte);
 
     return InOpCode.CycleCount;
 }
@@ -1193,16 +1193,16 @@ uint16_t Cpu::GetAddressByAddressingMode(const EAddressingMode InAddressingMode,
             const uint8_t lowbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
             const uint8_t highbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 2);
 
-            const uint16_t address = Utils::MakeDword(lowbyte, highbyte);
+            const uint16_t address = Utils::MakeWord(lowbyte, highbyte);
 
             return address;
         }
         case EAddressingMode::AbsoluteX:
         {
-            const uint8_t lowbyte =m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
+            const uint8_t lowbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
             const uint8_t highbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 2);
 
-            const uint16_t baseAddress = Utils::MakeDword(lowbyte, highbyte);
+            const uint16_t baseAddress = Utils::MakeWord(lowbyte, highbyte);
             const uint16_t finalAddress = baseAddress + m_Registers.X;
 
             if (bOutDidCrossPageBoundry != nullptr)
@@ -1217,7 +1217,7 @@ uint16_t Cpu::GetAddressByAddressingMode(const EAddressingMode InAddressingMode,
             const uint8_t lowbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
             const uint8_t highbyte = m_pDataBus->ReadData(m_Registers.ProgramCounter + 2);
 
-            const uint16_t baseAddress = Utils::MakeDword(lowbyte, highbyte);
+            const uint16_t baseAddress = Utils::MakeWord(lowbyte, highbyte);
             const uint16_t finalAddress = baseAddress + m_Registers.Y;
 
             if (bOutDidCrossPageBoundry != nullptr)
@@ -1236,14 +1236,14 @@ uint16_t Cpu::GetAddressByAddressingMode(const EAddressingMode InAddressingMode,
             const uint8_t pointerLow = m_pDataBus->ReadData(m_Registers.ProgramCounter + 1);
             const uint8_t pointerHigh = m_pDataBus->ReadData(m_Registers.ProgramCounter + 2);
 
-            const uint16_t pointer = Utils::MakeDword(pointerLow, pointerHigh);
+            const uint16_t pointer = Utils::MakeWord(pointerLow, pointerHigh);
 
             const uint8_t lowbyte = m_pDataBus->ReadData(pointer);
 
             const uint16_t highbyteAddress = (pointer & 0xFF) == 0xFF ? (pointer & 0xFF00) : (pointer + 1);
             const uint8_t highbyte = m_pDataBus->ReadData(highbyteAddress);
 
-            const uint16_t address = Utils::MakeDword(lowbyte, highbyte);
+            const uint16_t address = Utils::MakeWord(lowbyte, highbyte);
 
             return address;
         }
@@ -1255,7 +1255,7 @@ uint16_t Cpu::GetAddressByAddressingMode(const EAddressingMode InAddressingMode,
             const uint8_t lowbyte = m_pDataBus->ReadData(effectiveZP);
             const uint8_t highbyte = m_pDataBus->ReadData((effectiveZP + 1) & 0xFF);
 
-            const uint16_t address = Utils::MakeDword(lowbyte, highbyte);
+            const uint16_t address = Utils::MakeWord(lowbyte, highbyte);
 
             return address;
         }
@@ -1266,7 +1266,7 @@ uint16_t Cpu::GetAddressByAddressingMode(const EAddressingMode InAddressingMode,
             const uint8_t lowbyte = m_pDataBus->ReadData(zpAddress);
             const uint8_t highbyte = m_pDataBus->ReadData((zpAddress + 1) & 0xFF);
 
-            const uint16_t baseAddress = Utils::MakeDword(lowbyte, highbyte);
+            const uint16_t baseAddress = Utils::MakeWord(lowbyte, highbyte);
             const uint16_t finalAddress = baseAddress + m_Registers.Y;
 
             if (bOutDidCrossPageBoundry != nullptr)

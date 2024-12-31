@@ -6,12 +6,12 @@
 enum class ECpuFlag : uint8_t
 {
     /**
-    * Set if the last operation caused an overflow from bit 7 of the result, or an underflow from bit 0.
+    * Set if the last operation either caused an overflow from bit 7 of the result or an underflow from bit 0.
     */
     Carry = 0,
 
     /**
-    * Set if the result of the last operation was 0.
+    * Set if the result of the last operation was 0 or cleared if the result was not 0.
     */
     Zero = 1,
 

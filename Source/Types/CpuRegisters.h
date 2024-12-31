@@ -55,4 +55,9 @@ struct CpuRegisters
      * Checks if the specified flag is set or not
      */
     bool IsFlagSet(const ECpuFlag InFlag) const;
+    
+    /**
+     * Returns the state of the registers as a string
+     */
+    std::string ToString() const;
 };
