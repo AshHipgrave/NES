@@ -158,10 +158,15 @@ uint8_t Bus::ReadData(const uint16_t InAddress) const
     {
         return m_pPPU->ReadData((InAddress & 0x0007));
     }
+    else if ((InAddress >= 0x4000 && InAddress <= 0x4013) || InAddress == 0x4015 || InAddress == 0x4017)
+    {
+        // TODO: APU hasn't been implemented.
+        return 0xFF;
+    }
     else if (InAddress >= 0x4016 && InAddress <= 0x4017)
     {
         // TODO: Controller hasn't been implemented.
-        return 0;
+        return 0xFF;
     }
     else if (InAddress >= 0x8000 && InAddress <= 0xFFFF)
     {

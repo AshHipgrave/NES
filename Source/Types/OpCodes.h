@@ -453,11 +453,17 @@ const OpCode SRE_IndirectY = { "*SRE", 2, 8, EAddressingMode::IndirectY };
 /// Illegal NOP
 ///
 
+const OpCode UNOP_Implied  = { "*NOP", 1, 2, EAddressingMode::Implied   };
 const OpCode NOP_Immediate = { "*NOP", 2, 2, EAddressingMode::Immediate };
 const OpCode NOP_ZeroPage  = { "*NOP", 2, 3, EAddressingMode::ZeroPage  };
 const OpCode NOP_ZeroPageX = { "*NOP", 2, 4, EAddressingMode::ZeroPageX };
 const OpCode NOP_Absolute  = { "*NOP", 3, 4, EAddressingMode::Absolute  };
 const OpCode NOP_AbsoluteX = { "*NOP", 3, 4, EAddressingMode::AbsoluteX };
+
+///
+/// Illegal SBC (aka 'USBC')
+/// 
+const OpCode USBC_Immediate = { "*SBC", 2, 2, EAddressingMode::Immediate };
 
 ///
 /// Unimplemented opcodes
