@@ -7,6 +7,7 @@ class Bus;
 struct OpCode;
 struct CpuRegisters;
 
+enum class EInterruptType : uint8_t;
 enum class EAddressingMode : uint8_t;
 
 class Cpu
@@ -23,16 +24,13 @@ public:
     void Reset();
 
     /**
-     * Handles a request to interrupt the CPU.
-     * The interrupt can be discarded if the CPU 'InterruptDisable' flag is set.
+     * Handles a CPU interrupt either from an IRQ ('Interrupt Request'), NMI ('Non-Maskable Interrupt') or BRK ('Break' instruction).
+     * NMI and BRK and non-maskable (aka the CPU will always stop what it's doing to process them).
+     * IRQ is only handled if the CPU 'InterruptDisable' flag is false.
+     * 
+     * Depending on which interrupt type is specified will depend on where the CPU jumps to next to handle the interrupt.
      */
-    void IRQ();
-
-    /**
-     * Handles a CPU interrupt request that cannot be masked out by the CPU 'InterruptDisable' flag.
-     * NMI interrupts can however be disabled whilst writing to an memory mapped I/O device.
-     */
-    void NMI();
+    void HandleInterrupt(const EInterruptType InInterruptType);
 
     /**
      * Executes a single CPU instruction.

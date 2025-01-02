@@ -162,6 +162,9 @@
     <ClCompile Include="Logging\Log.cpp">
       <Filter>Source Files\Logging</Filter>
     </ClCompile>
+    <ClCompile Include="Enums\InterruptType.cpp">
+      <Filter>Header Files\Enums</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Core.h">
@@ -262,6 +265,9 @@
     </ClInclude>
     <ClInclude Include="Logging\Log.h">
       <Filter>Header Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Enums\InterruptType.h">
+      <Filter>Header Files\Enums</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

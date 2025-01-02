@@ -6,6 +6,7 @@
 #include "Logging/Log.h"
 #include "Types/OpCodes.h"
 #include "Enums/CpuFlags.h"
+#include "Enums/InterruptType.h"
 #include "Types/CpuRegisters.h"
 
 Cpu::Cpu(Bus* InDataBus)
@@ -55,13 +56,13 @@ void Cpu::Reset()
     m_Registers.SetFlag(ECpuFlag::InterruptDisable, true);
 
 // TEMP - Set to '1' to emulate standard NES reset behaviour. Set to '0' to run the nestest ROM in headless mode (we have no PPU so can't run it as a standard NES ROM).
-#if 0
+#if 1
     m_Registers.StackPointer -= 3;
 
     const uint8_t newLow = m_pDataBus->ReadData(0xFFFC);
     const uint8_t newHigh = m_pDataBus->ReadData(0xFFFD);
 
-    m_Registers.ProgramCounter = Utils::MakeDword(newLow, newHigh);
+    m_Registers.ProgramCounter = Utils::MakeWord(newLow, newHigh);
 #else
     m_Registers.StackPointer = 0xFD;
     m_Registers.ProgramCounter = 0xC000;
@@ -70,8 +71,16 @@ void Cpu::Reset()
     m_CycleCount += 7;
 }
 
-void Cpu::IRQ()
+void Cpu::HandleInterrupt(const EInterruptType InInterruptType)
 {
+    const bool bAreInterruptsDisabled = m_Registers.IsFlagSet(ECpuFlag::InterruptDisable);
+
+    // NMI and BRK interrupts ignore the interrupt disable flag (only IRQ is affected by this flag)
+    if (bAreInterruptsDisabled == true && InInterruptType == EInterruptType::IRQ)
+    {
+        return;
+    }
+
     const uint8_t lowbyte = Utils::GetLowByte(m_Registers.ProgramCounter);
     const uint8_t highbyte = Utils::GetHighByte(m_Registers.ProgramCounter);
 
@@ -79,27 +88,22 @@ void Cpu::IRQ()
     PushStack(lowbyte);
     PushStack(m_Registers.GetFlags());
 
-    const uint8_t newLow = m_pDataBus->ReadData(0xFFEE);
-    const uint8_t newHigh = m_pDataBus->ReadData(0xFFEF);
+    m_Registers.SetFlag(ECpuFlag::InterruptDisable, true);
 
-    m_Registers.ProgramCounter = Utils::MakeWord(newLow, newHigh);
+    if (InInterruptType == EInterruptType::NMI)
+    {
+        const uint8_t newLow = m_pDataBus->ReadData(0xFFFA);
+        const uint8_t newHigh = m_pDataBus->ReadData(0xFFFB);
 
-    m_CycleCount += 7;
-}
+        m_Registers.ProgramCounter = Utils::MakeWord(newLow, newHigh);
+    }
+    else
+    {
+        const uint8_t newLow = m_pDataBus->ReadData(0xFFFE);
+        const uint8_t newHigh = m_pDataBus->ReadData(0xFFFF);
 
-void Cpu::NMI()
-{
-    const uint8_t lowbyte = Utils::GetLowByte(m_Registers.ProgramCounter);
-    const uint8_t highbyte = Utils::GetHighByte(m_Registers.ProgramCounter);
-
-    PushStack(highbyte);
-    PushStack(lowbyte);
-    PushStack(m_Registers.GetFlags());
-
-    const uint8_t newLow = m_pDataBus->ReadData(0xFFFA);
-    const uint8_t newHigh = m_pDataBus->ReadData(0xFFFB);
-
-    m_Registers.ProgramCounter = Utils::MakeWord(newLow, newHigh);
+        m_Registers.ProgramCounter = Utils::MakeWord(newLow, newHigh);
+    }
 }
 
 uint8_t Cpu::Tick()
@@ -952,23 +956,12 @@ uint8_t Cpu::BRK(const OpCode& InOpCode)
 {
     m_Registers.SetFlag(ECpuFlag::Break, true);
 
-    const uint8_t lowbyte = Utils::GetLowByte(m_Registers.ProgramCounter);
-    const uint8_t highbyte = Utils::GetHighByte(m_Registers.ProgramCounter);
+    m_Registers.ProgramCounter += InOpCode.Size;
 
-    PushStack(highbyte);
-    PushStack(lowbyte);
+    HandleInterrupt(EInterruptType::BRK);
 
-    std::bitset<8> flags = m_Registers.GetFlags();
-    flags.set(std::size_t(ECpuFlag::Break), true);
-
-    PushStack(static_cast<uint8_t>(flags.to_ulong()));
-
-    const uint8_t newLow = m_pDataBus->ReadData(0xFFFE);
-    const uint8_t newHigh = m_pDataBus->ReadData(0xFFFF);
-
-    m_Registers.ProgramCounter = Utils::MakeWord(newLow, newHigh);
-
-    return InOpCode.CycleCount;
+    // 'HandleInterrupt' will increment the cycle count, so we don't need to return anything here (otherwise we'll increment it too much).
+    return 0;
 }
 
 uint8_t Cpu::NOP(const OpCode& InOpCode)

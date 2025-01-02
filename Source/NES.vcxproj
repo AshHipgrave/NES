@@ -104,6 +104,7 @@
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="Core\Utils.cpp" />
+    <ClCompile Include="Enums\InterruptType.cpp" />
     <ClCompile Include="Logging\Log.cpp" />
     <ClCompile Include="System\Cpu.cpp" />
     <ClCompile Include="Emulator.cpp" />
@@ -138,6 +139,7 @@
   <ItemGroup>
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\Utils.h" />
+    <ClInclude Include="Enums\InterruptType.h" />
     <ClInclude Include="Logging\Log.h" />
     <ClInclude Include="System\Cpu.h" />
     <ClInclude Include="Emulator.h" />
