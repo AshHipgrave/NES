@@ -35,7 +35,7 @@ private:
     void ConfigureMirroring(const EMirrorMode InMirroringMode);
 
 private:
-    int16_t m_ScanLine;
+    uint8_t m_ScanLine;
     uint16_t m_CurrentCycle;
 
     uint8_t m_LastReadBuffer;

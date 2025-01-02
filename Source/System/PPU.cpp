@@ -42,7 +42,7 @@ PPU::~PPU()
 void PPU::Reset()
 {
     m_ScanLine = 0;
-    m_CurrentCycle = 21;
+    m_CurrentCycle = 0;
     m_LastReadBuffer = 0;
 
     m_Registers.Mask = 0;

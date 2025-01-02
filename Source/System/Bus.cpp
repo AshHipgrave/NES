@@ -6,6 +6,7 @@
 #include "Logging/Log.h"
 #include "System/Memory.h"
 #include "System/Cartridge.h"
+#include "Enums/InterruptType.h"
 
 Bus* Bus::g_pBus = nullptr;
 
@@ -37,41 +38,6 @@ Bus::~Bus()
 Bus* Bus::Get()
 {
     return g_pBus;
-}
-
-Cpu* Bus::GetCPU() const
-{
-    return m_pCpu;
-}
-
-PPU* Bus::GetPPU() const
-{
-    return m_pPPU;
-}
-
-Memory* Bus::GetMemory() const
-{
-    return m_pMemory;
-}
-
-Cartridge* Bus::GetCartridge() const
-{
-    return m_pCartridge;
-}
-
-bool Bus::GetIsSingleStepEnabled() const
-{
-    return m_bEnableSingleStepMode;
-}
-
-void Bus::SetSingleStepModeEnabled(const bool bInIsEnabled)
-{
-    m_bEnableSingleStepMode = bInIsEnabled;
-}
-
-void Bus::SetCanPerformSingleStep()
-{
-    m_bCanSingleStep = true;
 }
 
 void Bus::InitDevices()
@@ -111,7 +77,7 @@ bool Bus::HasCartridgeLoaded() const
 
 void Bus::NotifyVBlank()
 {
-    m_pCpu->NMI();
+    m_pCpu->HandleInterrupt(EInterruptType::NMI);
 }
 
 void Bus::NotifyFrameComplete()
@@ -176,4 +142,39 @@ uint8_t Bus::ReadData(const uint16_t InAddress) const
     {
         EMULATOR_LOG_FATAL("Segmentation fault! Attempting to read outside of bounds.");
     }
+}
+
+Cpu* Bus::GetCPU() const
+{
+    return m_pCpu;
+}
+
+PPU* Bus::GetPPU() const
+{
+    return m_pPPU;
+}
+
+Memory* Bus::GetMemory() const
+{
+    return m_pMemory;
+}
+
+Cartridge* Bus::GetCartridge() const
+{
+    return m_pCartridge;
+}
+
+bool Bus::GetIsSingleStepEnabled() const
+{
+    return m_bEnableSingleStepMode;
+}
+
+void Bus::SetSingleStepModeEnabled(const bool bInIsEnabled)
+{
+    m_bEnableSingleStepMode = bInIsEnabled;
+}
+
+void Bus::SetCanPerformSingleStep()
+{
+    m_bCanSingleStep = true;
 }
