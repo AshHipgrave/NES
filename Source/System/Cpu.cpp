@@ -18,7 +18,7 @@ Cpu::Cpu(Bus* InDataBus)
     m_Registers.Y = 0;
     m_Registers.Accumulator = 0;
 
-    m_Registers.Flags = 36; //36 = 00100100 in binary which sets all flags to 0 except the 'Unused' and 'Interrupt Disable' flags which default to 1 when the NES is powered on
+    m_Registers.ResetFlags();
 
     m_Registers.StackPointer = 0xFD;
     m_Registers.ProgramCounter = 0xFFFC;
@@ -53,18 +53,17 @@ Cpu::~Cpu()
 
 void Cpu::Reset()
 {
-    m_Registers.SetFlag(ECpuFlag::InterruptDisable, true);
+    m_Registers.ResetFlags();
+
+    m_Registers.StackPointer = 0xFD;
 
 // TEMP - Set to '1' to emulate standard NES reset behaviour. Set to '0' to run the nestest ROM in headless mode (we have no PPU so can't run it as a standard NES ROM).
 #if 1
-    m_Registers.StackPointer -= 3;
-
     const uint8_t newLow = m_pDataBus->ReadData(0xFFFC);
     const uint8_t newHigh = m_pDataBus->ReadData(0xFFFD);
 
     m_Registers.ProgramCounter = Utils::MakeWord(newLow, newHigh);
 #else
-    m_Registers.StackPointer = 0xFD;
     m_Registers.ProgramCounter = 0xC000;
 #endif
 

@@ -55,7 +55,13 @@ struct CpuRegisters
      * Checks if the specified flag is set or not
      */
     bool IsFlagSet(const ECpuFlag InFlag) const;
-    
+
+    /**
+     * Resets the flags to the default state they would be in when the NES resets or boots up.
+     * All flags will be set to 0 except 'Unused' and 'InterruptDisable' which will be set to 1.
+     */
+    void ResetFlags();
+
     /**
      * Returns the state of the registers as a string
      */

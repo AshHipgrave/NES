@@ -97,16 +97,23 @@ void Bus::WriteData(const uint8_t InData, const uint16_t InAddress)
     }
     else if ((InAddress >= 0x4000 && InAddress <= 0x4013) || InAddress == 0x4015 || InAddress == 0x4017)
     {
-        // TODO: APU hasn't been implemented.
+        EMULATOR_LOG_DEBUG("Attempting to write to APU registers. This has not been implemented yet!");
+    }
+    else if (InAddress == 0x4014)
+    {
+        EMULATOR_LOG_DEBUG("Attempting to write to DMA address. This has not been implemented yet!");
     }
     else if (InAddress >= 0x4016 && InAddress <= 0x4017)
     {
-        // TODO: Controller hasn't been implemented.
+        EMULATOR_LOG_DEBUG("Attempting to write to I/O registers. This has not been implemented yet!");
     }
-    else if (InAddress >= 0x8000 && InAddress <= 0xFFFF)
+    else if (InAddress >= 0x4018 && InAddress <= 0x401F)
     {
-        // TODO: Writing to cartridge memory is not yet supported. If we reach this we've likely loaded a ROM which relies on mappers (?)
-        EMULATOR_DEBUG_BREAK();
+        EMULATOR_LOG_WARN("Attempting to write into CPU Test Mode memory region (4018 - 401F). This is not allowed!");
+    }
+    else if (InAddress >= 0x6000 && InAddress <= 0xFFFF)
+    {
+        EMULATOR_LOG_DEBUG("Attempting to write into cartridge memory. This has not been implemented yet!");
     }
     else
     {
@@ -126,15 +133,29 @@ uint8_t Bus::ReadData(const uint16_t InAddress) const
     }
     else if ((InAddress >= 0x4000 && InAddress <= 0x4013) || InAddress == 0x4015 || InAddress == 0x4017)
     {
-        // TODO: APU hasn't been implemented.
+        EMULATOR_LOG_DEBUG("Attempting to read from APU registers. This has not been implemented yet!");
+
+        return 0xFF;
+    }
+    else if (InAddress == 0x4014)
+    {
+        EMULATOR_LOG_DEBUG("Attempting to read from DMA address. This has not been implemented yet!");
+
         return 0xFF;
     }
     else if (InAddress >= 0x4016 && InAddress <= 0x4017)
     {
-        // TODO: Controller hasn't been implemented.
+        EMULATOR_LOG_DEBUG("Attempting to read from I/O registers. This has not been implemented yet!");
+
         return 0xFF;
     }
-    else if (InAddress >= 0x8000 && InAddress <= 0xFFFF)
+    else if (InAddress >= 0x4018 && InAddress <= 0x401F)
+    {
+        EMULATOR_LOG_WARN("Attempting to read from CPU Test Mode memory region (4018 - 401F). This is not allowed!");
+
+        return 0xFF;
+    }
+    else if (InAddress >= 0x6000 && InAddress <= 0xFFFF)
     {
         return m_pCartridge->ReadProgramData(InAddress & 0x3FFF);
     }

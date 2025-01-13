@@ -64,29 +64,31 @@ void PPU::Tick()
     {
         m_ScanLine++;
 
-        if (m_ScanLine == 241)
+        if (m_ScanLine >= 241)
         {
             m_Registers.SetFlag(m_Registers.Status, EPPUStatusFlag::VBlank, true);
 
-            if (m_Registers.IsFlagSet(m_Registers.Control, EPPUControlFlags::VBlankNMIEnable))
+            const bool bIsNMIEnabled = m_Registers.IsFlagSet(m_Registers.Control, EPPUControlFlags::VBlankNMIEnable);
+
+            if (m_ScanLine == 241 && bIsNMIEnabled)
             {
                 m_pDataBus->NotifyVBlank();
             }
-        }
-        else if (m_ScanLine == 261)
-        {
-            // TODO: Shift registers
-        }
-        else if (m_ScanLine == 262)
-        {
-            // TODO: Handle scrolling
+            else if (m_ScanLine == 261)
+            {
+                // TODO: Shift registers
+            }
+            else if (m_ScanLine == 262) // Dummy scanline (also known as scanline -1 in some emulators).
+            {
+                // TODO: Handle scrolling
 
-            m_ScanLine = 0;
-            m_CurrentCycle = 0;
+                m_ScanLine = 0;
+                m_CurrentCycle = 0;
 
-            m_Registers.SetFlag(m_Registers.Status, EPPUStatusFlag::VBlank, false);
+                m_Registers.SetFlag(m_Registers.Status, EPPUStatusFlag::VBlank, false);
 
-            m_pDataBus->NotifyFrameComplete();
+                m_pDataBus->NotifyFrameComplete();
+            }
         }
     }
 }

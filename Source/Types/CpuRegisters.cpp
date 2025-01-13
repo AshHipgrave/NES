@@ -18,6 +18,12 @@ bool CpuRegisters::IsFlagSet(const ECpuFlag InFlag) const
     return Flags.test(std::size_t(InFlag));
 }
 
+void CpuRegisters::ResetFlags()
+{
+    // 0x24 = 00100100 in binary which sets all flags to 0 except the 'Unused' and 'Interrupt Disable' flags.
+    Flags = 0x24; 
+}
+
 std::string CpuRegisters::ToString() const
 {
     const std::string x = std::format("{:02X}", X);
